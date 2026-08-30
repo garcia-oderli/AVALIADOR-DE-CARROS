@@ -7,18 +7,30 @@ máximo que ainda faz sentido pagar.
 **Stack:** HTML/CSS/JS puro, sem build e sem dependências. Todo o app está em
 `index.html`.
 
-## Como se usa — três etapas
+## Como se usa — quatro abas
 
-| Etapa | O que faz |
+| Aba | O que faz |
 |---|---|
-| **1 · Perfil** | Parâmetros de uso, seu carro na troca e a forma de pagamento. Define uma vez, vale para todo anúncio. |
-| **2 · FIPE ao vivo** | Escolhe marca, modelo e ano. Puxa o valor da FIPE do mês **e monta a ficha técnica sozinha** — motor, câmbio, sincronismo e consumo. |
-| **3 · Análise** | Preço, km e checkboxes do anúncio; sai o score, o teto de negociação e o comparativo. |
+| **Perfil** | Parâmetros de uso: km/ano, combustível, IPVA, orçamento, horizonte, score mínimo. Define uma vez. |
+| **Pagamento** | Seu carro na troca e a forma de pagamento — entrada, prazo, juros, parcela máxima. |
+| **Anúncio** | Escolhe o carro na FIPE (que **monta a ficha técnica sozinha**) e preenche preço e km. |
+| **Resultado** | Score, teto de negociação, composição do custo e o comparativo de anúncios salvos. |
 
-As três etapas são recolhíveis e trazem resumo no cabeçalho. Perfil começa
-recolhido; escolher o ano na etapa 2 recolhe ela e leva a tela para a análise.
+Uma aba por vez, com uma barra de contexto embaixo que mostra o carro escolhido e
+os parâmetros ativos em qualquer aba. Primeira visita abre no Perfil; depois, no
+Anúncio. Avaliar leva direto para o Resultado.
+
 Marca e modelo são campos de busca — filtram por termo, ignoram acento
 (`citroen` acha `Citroën`) e aceitam vários termos (`virtus tsi`).
+
+### Os dois números da negociação
+
+São coisas diferentes e confundi-las custa dinheiro:
+
+- **Folga até o seu teto** — quanto ainda caberia pagar sem furar seu critério.
+  Não é margem de negociação.
+- **Negociação vs alvo** — a distância até o preço que você deve mirar. É esse
+  que se leva para a mesa.
 
 ## Meu carro na troca
 
@@ -113,7 +125,7 @@ anúncio e os parâmetros usados. Controles e navegação saem da página impres
 
 ## Publicando uma versão nova
 
-1. Suba `CACHE` em `sw.js` (`avaliador-v7` → `avaliador-v8`)
+1. Suba `CACHE` em `sw.js` (`avaliador-v8` → `avaliador-v9`)
 2. Atualize o badge de versão no `index.html`
 3. Publique
 
