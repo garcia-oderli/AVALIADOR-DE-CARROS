@@ -11,9 +11,34 @@ máximo que ainda faz sentido pagar.
 
 | Etapa | O que faz |
 |---|---|
-| **1 · Perfil** | Seus parâmetros de uso: km/ano, combustível, IPVA, orçamento, horizonte, score mínimo. Vale para todo anúncio, define uma vez. |
+| **1 · Perfil** | Parâmetros de uso, seu carro na troca e a forma de pagamento. Define uma vez, vale para todo anúncio. |
 | **2 · FIPE ao vivo** | Escolhe marca, modelo e ano. Puxa o valor da FIPE do mês **e monta a ficha técnica sozinha** — motor, câmbio, sincronismo e consumo. |
 | **3 · Análise** | Preço, km e checkboxes do anúncio; sai o score, o teto de negociação e o comparativo. |
+
+As três etapas são recolhíveis e trazem resumo no cabeçalho. Perfil começa
+recolhido; escolher o ano na etapa 2 recolhe ela e leva a tela para a análise.
+Marca e modelo são campos de busca — filtram por termo, ignoram acento
+(`citroen` acha `Citroën`) e aceitam vários termos (`virtus tsi`).
+
+## Meu carro na troca
+
+Consulta o seu carro na mesma FIPE ao vivo e compara com o que a loja está
+oferecendo. **Dar o carro na troca não barateia o negócio** — você entrega um bem
+no valor dele. O que custa é o deságio: a loja dá desconto no carro novo e retoma
+no seu. Esse valor entra no custo total e vira alerta acima de 8% da FIPE.
+
+## Financiamento
+
+Tabela Price: entrada em dinheiro, carro na troca, prazo, juros ao mês e parcela
+máxima. Sai parcela, valor financiado, juros totais e o caixa que você precisa ter
+no ato.
+
+Os juros pagos **dentro do horizonte** entram no custo total — o prazo do contrato
+quase nunca coincide com o horizonte de posse, então o cálculo amortiza mês a mês
+e considera o saldo devedor no fim.
+
+Com prazo 0 o app trata como compra à vista e o teto sai do orçamento. Financiando,
+o teto passa a sair da parcela máxima.
 
 ## Ficha técnica automática
 
@@ -88,7 +113,7 @@ anúncio e os parâmetros usados. Controles e navegação saem da página impres
 
 ## Publicando uma versão nova
 
-1. Suba `CACHE` em `sw.js` (`avaliador-v5` → `avaliador-v6`)
+1. Suba `CACHE` em `sw.js` (`avaliador-v6` → `avaliador-v7`)
 2. Atualize o badge de versão no `index.html`
 3. Publique
 
