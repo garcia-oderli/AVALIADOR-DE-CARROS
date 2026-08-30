@@ -1,0 +1,16 @@
+{
+  "name": "Avaliador de Carro Usado — RitmoProd",
+  "short_name": "Avaliador",
+  "description": "Avaliação de anúncios de carro usado com FIPE ao vivo, custo total e teto de negociação",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
