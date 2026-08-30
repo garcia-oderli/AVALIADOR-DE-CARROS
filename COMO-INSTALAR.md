@@ -31,6 +31,9 @@ A URL sai como `https://garcia-oderli.github.io/<repo>/`.
 
 - Abre em tela cheia, sem barra de navegador
 - Parâmetros e anúncios salvos ficam no aparelho (localStorage)
+- A tela é dividida em três etapas: **1 Perfil**, **2 FIPE ao vivo**, **3 Análise**
+- Escolher marca/modelo/ano na etapa 2 preenche sozinho a ficha técnica do anúncio
+  (motor, câmbio, sincronismo e consumo) — sem lista manual
 - Funciona offline, **exceto** a consulta FIPE, que precisa de internet
 - Sem internet: o campo FIPE continua editável, você digita e a conta roda igual
 - **Imprimir / salvar PDF** no resultado gera uma folha limpa da avaliação;
@@ -45,7 +48,7 @@ o cache assume e o app abre igual.
 Ainda assim, ao publicar suba a linha 2 do `sw.js` — é o que renova ícones e
 manifesto, que continuam vindo do cache:
 
-    const CACHE = 'avaliador-v5';
+    const CACHE = 'avaliador-v6';
 
 ## Fonte da FIPE
 

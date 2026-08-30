@@ -55,7 +55,7 @@ input:focus,select:focus{border-color:var(--acc)}
 table{width:100%;border-collapse:collapse;font-family:var(--font-b);font-size:13px;color:var(--txt)}
 th{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:2px;text-transform:uppercase;padding:8px 10px;border-bottom:0.5px solid var(--border);text-align:left;white-space:nowrap}
 td{padding:10px;border-bottom:0.5px solid var(--border);font-family:var(--font-d);font-size:13px}
-td.nm{font-family:var(--font-b)}
+td.nm{font-family:var(--font-b);white-space:normal;min-width:190px}
 tr:hover td{background:var(--elevated)}
 .num{text-align:right;white-space:nowrap}
 .scorebox{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-bottom:14px;border-bottom:0.5px solid var(--border);margin-bottom:14px}
@@ -68,6 +68,16 @@ tr:hover td{background:var(--elevated)}
 .wrap{overflow-x:auto}
 footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5px solid var(--border);background:var(--bg)}
 .hint{font-family:var(--font-d);font-size:10px;color:var(--txt3);margin-top:5px;letter-spacing:.5px}
+.etapa{margin-bottom:28px}
+.etapa-cab{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid var(--border)}
+.etapa-n{display:flex;align-items:center;justify-content:center;width:30px;height:30px;flex-shrink:0;border-radius:6px;background:var(--acc);color:#111;font-family:var(--font-h);font-size:19px;font-weight:700;line-height:1}
+.etapa-t{font-family:var(--font-h);font-size:21px;font-weight:700;letter-spacing:.5px;line-height:1.1;color:var(--txt)}
+.etapa-s{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+.ficha{background:var(--elevated);border:0.5px solid var(--border);border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.65}
+.ficha .l1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ficha .mt{font-family:var(--font-d);font-size:13px;color:var(--txt);letter-spacing:.5px}
+.ficha .obs{color:var(--txt2);font-size:12px;line-height:1.6}
+.ficha .alerta{color:var(--warn)} .ficha .grave{color:var(--red)}
 
 /* ---------- impressão / PDF ---------- */
 .print-only{display:none}
@@ -75,7 +85,8 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   @page{margin:14mm}
   :root{--bg:#fff;--surface:#fff;--elevated:#fff;--border:#999;--txt:#111;--txt2:#444;--txt3:#666}
   body{background:#fff;color:#111;font-size:10.5pt}
-  header,footer,.no-print{display:none!important}
+  header,footer,.no-print,.etapa-cab{display:none!important}
+  .etapa{margin:0}
   main{padding:0;margin:0;max-width:none}
   .card{background:#fff;border:none;padding:0;margin:0 0 16px;break-inside:avoid}
   .print-only{display:block}
@@ -114,10 +125,16 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <text x="77" y="65" font-family="'IBM Plex Mono','Courier New',monospace" font-size="8" fill="#888888" letter-spacing="3">ANÁLISE · PRODUÇÃO · RITMO</text>
   <rect width="319" height="79" fill="none" stroke="#2A2A2A" stroke-width="0.5" rx="6"/>
 </svg>
-<span class="badge badge-acc">Avaliador v4 · FIPE ao vivo</span>
+<span class="badge badge-acc">Avaliador v5 · ficha automática</span>
 </header>
 
 <main>
+
+<section class="etapa">
+<div class="etapa-cab"><span class="etapa-n">1</span><div>
+  <div class="etapa-t">Perfil</div>
+  <div class="etapa-s">como você usa o carro — vale para todo anúncio</div>
+</div></div>
 
 <div class="card">
   <div class="section-label">Perfil de uso — seus parâmetros</div>
@@ -135,6 +152,14 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   </div>
 </div>
 
+</section>
+
+<section class="etapa">
+<div class="etapa-cab"><span class="etapa-n">2</span><div>
+  <div class="etapa-t">FIPE ao vivo</div>
+  <div class="etapa-s">escolha o carro — puxa o valor e monta a ficha técnica</div>
+</div></div>
+
 <div class="card">
   <div class="section-label">FIPE ao vivo <span id="fipeRef" class="badge badge-acc" style="margin-left:6px">—</span></div>
   <div class="grid g3">
@@ -142,14 +167,23 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <div><label>Modelo / versão</label><select id="qModelo"><option value="">selecione a marca</option></select></div>
     <div><label>Ano</label><select id="qAno"><option value="">selecione o modelo</option></select></div>
   </div>
-  <div class="muted" id="fipeStatus" style="margin-top:10px">Selecione marca, modelo e ano para puxar o valor direto da FIPE do mês. O campo FIPE abaixo continua editável se preferir digitar.</div>
+  <div class="muted" id="fipeStatus" style="margin-top:10px">Selecione marca, modelo e ano. Além do valor da FIPE, isso preenche sozinho a ficha técnica do anúncio abaixo — motor, câmbio, sincronismo e consumo.</div>
   <div class="row-btn no-print"><button class="btn-ghost" onclick="carregarMarcas()">Recarregar marcas</button></div>
 </div>
+
+</section>
+
+<section class="etapa">
+<div class="etapa-cab"><span class="etapa-n">3</span><div>
+  <div class="etapa-t">Análise</div>
+  <div class="etapa-s">o anúncio, o veredito e a comparação</div>
+</div></div>
 
 <div class="card">
   <div class="section-label">Anúncio a avaliar</div>
   <div class="grid g3">
-    <div style="grid-column:1/-1"><label>Modelo (carrega dados técnicos)</label><select id="fModelo"></select></div>
+    <div style="grid-column:1/-1"><label>Ficha técnica</label><select id="fModelo"></select><div class="hint">a seleção da FIPE acima preenche sozinha — use esta lista só para sobrepor à mão</div></div>
+    <div style="grid-column:1/-1" id="fichaStatus" class="ficha" hidden></div>
     <div><label>Apelido do anúncio</label><input id="fNome" placeholder="ex: Virtus loja Souza"></div>
     <div><label>Ano do modelo</label><input type="number" id="fAno" value="2019"></div>
     <div><label>Km atual</label><input type="number" id="fKm" value="70000"></div>
@@ -160,6 +194,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
       <option value="seca">Correia seca (externa)</option>
       <option value="banhada">Correia banhada a óleo</option>
       <option value="corrente">Corrente</option>
+      <option value="?">Não identificado — confirmar</option>
     </select></div>
     <div><label>Intervalo troca (km)</label><input type="number" id="fCorreiaKm" value="120000"></div>
     <div><label>Custo da troca R$</label><input type="number" id="fCorreiaCusto" value="1200"></div>
@@ -230,6 +265,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <button class="btn-ghost" onclick="limpar()">Limpar lista</button>
   </div>
 </div>
+</section>
 
 </main>
 
@@ -240,26 +276,195 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
 </footer>
 
 <script>
-// ---------- biblioteca de modelos ----------
-// fipe: valores de referência ago/2026 (verificados). Sempre reconfirme na FIPE do mês.
+// ---------- biblioteca de modelos (sobreposição manual) ----------
+// Sem preço aqui de propósito: a FIPE do mês é a única fonte de valor. Uma tabela
+// de preço embutida no código envelhece em silêncio e briga com a consulta ao vivo.
 var MODELOS = [
-  {id:'custom', nome:'— Outro / preencher manualmente —'},
-  {id:'onixplus_tb', nome:'Chevrolet Onix Plus 1.0 Turbo (Aut.)', cons:14.5, correia:'banhada', correiaKm:240000, correiaCusto:3600, cambio:'AT', complex:1.25, fipe:{2020:61889,2021:67321}},
-  {id:'onix_tb', nome:'Chevrolet Onix Hatch 1.0 Turbo (Aut.)', cons:14.0, correia:'banhada', correiaKm:240000, correiaCusto:3600, cambio:'AT', complex:1.25, fipe:{}},
-  {id:'virtus_16', nome:'VW Virtus 1.6 MSI (Aut.)', cons:12.5, correia:'seca', correiaKm:120000, correiaCusto:1200, cambio:'AT', complex:1.00, fipe:{2019:69644,2020:74000}},
-  {id:'virtus_tsi', nome:'VW Virtus 200 TSI 1.0 (Aut.)', cons:14.0, correia:'seca', correiaKm:120000, correiaCusto:1400, cambio:'AT', complex:1.20, fipe:{}},
-  {id:'polo_16', nome:'VW Polo 1.6 MSI (Aut.)', cons:12.8, correia:'seca', correiaKm:120000, correiaCusto:1200, cambio:'AT', complex:1.00, fipe:{}},
-  {id:'etios_sd', nome:'Toyota Etios Sedan 1.5 (Aut.)', cons:13.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:0.85, fipe:{}},
-  {id:'yaris_sd', nome:'Toyota Yaris Sedan 1.5 (CVT)', cons:13.5, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:0.90, fipe:{}},
-  {id:'hb20s_16', nome:'Hyundai HB20S 1.6 (Aut.)', cons:12.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:1.00, fipe:{}},
-  {id:'versa_16', nome:'Nissan Versa 1.6 (CVT)', cons:13.5, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.10, fipe:{}},
-  {id:'sentra_20', nome:'Nissan Sentra 2.0 (CVT)', cons:11.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.15, fipe:{}},
-  {id:'cronos_13', nome:'Fiat Cronos 1.3 (CVT)', cons:13.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.05, fipe:{}},
-  {id:'prisma_14', nome:'Chevrolet Prisma 1.4 (Aut.)', cons:12.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:0.95, fipe:{}}
+  {id:'custom', nome:'— Preencher manualmente / detectado pela FIPE —'},
+  {id:'onixplus_tb', nome:'Chevrolet Onix Plus 1.0 Turbo (Aut.)', cons:14.5, correia:'banhada', correiaKm:240000, correiaCusto:3600, cambio:'AT', complex:1.25},
+  {id:'onix_tb', nome:'Chevrolet Onix Hatch 1.0 Turbo (Aut.)', cons:14.0, correia:'banhada', correiaKm:240000, correiaCusto:3600, cambio:'AT', complex:1.25},
+  {id:'virtus_16', nome:'VW Virtus 1.6 MSI (Aut.)', cons:12.5, correia:'seca', correiaKm:120000, correiaCusto:1200, cambio:'AT', complex:1.00},
+  {id:'virtus_tsi', nome:'VW Virtus 200 TSI 1.0 (Aut.)', cons:14.0, correia:'seca', correiaKm:120000, correiaCusto:1400, cambio:'AT', complex:1.20},
+  {id:'polo_16', nome:'VW Polo 1.6 MSI (Aut.)', cons:12.8, correia:'seca', correiaKm:120000, correiaCusto:1200, cambio:'AT', complex:1.00},
+  {id:'etios_sd', nome:'Toyota Etios Sedan 1.5 (Aut.)', cons:13.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:0.85},
+  {id:'yaris_sd', nome:'Toyota Yaris Sedan 1.5 (CVT)', cons:13.5, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:0.90},
+  {id:'hb20s_16', nome:'Hyundai HB20S 1.6 (Aut.)', cons:12.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:1.00},
+  {id:'versa_16', nome:'Nissan Versa 1.6 (CVT)', cons:13.5, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.10},
+  {id:'sentra_20', nome:'Nissan Sentra 2.0 (CVT)', cons:11.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.15},
+  {id:'cronos_13', nome:'Fiat Cronos 1.3 (CVT)', cons:13.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.05},
+  {id:'prisma_14', nome:'Chevrolet Prisma 1.4 (Aut.)', cons:12.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:0.95}
 ];
+
+// ---------- ficha técnica automática a partir do nome da FIPE ----------
+// A FIPE devolve algo como "VIRTUS 1.6 MSI Flex 16V 4p Aut.". Dali dá para tirar
+// cilindrada, aspiração e câmbio com segurança. O que o nome NUNCA diz é o
+// sincronismo — e é justamente ele que separa R$ 0 de R$ 3.600 no ato da compra.
+// Por isso sincronismo só sai do catálogo abaixo, de famílias identificadas.
+// O que não casa fica marcado como NÃO IDENTIFICADO em vez de receber um chute:
+// preencher "corrente" por omissão esconderia exatamente o risco que o app existe
+// para achar. A ordem importa — a primeira família que casar vence.
+var FAMILIAS = [
+  // Volkswagen — linha EA211 (1.0 MPI, 1.0/1.4 TSI, 1.6 MSI) usa correia dentada seca
+  {m:/volks|^vw\b/i, re:/\b2\.0\b[\s\S]*\bTSI\b/i,                sinc:'corrente', cons:9.5, cx:1.30, ref:'VW EA888 2.0 TSI'},
+  {m:/volks|^vw\b/i, re:/\bTSI\b/i,                                  sinc:'seca', km:120000, cst:1400, cx:1.20, ref:'VW EA211 turbo'},
+  {m:/volks|^vw\b/i, re:/\b(MSI|MPI)\b/i,                            sinc:'seca', km:120000, cst:1200, cx:1.00, ref:'VW EA211 aspirado'},
+
+  // Chevrolet — o 1.0/1.2 turbo (Onix 2020+, Onix Plus, Tracker) tem correia em banho de óleo
+  {m:/chevrolet|^gm\b/i, re:/\b1\.[02]\b[\s\S]*\b(TURBO|TB)\b/i,   sinc:'banhada', km:240000, cst:3600, cx:1.25, ref:'GM 1.0/1.2 turbo — correia em banho de óleo'},
+  {m:/chevrolet|^gm\b/i, re:/\b(ONIX|PRISMA|COBALT|SPIN|JOY|MONTANA)\b/i, sinc:'corrente', cx:0.95, ref:'GM SPE/4 aspirado'},
+
+  // Ford — o 1.0 EcoBoost também é correia em banho de óleo
+  {m:/ford/i, re:/\bECOBOOST\b|\b1\.0\b[\s\S]*\bTURBO\b/i,        sinc:'banhada', km:240000, cst:3600, cx:1.25, ref:'Ford 1.0 EcoBoost — correia em banho de óleo'},
+  {m:/ford/i, re:/\b(KA|FIESTA|ECOSPORT|FOCUS)\b/i,                   sinc:'seca', km:120000, cst:1300, cx:1.00, ref:'Ford Sigma/Rocam'},
+
+  // PSA / Stellantis — o 1.2 PureTech é o caso mais conhecido de correia em óleo
+  {m:/peugeot|citro/i, re:/\bPURETECH\b|\b1\.2\b/i,                  sinc:'banhada', km:180000, cst:3200, cx:1.25, ref:'PSA 1.2 PureTech — correia em banho de óleo'},
+  {m:/peugeot|citro/i, re:/\bTHP\b/i,                                 sinc:'corrente', cx:1.30, ref:'PSA 1.6 THP'},
+
+  // Fiat — os turbo da família GSE eu não confirmo, então não afirmo
+  {m:/fiat|jeep|ram/i, re:/\bTURBO\b|\bT\d{3}\b|\bGSE\b/i,          sinc:null, cx:1.25, ref:'Fiat/Jeep turbo — sincronismo não confirmado'},
+  {m:/fiat/i, re:/\bFIREFLY\b/i,                                      sinc:'seca', km:100000, cst:1300, cx:0.95, ref:'Fiat Firefly'},
+  {m:/fiat|jeep/i, re:/\bE\.?TORQ\b|\b1\.[68]\b/i,                   sinc:'seca', km:120000, cst:1400, cx:1.05, ref:'Fiat E.torQ'},
+  {m:/fiat/i, re:/\bFIRE\b|\b1\.[04]\b/i,                            sinc:'seca', km:100000, cst:1100, cx:0.90, ref:'Fiat Fire'},
+
+  // Japoneses e coreanos de linha: corrente de comando em toda a gama vendida aqui
+  {m:/toyota/i,  re:/./, sinc:'corrente', cx:0.88, ref:'Toyota — corrente'},
+  {m:/honda/i,   re:/./, sinc:'corrente', cx:0.92, ref:'Honda — corrente'},
+  {m:/hyundai/i, re:/./, sinc:'corrente', cx:1.00, ref:'Hyundai Gamma/Kappa — corrente'},
+  {m:/kia/i,     re:/./, sinc:'corrente', cx:1.05, ref:'Kia Gamma/Kappa — corrente'},
+  {m:/nissan/i,  re:/./, sinc:'corrente', cx:1.10, ref:'Nissan HR/MR — corrente'},
+  {m:/renault/i, re:/./, sinc:'corrente', cx:1.05, ref:'Renault SCe/TCe — corrente'}
+];
+
+var CAMBIO_TXT={AT:'automático (conversor)',CVT:'CVT',DCT:'dupla embreagem',MEC:'manual'};
+
+// Lê o que dá para ler do nome: cilindrada, aspiração, câmbio e combustível.
+function lerNomeFipe(marca,modelo,combustivel){
+  var t=(String(marca||'')+' '+String(modelo||'')).toUpperCase();
+  var mc=t.match(/\b(\d)[.,](\d)\b/);
+  var cil=mc?parseFloat(mc[1]+'.'+mc[2]):0;
+  var turbo=/\b(TSI|TFSI|TB|TURBO|T\d{3}|ECOBOOST|TGDI|THP|DIG-T|PURETECH|MULTIJET|CRDI|BLUEHDI|TDI)\b/.test(t);
+  var cambio;
+  // A ordem separa CVT e dupla embreagem do "Aut." genérico — os três têm risco bem diferente.
+  if(/\b(CVT|X.?TRONIC|LINEARTRONIC|MULTIDRIVE)\b/.test(t)) cambio='CVT';
+  else if(/\b(DSG|DCT|DUALOGIC|EDC|POWERSHIFT|TCT|PDK)\b|AUTOMATIZAD/.test(t)) cambio='DCT';
+  else if(/\bAUT\b|\bAUTOM/.test(t)) cambio='AT';
+  else cambio='MEC';
+  var diesel=/DIESEL/i.test(String(combustivel||''))||/\b(MULTIJET|CRDI|BLUEHDI|TDI|CRD)\b/.test(t);
+  if(diesel) turbo=true; // diesel de passeio vendido aqui é turbo sem exceção prática
+  // Elétrico não tem km/L: o app inteiro custeia combustível, então avisa em vez de inventar.
+  var eletrico=/EL[ÉE]TRIC|100%\s*EL|\bBEV\b|\bEV\b/.test(t)||/EL[ÉE]TRIC/i.test(String(combustivel||''));
+  return {cil:cil,turbo:turbo,cambio:cambio,diesel:diesel,eletrico:eletrico,txt:t};
+}
+
+// Consumo de estrada estimado por cilindrada e aspiração. É chute educado, e a
+// interface diz isso — o número real do anúncio sempre ganha.
+function consumoEstimado(p){
+  // Diesel roda mais por litro, mas quem monta 2.4+ aqui é picape pesada.
+  if(p.diesel) return p.cil>=2.5?11.5:13.0;
+  var base;
+  if(!p.cil) base=12.0;
+  else if(p.cil<=1.0) base=13.5;
+  else if(p.cil<=1.3) base=13.0;
+  else if(p.cil<=1.4) base=12.5;
+  else if(p.cil<=1.6) base=12.3;
+  else if(p.cil<=1.8) base=11.8;
+  else if(p.cil<=2.0) base=11.0;
+  else base=9.0;
+  if(p.turbo) base+=(p.cil&&p.cil<=1.3)?0.7:-0.8; // turbo pequeno rende mais; turbo grande, menos
+  if(p.cambio==='CVT') base+=0.3;
+  if(p.cambio==='MEC') base+=0.4;
+  return Math.round(base*10)/10;
+}
+
+function complexEstimado(p){
+  if(p.diesel) return 1.30;
+  if(p.turbo) return 1.22;
+  if(!p.cil||p.cil<=1.4) return 0.95;
+  if(p.cil<=1.6) return 1.00;
+  return 1.10;
+}
+
+function inferirFicha(marca,modelo,combustivel){
+  var p=lerNomeFipe(marca,modelo,combustivel), fam=null;
+  for(var i=0;i<FAMILIAS.length;i++){
+    if(FAMILIAS[i].m.test(String(marca||''))&&FAMILIAS[i].re.test(p.txt)){ fam=FAMILIAS[i]; break; }
+  }
+  return {
+    cons: (fam&&fam.cons)||consumoEstimado(p),
+    cambio: p.cambio,
+    complex: (fam&&fam.cx)||complexEstimado(p),
+    sinc: fam?fam.sinc:null,
+    sincKm: (fam&&fam.km)||0,
+    sincCusto: (fam&&fam.cst)||0,
+    ref: fam?fam.ref:null,
+    casou: !!fam,
+    eletrico: p.eletrico,
+    motor: p.eletrico ? 'elétrico'
+      : (p.cil?p.cil.toFixed(1).replace('.',','):'cilindrada não lida')
+        +(p.diesel?' turbodiesel':(p.turbo?' turbo':' aspirado')),
+    p: p
+  };
+}
+
+// Escreve a ficha nos campos do anúncio e mostra o que foi deduzido e o que falta confirmar.
+function aplicarFicha(f){
+  // Sincronismo desconhecido tem de LIMPAR o campo. Herdar o do carro anterior é
+  // pior que chutar: a conta rodaria com a correia banhada de outro anúncio.
+  if(!f.sinc){ $('fCorreia').value='?'; $('fCorreiaKm').value=0; $('fCorreiaCusto').value=0; }
+  else {
+    $('fCorreia').value=f.sinc;
+    $('fCorreiaKm').value=f.sinc==='corrente'?0:f.sincKm;
+    $('fCorreiaCusto').value=f.sinc==='corrente'?0:f.sincCusto;
+  }
+  if(!f.eletrico){ // num elétrico o km/L não significa nada, então não escreve
+    $('fCons').value=f.cons;
+    $('fCambio').value=f.cambio;
+    $('fComplex').value=f.complex.toFixed(2);
+  }
+  $('fModelo').value='custom'; // a lista fixa para de mandar; quem manda é a FIPE
+  mostrarFicha(f);
+}
+
+function mostrarFicha(f){
+  var cls,rot,corpo;
+  if(f.eletrico){
+    $('fichaStatus').innerHTML=
+      '<div class="l1"><span class="badge badge-red">fora do escopo</span>'
+      +'<span class="mt">veículo elétrico</span></div>'
+      +'<span class="grave">Este avaliador custeia combustível em km/L e sincronismo de motor — nada disso'
+      +' se aplica a um elétrico. O custo total sairia errado. Use os campos à mão por sua conta,'
+      +' ou avalie este anúncio fora daqui.</span>';
+    $('fichaStatus').hidden=false;
+    return;
+  }
+  if(!f.sinc){
+    cls='badge-red'; rot='sincronismo a confirmar';
+    corpo='<span class="grave">Não identifiquei o sincronismo deste motor'+(f.ref?' ('+esc(f.ref)+')':'')
+      +'. Confirme no manual antes de fechar negócio: se for <b>correia banhada a óleo</b>, some a troca preventiva ao preço.</span>';
+  } else if(f.sinc==='banhada'){
+    cls='badge-warn'; rot='correia banhada a óleo';
+    corpo='<span class="alerta">'+esc(f.ref)+'. Troca a cada '+f.sincKm.toLocaleString('pt-BR')+' km, ~'+brl(f.sincCusto)
+      +'. Motor com interferência: sem histórico de óleo comprovado, orce a troca já na compra.</span>';
+  } else if(f.sinc==='seca'){
+    cls='badge-acc'; rot='correia dentada seca';
+    corpo=esc(f.ref)+'. Troca a cada '+f.sincKm.toLocaleString('pt-BR')+' km, ~'+brl(f.sincCusto)+'.';
+  } else {
+    cls='badge-ok'; rot='corrente de comando';
+    corpo=esc(f.ref)+'. Sem troca de sincronismo prevista.';
+  }
+  $('fichaStatus').innerHTML=
+    '<div class="l1"><span class="badge '+cls+'">'+rot+'</span>'
+    +'<span class="mt">'+esc(f.motor)+' · câmbio '+esc(CAMBIO_TXT[f.cambio]||f.cambio)+'</span></div>'
+    +corpo
+    +'<div class="obs" style="margin-top:8px">Consumo de '+f.cons.toFixed(1).replace('.',',')
+    +' km/L é estimativa por cilindrada e aspiração, não medição. Se o anúncio ou a etiqueta do Inmetro trouxer o número real, corrija o campo.</div>';
+  $('fichaStatus').hidden=false;
+}
 
 var lista = [];
 var ultimo = null;
+var nomeAuto = true; // vira false assim que o usuário digita o próprio apelido
 
 function $(id){return document.getElementById(id)}
 function n(id){return parseFloat($(id).value)||0}
@@ -267,6 +472,7 @@ function brl(v){return 'R$ '+Math.round(v).toLocaleString('pt-BR')}
 function brl2(v){return 'R$ '+v.toFixed(2).replace('.',',')}
 var ESC={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return ESC[c]})}
+function marcaLimpa(m){ return String(m||'').replace(/^[A-Za-z]{2,4}\s*-\s*/,'').trim(); }
 
 // popula o select
 (function(){
@@ -274,12 +480,11 @@ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){retur
   MODELOS.forEach(function(m){
     var o=document.createElement('option'); o.value=m.id; o.textContent=m.nome; s.appendChild(o);
   });
-  s.value='virtus_16';
+  s.value='custom';
   s.addEventListener('change',carregarModelo);
-  $('fAno').addEventListener('change',carregarFipe);
-  carregarModelo();
 })();
 
+// Sobreposição manual: só entra quando o usuário escolhe um carro da lista fixa.
 function carregarModelo(){
   var m=MODELOS.filter(function(x){return x.id===$('fModelo').value})[0];
   if(!m||m.id==='custom') return;
@@ -289,14 +494,13 @@ function carregarModelo(){
   $('fCorreiaCusto').value=m.correiaCusto;
   $('fCambio').value=m.cambio;
   $('fComplex').value=m.complex.toFixed(2);
-  if(!$('fNome').value) $('fNome').value=m.nome;
-  carregarFipe();
-}
-function carregarFipe(){
-  var m=MODELOS.filter(function(x){return x.id===$('fModelo').value})[0];
-  if(!m||!m.fipe) return;
-  var f=m.fipe[$('fAno').value];
-  if(f) $('fFipe').value=f;
+  if(!$('fNome').value||nomeAuto){ $('fNome').value=m.nome; nomeAuto=true; }
+  mostrarFicha({
+    cons:m.cons, cambio:m.cambio, complex:m.complex, sinc:m.correia,
+    sincKm:m.correiaKm, sincCusto:m.correiaCusto, casou:true,
+    ref:'ficha da lista fixa — '+m.nome,
+    motor:'conforme a lista'
+  });
 }
 
 // ---------- motor de cálculo ----------
@@ -330,7 +534,8 @@ function calcular(precoOverride, ignorarOrc){
 
   // sincronismo
   var custoCorreia=0, correiaNota='';
-  if(correia==='corrente'){ correiaNota='corrente — sem troca prevista'; }
+  if(correia==='?'){ correiaNota='não identificado — confirme no manual'; }
+  else if(correia==='corrente'){ correiaNota='corrente — sem troca prevista'; }
   else if(correia==='banhada'){
     // banhada a óleo sem histórico de óleo comprovado = troca preventiva imediata
     custoCorreia=cCusto*(notas?0.5:1);
@@ -376,6 +581,11 @@ function calcular(precoOverride, ignorarOrc){
   if(exc>0){ score-=Math.min(25,exc*0.15); }
   if(exc>35) flags.push(['warn','Km '+exc.toFixed(0)+'% acima do esperado para '+(idade<1?'um carro do ano':idade+' anos')+'. Vai a '+kmFinal.toLocaleString('pt-BR')+' km em '+anos+' anos — revenda castigada.']);
 
+  if(correia==='?'){
+    // Informação que falta é risco que existe: não dá para orçar o que não se sabe.
+    score-=8;
+    flags.push(['red','Sincronismo não identificado. Sem saber se é corrente, correia seca ou banhada a óleo, não dá para orçar a manutenção nem medir o risco de quebra. Confirme no manual do carro antes de negociar.']);
+  }
   if(correia==='banhada'){
     score-=notas?10:22;
     flags.push([notas?'warn':'red','Correia banhada a óleo. Motor com interferência: se romper, vai cabeçote. '+(notas?'Notas de óleo apresentadas reduzem o risco, mas não zeram.':'Sem comprovação do óleo usado, o risco não é auditável. Orce '+brl(cCusto)+' de troca preventiva na compra.')]);
@@ -401,6 +611,7 @@ function calcular(precoOverride, ignorarOrc){
 
   // preço alvo: FIPE ajustada pelos riscos identificados
   var descAlvo=0.05;
+  if(correia==='?') descAlvo+=0.03;
   if(correia==='banhada') descAlvo+=notas?0.04:0.08;
   if(cambio==='CVT') descAlvo+=0.03;
   if(cambio==='DCT') descAlvo+=0.05;
@@ -526,7 +737,7 @@ function cabecalhoImpressao(r){
   $('phTitulo').textContent=r.nome;
   $('phSub').innerHTML=esc(r.ano+' · '+r.km.toLocaleString('pt-BR')+' km · pedido '+brl(r.preco)+' · FIPE '+brl(r.fipe))
     +'<br>'+esc('Horizonte '+r.anos+' anos · '+Math.round(r.kmPeriodo).toLocaleString('pt-BR')+' km · '+Math.round(r.pEstrada)+'% estrada · gasolina '+brl2(n('pComb'))+'/L');
-  $('pfAval').textContent='Avaliador de Carro Usado v4 · RitmoProd · gerado em '
+  $('pfAval').textContent='Avaliador de Carro Usado v5 · RitmoProd · gerado em '
     +new Date().toLocaleString('pt-BR')
     +' · estimativa a partir dos parâmetros informados, não substitui cautelar nem laudo mecânico.';
 }
@@ -539,7 +750,7 @@ function imprimir(modo){
     if(!lista.length){ alert('Nenhum anúncio salvo para imprimir.'); return; }
     $('phSubLista').textContent=lista.length+(lista.length===1?' anúncio':' anúncios')
       +' · ordenados por score · horizonte '+n('pAnos')+' anos · '+Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano';
-    $('pfLista').textContent='Avaliador de Carro Usado v4 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
+    $('pfLista').textContent='Avaliador de Carro Usado v5 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
   }
   document.body.classList.add(modo==='aval'?'p-aval':'p-lista');
   window.print();
@@ -585,7 +796,7 @@ function limpar(){ if(confirm('Apagar todos os anúncios salvos?')){ lista=[]; r
 
 function exportar(){
   var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-  var dados={versao:4, data:new Date().toISOString(), parametros:p, lista:lista};
+  var dados={versao:5, data:new Date().toISOString(), parametros:p, lista:lista};
   var b=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(b);
@@ -690,11 +901,20 @@ function buscarValorFipe(){
     if(d.error){ fstatus('FIPE: '+d.error,'var(--warn)'); return; }
     var v=parseFloat(String(d.Valor).replace(/[^0-9,]/g,'').replace(',','.'));
     $('fFipe').value=Math.round(v);
+    // A FIPE marca zero-km como ano 32000; nesse caso o ano do modelo é o corrente.
     var ano=parseInt(String(d.AnoModelo),10);
-    if(ano && ano>1990) $('fAno').value=ano;
-    if(!$('fNome').value) $('fNome').value=d.Modelo;
+    if(ano===32000) ano=new Date().getFullYear();
+    if(ano && ano>1990 && ano<2100) $('fAno').value=ano;
+    // Só sobrescreve o apelido enquanto ele for automático — nome digitado é do usuário.
+    if(!$('fNome').value||nomeAuto){ $('fNome').value=marcaLimpa(d.Marca)+' '+d.Modelo; nomeAuto=true; }
     $('fipeRef').textContent=d.MesReferencia?String(d.MesReferencia).trim():'—';
-    fstatus('FIPE '+d.Valor+' · '+d.Marca+' '+d.Modelo+' '+d.AnoModelo+' · código '+d.CodigoFipe+'. Confira o combustível e a versão antes de usar.','var(--ok)');
+
+    var ficha=inferirFicha(d.Marca,d.Modelo,d.Combustivel);
+    aplicarFicha(ficha);
+
+    fstatus('FIPE '+d.Valor+' · '+d.Marca+' '+d.Modelo+' '+d.AnoModelo+' · código '+d.CodigoFipe
+      +'. Ficha técnica preenchida abaixo'+(ficha.casou?'':' (motor não reconhecido — confira o sincronismo)')+'.',
+      ficha.casou&&ficha.sinc?'var(--ok)':'var(--warn)');
   }).catch(function(err){ fstatus('Erro na consulta: '+err.message+'. Digite a FIPE manualmente.','var(--red)'); });
 }
 
@@ -708,7 +928,7 @@ var CAMPOS_P=['pKmAno','pComb','pIpva','pAnos','pOrc','pEstrada','pAnoRef','pKmR
 function salvarLocal(){
   try{
     var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-    localStorage.setItem('avaliador_carro',JSON.stringify({v:4,parametros:p,lista:lista}));
+    localStorage.setItem('avaliador_carro',JSON.stringify({v:5,parametros:p,lista:lista}));
   }catch(e){ /* modo sem storage — export JSON continua funcionando */ }
 }
 function restaurarLocal(){
@@ -720,6 +940,7 @@ function restaurarLocal(){
   }catch(e){}
 }
 CAMPOS_P.forEach(function(c){ $(c).addEventListener('change',salvarLocal); });
+$('fNome').addEventListener('input',function(){ nomeAuto=false; });
 setInterval(salvarLocal,120000);
 
 // ---------- boot ----------
