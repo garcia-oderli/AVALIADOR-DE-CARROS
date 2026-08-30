@@ -166,7 +166,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <text x="77" y="65" font-family="'IBM Plex Mono','Courier New',monospace" font-size="8" fill="#888888" letter-spacing="3">ANÁLISE · PRODUÇÃO · RITMO</text>
   <rect width="319" height="79" fill="none" stroke="#2A2A2A" stroke-width="0.5" rx="6"/>
 </svg>
-<span class="badge badge-acc">Avaliador v8 · abas</span>
+<span class="badge badge-acc">Avaliador v9 · abas</span>
 </header>
 
 <main>
@@ -755,6 +755,9 @@ function calcular(precoOverride, ignorarOrc){
       flags.push(['warn','Juros do contrato somam '+brl(fin.jurosTotais)+' em '+prazo+'x. Encurtar o prazo ou aumentar a entrada corta isso rápido.']);
     }
   }
+  if(temTroca && fipeMeu>0 && !(oferta>0)){
+    flags.push(['warn','Você marcou que tem carro na troca e a FIPE dele é '+brl(fipeMeu)+', mas não informou a oferta da loja. Sem esse número o deságio da troca fica de fora da conta.']);
+  }
   if(perdaTroca>0 && fipeMeu>0){
     var pctTroca=perdaTroca/fipeMeu*100;
     if(pctTroca>8){
@@ -951,7 +954,7 @@ function cabecalhoImpressao(r){
       +' a '+r.taxa.toFixed(2).replace('.',',')+'% a.m. · entrada '+brl(r.entradaFin)
       +(r.troca>0?' · troca '+brl(r.troca):'')+' · juros '+brl(r.jurosTotais));
   }
-  $('pfAval').textContent='Avaliador de Carro Usado v8 · RitmoProd · gerado em '
+  $('pfAval').textContent='Avaliador de Carro Usado v9 · RitmoProd · gerado em '
     +new Date().toLocaleString('pt-BR')
     +' · estimativa a partir dos parâmetros informados, não substitui cautelar nem laudo mecânico.';
 }
@@ -964,7 +967,7 @@ function imprimir(modo){
     if(!lista.length){ alert('Nenhum anúncio salvo para imprimir.'); return; }
     $('phSubLista').textContent=lista.length+(lista.length===1?' anúncio':' anúncios')
       +' · ordenados por score · horizonte '+n('pAnos')+' anos · '+Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano';
-    $('pfLista').textContent='Avaliador de Carro Usado v8 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
+    $('pfLista').textContent='Avaliador de Carro Usado v9 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
   }
   document.body.classList.add(modo==='aval'?'p-aval':'p-lista');
   window.print();
@@ -1010,7 +1013,7 @@ function limpar(){ if(confirm('Apagar todos os anúncios salvos?')){ lista=[]; r
 
 function exportar(){
   var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-  var dados={versao:8, data:new Date().toISOString(), parametros:p, lista:lista};
+  var dados={versao:9, data:new Date().toISOString(), parametros:p, lista:lista};
   var b=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(b);
@@ -1188,7 +1191,7 @@ function irAba(nome){
 }
 
 // Barra de contexto: o que está selecionado continua visível em qualquer aba.
-var carroEscolhido='';
+var carroEscolhido='', carroTroca='';
 function contexto(){
   var q=[];
   q.push(carroEscolhido?'<b>'+esc(carroEscolhido)+'</b>':'nenhum carro escolhido — vá em Anúncio');
@@ -1197,16 +1200,23 @@ function contexto(){
   q.push('orçamento '+brl(n('pOrc')));
   if(n('pPrazo')>0) q.push(Math.round(n('pPrazo'))+'x a '+n('pTaxa').toFixed(2).replace('.',',')+'%');
   else q.push('à vista');
-  if($('mTroca').value==='sim'&&n('mOferta')>0) q.push('troca '+brl(n('mOferta')));
+  if($('mTroca').value==='sim'){
+    q.push(n('mOferta')>0 ? 'troca '+brl(n('mOferta'))+(carroTroca?' ('+esc(carroTroca)+')':'')
+                          : 'troca sem oferta informada');
+  }
   $('ctx').innerHTML=q.join(' · ');
 }
 
 function resumoTroca(){
   var el=$('mResumo'), tem=$('mTroca').value==='sim', f=n('mFipe'), o=n('mOferta');
   if(!tem){ el.textContent='Sem troca.'; el.style.color='var(--txt2)'; return; }
-  if(!(f>0)){ el.textContent='Informe a FIPE do seu carro.'; el.style.color='var(--txt2)'; return; }
+  if(!(f>0)){ el.textContent='Consulte seu carro na FIPE abaixo, ou digite o valor.'; el.style.color='var(--txt2)'; return; }
+  if(!(o>0)){
+    el.textContent='FIPE '+brl(f)+'. Falta a oferta da loja — sem ela o deságio não é medido.';
+    el.style.color='var(--warn)'; return;
+  }
   var d=f-o, pct=d/f*100;
-  if(d<=0){ el.textContent='Oferta em linha com a FIPE.'; el.style.color='var(--ok)'; return; }
+  if(d<=0){ el.textContent='Oferta em linha com a FIPE ou acima. Confira se não há pegadinha no preço do outro carro.'; el.style.color='var(--ok)'; return; }
   el.textContent='−'+brl(d)+' ('+pct.toFixed(0)+'% abaixo da FIPE)';
   el.style.color=pct>8?'var(--red)':'var(--warn)';
 }
@@ -1321,10 +1331,16 @@ function aoAcharAnuncio(d, fstatus){
 
 function aoAcharMeuCarro(d, st){
   $('mFipe').value=valorFipeNum(d.Valor);
-  if(!n('mOferta')) $('mOferta').value=valorFipeNum(d.Valor);
+  // Não pré-preenche a oferta com a FIPE: isso zerava o deságio e dava
+  // "oferta em linha com a FIPE" antes de a loja ter dito qualquer coisa —
+  // um falso negativo justo no número que esta tela existe para pegar.
   $('mTroca').value='sim';
-  st('Seu carro: '+d.Valor+' na FIPE de '+String(d.MesReferencia||'').trim()+'. Agora digite quanto a loja está oferecendo.','var(--ok)');
+  carroTroca=marcaLimpa(d.Marca)+' '+d.Modelo+' '+d.AnoModelo;
+  st('Seu carro: '+d.Valor+' na FIPE de '+String(d.MesReferencia||'').trim()
+    +'. Falta digitar a oferta da loja ao lado.','var(--ok)');
   resumoTroca();
+  contexto();
+  salvarLocal(); // valor posto por código não dispara change, e sem isto some no reload
 }
 
 // ---------- persistência local ----------
@@ -1334,7 +1350,7 @@ var CAMPOS_P=['pKmAno','pComb','pIpva','pAnos','pOrc','pEstrada','pAnoRef','pKmR
 function salvarLocal(){
   try{
     var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-    localStorage.setItem('avaliador_carro',JSON.stringify({v:8,parametros:p,lista:lista}));
+    localStorage.setItem('avaliador_carro',JSON.stringify({v:9,parametros:p,lista:lista}));
   }catch(e){ /* modo sem storage — export JSON continua funcionando */ }
 }
 function restaurarLocal(){
@@ -1345,7 +1361,14 @@ function restaurarLocal(){
     if(d.lista){ lista=d.lista; render(); }
   }catch(e){}
 }
-CAMPOS_P.forEach(function(c){ $(c).addEventListener('change',salvarLocal); });
+// change só dispara ao sair do campo: digitar e fechar o app perdia o valor
+// até o autosave de 2 minutos. input com espera curta cobre esse buraco.
+var salvarTimer=null;
+function salvarBreve(){ clearTimeout(salvarTimer); salvarTimer=setTimeout(salvarLocal,600); }
+CAMPOS_P.forEach(function(c){
+  $(c).addEventListener('change',salvarLocal);
+  $(c).addEventListener('input',salvarBreve);
+});
 $('fNome').addEventListener('input',function(){ nomeAuto=false; });
 setInterval(salvarLocal,120000);
 
