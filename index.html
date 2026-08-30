@@ -21,6 +21,7 @@
   --font-h:'Barlow Condensed',sans-serif; --font-b:'Barlow',sans-serif; --font-d:'IBM Plex Mono',monospace;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--font-b);font-size:14px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
 main{padding:20px;max-width:1180px;margin:0 auto}
@@ -31,7 +32,16 @@ main{padding:20px;max-width:1180px;margin:0 auto}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g4{grid-template-columns:repeat(4,1fr)}
 @media(max-width:760px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:460px){.g2,.g3,.g4{grid-template-columns:1fr}}
+@media(max-width:460px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  /* KPI é rótulo curto + número: empilhar um por linha desperdiça a tela toda */
+  .grid.kpis{grid-template-columns:repeat(2,1fr);gap:16px 10px}
+  .kpis .kpi-value{font-size:21px}
+  .kpis .kpi-forte{font-size:25px}
+  .kpis .kpi-label{font-size:9px;letter-spacing:1px}
+  .kpis .kpi-delta{font-size:10px}
+  .scoreval{font-size:44px}
+}
 label{display:block;font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
 input,select{width:100%;background:var(--elevated);border:0.5px solid var(--border);border-radius:6px;color:var(--txt);font-family:var(--font-d);font-size:14px;padding:9px 10px;outline:none}
 input:focus,select:focus{border-color:var(--acc)}
@@ -44,6 +54,7 @@ input:focus,select:focus{border-color:var(--acc)}
 .row-btn{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .kpi-label{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:2px;text-transform:uppercase}
 .kpi-value{font-family:var(--font-h);font-size:28px;font-weight:700;color:var(--txt);line-height:1.15;margin-top:4px}
+.kpi-forte{font-size:34px}
 .kpi-delta{font-family:var(--font-d);font-size:11px;color:var(--ok);margin-top:2px}
 .kpi-delta.neg{color:var(--red)}
 .kpi-delta.mut{color:var(--txt2)}
@@ -154,7 +165,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <text x="77" y="65" font-family="'IBM Plex Mono','Courier New',monospace" font-size="8" fill="#888888" letter-spacing="3">ANÁLISE · PRODUÇÃO · RITMO</text>
   <rect width="319" height="79" fill="none" stroke="#2A2A2A" stroke-width="0.5" rx="6"/>
 </svg>
-<span class="badge badge-acc">Avaliador v6 · troca e financiamento</span>
+<span class="badge badge-acc">Avaliador v7 · troca e financiamento</span>
 </header>
 
 <main>
@@ -310,20 +321,21 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <div><div id="rBadge"></div><div class="muted" id="rVeredito" style="margin-top:8px;max-width:520px"></div></div>
   </div>
   <div id="tetoBox" style="border:0.5px solid var(--acc);background:#F5A62310;border-radius:8px;padding:16px;margin-bottom:16px">
-    <div class="grid g3">
+    <div class="grid g3 kpis">
       <div><div class="kpi-label">Mire aqui (alvo)</div><div class="kpi-value" id="rAlvo2" style="color:var(--ok)">—</div><div class="kpi-delta mut">abertura da negociação</div></div>
-      <div><div class="kpi-label">Máximo que você pode pagar</div><div class="kpi-value" id="rTeto" style="color:var(--acc);font-size:34px">—</div><div class="kpi-delta mut" id="rTetoOrigem"></div></div>
+      <div><div class="kpi-label">Máximo que você pode pagar</div><div class="kpi-value kpi-forte" id="rTeto" style="color:var(--acc)">—</div><div class="kpi-delta mut" id="rTetoOrigem"></div></div>
       <div><div class="kpi-label">Margem sobre o pedido</div><div class="kpi-value" id="rMargem">—</div><div class="kpi-delta mut" id="rMargemTx"></div></div>
     </div>
     <div class="muted" id="rTetoNota" style="margin-top:12px;padding-top:12px;border-top:0.5px solid #F5A62330"></div>
   </div>
-  <div class="grid g4" id="boxFin" style="margin-bottom:16px" hidden>
+  <div class="muted" id="finNota" style="margin-bottom:16px" hidden></div>
+  <div class="grid g4 kpis" id="boxFin" style="margin-bottom:16px" hidden>
     <div><div class="kpi-label">Parcela</div><div class="kpi-value" id="rParcela">—</div><div class="kpi-delta mut" id="rParcelaTx"></div></div>
     <div><div class="kpi-label">Valor financiado</div><div class="kpi-value" id="rFinanciado">—</div><div class="kpi-delta mut" id="rEntradaTx"></div></div>
     <div><div class="kpi-label">Juros no período</div><div class="kpi-value" id="rJuros" style="color:var(--red)">—</div><div class="kpi-delta mut" id="rJurosTx"></div></div>
     <div><div class="kpi-label">Caixa na compra</div><div class="kpi-value" id="rCaixa">—</div><div class="kpi-delta mut" id="rCaixaTx"></div></div>
   </div>
-  <div class="grid g4" style="margin-bottom:16px">
+  <div class="grid g4 kpis" style="margin-bottom:16px">
     <div><div class="kpi-label">Custo total <span id="rAnosA"></span> anos</div><div class="kpi-value" id="rTco">—</div><div class="kpi-delta mut">compra + uso − revenda</div></div>
     <div><div class="kpi-label">Custo por km</div><div class="kpi-value" id="rCustoKm">—</div><div class="kpi-delta mut" id="rKmTotal"></div></div>
     <div><div class="kpi-label">Preço vs FIPE</div><div class="kpi-value" id="rDesvio">—</div><div class="kpi-delta" id="rDesvioTx"></div></div>
@@ -861,8 +873,14 @@ function avaliar(){
     $('rJurosTx').textContent=Math.round(r.jurosTotais/(r.preco||1)*100)+'% do preço · '+brl(r.juros)+' dentro dos '+r.anos+' anos';
     $('rCaixa').textContent=brl(r.caixaCompra);
     $('rCaixaTx').textContent='sai da sua conta no ato';
+    $('finNota').hidden=true;
+  } else if(r.financiando){
+    // Prazo preenchido mas nada a financiar: dizer isso é melhor que sumir calado.
+    $('boxFin').hidden=true; $('finNota').hidden=false;
+    $('finNota').textContent='Prazo de '+r.prazo+'x preenchido, mas entrada de '+brl(r.entradaFin)
+      +(r.troca>0?' mais '+brl(r.troca)+' da troca':'')+' já cobrem os '+brl(r.preco)+' do carro — nada a financiar.';
   } else {
-    $('boxFin').hidden=true;
+    $('boxFin').hidden=true; $('finNota').hidden=true;
   }
 
   // --- teto máximo ---
@@ -932,7 +950,7 @@ function cabecalhoImpressao(r){
       +' a '+r.taxa.toFixed(2).replace('.',',')+'% a.m. · entrada '+brl(r.entradaFin)
       +(r.troca>0?' · troca '+brl(r.troca):'')+' · juros '+brl(r.jurosTotais));
   }
-  $('pfAval').textContent='Avaliador de Carro Usado v6 · RitmoProd · gerado em '
+  $('pfAval').textContent='Avaliador de Carro Usado v7 · RitmoProd · gerado em '
     +new Date().toLocaleString('pt-BR')
     +' · estimativa a partir dos parâmetros informados, não substitui cautelar nem laudo mecânico.';
 }
@@ -945,7 +963,7 @@ function imprimir(modo){
     if(!lista.length){ alert('Nenhum anúncio salvo para imprimir.'); return; }
     $('phSubLista').textContent=lista.length+(lista.length===1?' anúncio':' anúncios')
       +' · ordenados por score · horizonte '+n('pAnos')+' anos · '+Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano';
-    $('pfLista').textContent='Avaliador de Carro Usado v6 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
+    $('pfLista').textContent='Avaliador de Carro Usado v7 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
   }
   document.body.classList.add(modo==='aval'?'p-aval':'p-lista');
   window.print();
@@ -991,7 +1009,7 @@ function limpar(){ if(confirm('Apagar todos os anúncios salvos?')){ lista=[]; r
 
 function exportar(){
   var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-  var dados={versao:6, data:new Date().toISOString(), parametros:p, lista:lista};
+  var dados={versao:7, data:new Date().toISOString(), parametros:p, lista:lista};
   var b=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(b);
@@ -1297,7 +1315,7 @@ var CAMPOS_P=['pKmAno','pComb','pIpva','pAnos','pOrc','pEstrada','pAnoRef','pKmR
 function salvarLocal(){
   try{
     var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-    localStorage.setItem('avaliador_carro',JSON.stringify({v:6,parametros:p,lista:lista}));
+    localStorage.setItem('avaliador_carro',JSON.stringify({v:7,parametros:p,lista:lista}));
   }catch(e){ /* modo sem storage — export JSON continua funcionando */ }
 }
 function restaurarLocal(){
