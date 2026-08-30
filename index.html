@@ -57,7 +57,7 @@ th{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:2px
 td{padding:10px;border-bottom:0.5px solid var(--border);font-family:var(--font-d);font-size:13px}
 td.nm{font-family:var(--font-b)}
 tr:hover td{background:var(--elevated)}
-.num{text-align:right}
+.num{text-align:right;white-space:nowrap}
 .scorebox{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-bottom:14px;border-bottom:0.5px solid var(--border);margin-bottom:14px}
 .scoreval{font-family:var(--font-h);font-size:56px;font-weight:700;line-height:1}
 .flag{display:flex;gap:9px;padding:9px 0;border-bottom:0.5px solid var(--border);align-items:flex-start}
@@ -68,6 +68,35 @@ tr:hover td{background:var(--elevated)}
 .wrap{overflow-x:auto}
 footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5px solid var(--border);background:var(--bg)}
 .hint{font-family:var(--font-d);font-size:10px;color:var(--txt3);margin-top:5px;letter-spacing:.5px}
+
+/* ---------- impressão / PDF ---------- */
+.print-only{display:none}
+@media print{
+  @page{margin:14mm}
+  :root{--bg:#fff;--surface:#fff;--elevated:#fff;--border:#999;--txt:#111;--txt2:#444;--txt3:#666}
+  body{background:#fff;color:#111;font-size:10.5pt}
+  header,footer,.no-print{display:none!important}
+  main{padding:0;margin:0;max-width:none}
+  .card{background:#fff;border:none;padding:0;margin:0 0 16px;break-inside:avoid}
+  .print-only{display:block}
+  body.p-aval .card:not(#resultado){display:none!important}
+  body.p-lista .card:not(#listaCard){display:none!important}
+  .scoreval{font-size:42pt}
+  .kpi-value{font-size:17pt}
+  .section-label{color:#666}
+  table{font-size:9pt}
+  th,td{padding:5px 6px;border-bottom:0.5px solid #ccc}
+  .col-acao{display:none!important}
+  tr:hover td{background:transparent}
+  .wrap{overflow:visible}
+  .grid,.flag,.scorebox{break-inside:avoid}
+  .badge{background:transparent!important;border:0.5px solid currentColor!important}
+  #tetoBox{border:1px solid #111!important;background:transparent!important}
+  .ph{border-bottom:1.5px solid #111;padding-bottom:9px;margin-bottom:16px}
+  .ph-t{font-family:var(--font-h);font-size:19pt;font-weight:700;color:#111;line-height:1.1}
+  .ph-s{font-family:var(--font-d);font-size:8.5pt;color:#444;margin-top:6px;letter-spacing:.3px;line-height:1.6}
+  .pf{margin-top:16px;padding-top:8px;border-top:0.5px solid #999;font-family:var(--font-d);font-size:7.5pt;color:#666;letter-spacing:.3px}
+}
 </style>
 </head>
 <body>
@@ -85,7 +114,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <text x="77" y="65" font-family="'IBM Plex Mono','Courier New',monospace" font-size="8" fill="#888888" letter-spacing="3">ANÁLISE · PRODUÇÃO · RITMO</text>
   <rect width="319" height="79" fill="none" stroke="#2A2A2A" stroke-width="0.5" rx="6"/>
 </svg>
-<span class="badge badge-acc">Avaliador v3 · FIPE ao vivo</span>
+<span class="badge badge-acc">Avaliador v4 · FIPE ao vivo</span>
 </header>
 
 <main>
@@ -94,14 +123,14 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <div class="section-label">Perfil de uso — seus parâmetros</div>
   <div class="grid g4">
     <div><label>Km por ano</label><input type="number" id="pKmAno" value="20400"></div>
-    <div><label>Preço gasolina R$/L</label><input type="number" step="0.01" id="pComb" value="6.20"></div>
+    <div><label>Preço gasolina R$/L</label><input type="number" step="0.01" id="pComb" value="6.49"><div class="hint">confira na bomba que você usa</div></div>
     <div><label>IPVA %</label><input type="number" step="0.1" id="pIpva" value="4"></div>
     <div><label>Horizonte (anos)</label><input type="number" id="pAnos" value="3"></div>
     <div><label>Orçamento máx. R$</label><input type="number" id="pOrc" value="70000"></div>
-    <div><label>% rodagem em estrada</label><input type="number" id="pEstrada" value="85"></div>
-    <div><label>Ano de referência</label><input type="number" id="pAnoRef" value="2026"></div>
+    <div><label>% rodagem em estrada</label><input type="number" id="pEstrada" value="85"><div class="hint">o resto entra como cidade, que rende ~22% menos</div></div>
+    <div><label>Ano de referência</label><input type="number" id="pAnoRef" value="2026"><div class="hint">preenchido com o ano corrente</div></div>
     <div><label>Km/ano de referência</label><input type="number" id="pKmRef" value="12000"><div class="hint">média do mercado, p/ julgar km alto</div></div>
-    <div><label>Custos de entrada R$</label><input type="number" id="pEntrada" value="1800"><div class="hint">transferência + cautelar + 1ª revisão</div></div>
+    <div><label>Custos de entrada R$</label><input type="number" id="pEntrada" value="2200"><div class="hint">transferência + cautelar + 1ª revisão</div></div>
     <div><label>Score mínimo aceitável</label><input type="number" id="pLimiar" value="60"><div class="hint">abaixo disso você não compra</div></div>
   </div>
 </div>
@@ -114,7 +143,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <div><label>Ano</label><select id="qAno"><option value="">selecione o modelo</option></select></div>
   </div>
   <div class="muted" id="fipeStatus" style="margin-top:10px">Selecione marca, modelo e ano para puxar o valor direto da FIPE do mês. O campo FIPE abaixo continua editável se preferir digitar.</div>
-  <div class="row-btn"><button class="btn-ghost" onclick="carregarMarcas()">Recarregar marcas</button></div>
+  <div class="row-btn no-print"><button class="btn-ghost" onclick="carregarMarcas()">Recarregar marcas</button></div>
 </div>
 
 <div class="card">
@@ -145,7 +174,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <div class="chk"><input type="checkbox" id="fFrota"><span>Ex-frota / locadora</span></div>
     <div class="chk"><input type="checkbox" id="fCautelar"><span>Cautelar já aprovada</span></div>
   </div>
-  <div class="row-btn">
+  <div class="row-btn no-print">
     <button class="btn-primary" onclick="avaliar()">Avaliar</button>
     <button class="btn-primary" onclick="salvar()">Avaliar e salvar na lista</button>
     <button class="btn-ghost" onclick="exportar()">Exportar JSON</button>
@@ -155,6 +184,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
 </div>
 
 <div class="card" id="resultado" style="display:none">
+  <div class="ph print-only"><div class="ph-t" id="phTitulo">Avaliação</div><div class="ph-s" id="phSub"></div></div>
   <div class="section-label">Resultado</div>
   <div class="scorebox">
     <div><div class="kpi-label">Score</div><div class="scoreval" id="rScore">—</div></div>
@@ -184,12 +214,21 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
       <div id="rFlags"></div>
     </div>
   </div>
+  <div class="pf print-only" id="pfAval"></div>
+  <div class="row-btn no-print">
+    <button class="btn-primary" onclick="imprimir('aval')">Imprimir / salvar PDF</button>
+  </div>
 </div>
 
-<div class="card">
+<div class="card" id="listaCard">
+  <div class="ph print-only"><div class="ph-t">Comparativo de anúncios</div><div class="ph-s" id="phSubLista"></div></div>
   <div class="section-label">Comparativo — anúncios salvos</div>
   <div class="wrap"><table id="tLista"><tbody><tr><td class="muted" style="font-family:var(--font-b)">Nenhum anúncio salvo ainda.</td></tr></tbody></table></div>
-  <div class="row-btn"><button class="btn-ghost" onclick="limpar()">Limpar lista</button></div>
+  <div class="pf print-only" id="pfLista"></div>
+  <div class="row-btn no-print">
+    <button class="btn-ghost" onclick="imprimir('lista')">Imprimir comparativo</button>
+    <button class="btn-ghost" onclick="limpar()">Limpar lista</button>
+  </div>
 </div>
 
 </main>
@@ -226,6 +265,8 @@ function $(id){return document.getElementById(id)}
 function n(id){return parseFloat($(id).value)||0}
 function brl(v){return 'R$ '+Math.round(v).toLocaleString('pt-BR')}
 function brl2(v){return 'R$ '+v.toFixed(2).replace('.',',')}
+var ESC={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return ESC[c]})}
 
 // popula o select
 (function(){
@@ -271,10 +312,16 @@ function calcular(precoOverride, ignorarOrc){
 
   var kmPeriodo=kmAno*anos;
   var kmFinal=km+kmPeriodo;
-  var idade=anoRef-ano;
+  var idade=Math.max(0,anoRef-ano);
+  var idadeKm=Math.max(0.5,idade); // carro do ano também pode chegar rodado
 
-  // combustível
-  var litros=kmPeriodo/(cons||1);
+  // combustível — o consumo informado é de estrada; na cidade o carro rende ~22% menos.
+  // Média harmônica ponderada: é como se mistura km/L de dois regimes sem errar a conta.
+  var pEstr=Math.min(100,Math.max(0,n('pEstrada')))/100;
+  var consE=cons>0?cons:1;
+  var consC=consE*0.78;
+  var consMix=1/(pEstr/consE+(1-pEstr)/consC);
+  var litros=kmPeriodo/consMix;
   var custoComb=litros*comb;
 
   // IPVA — base cai ~8%/ano
@@ -303,7 +350,7 @@ function calcular(precoOverride, ignorarOrc){
 
   // valor de revenda: depreciação ~9%/ano sobre FIPE + penalidade por km alto
   var resid=fipe*Math.pow(0.91,anos);
-  var kmEsperadoFinal=kmRef*(idade+anos);
+  var kmEsperadoFinal=kmRef*(idadeKm+anos);
   var excFinal=kmEsperadoFinal>0?(kmFinal-kmEsperadoFinal)/kmEsperadoFinal:0;
   if(excFinal>0) resid*=Math.max(0.70,1-excFinal*0.22);
 
@@ -317,15 +364,17 @@ function calcular(precoOverride, ignorarOrc){
   // ---------- score ----------
   var score=100, flags=[];
 
-  if(desvio>0){ score-=Math.min(30,desvio*2.5); }
+  // A penalidade satura em 30 pontos até +12%, mas continua subindo acima disso.
+  // Se ela travasse de vez, o score ficaria constante e a busca do teto perderia o pé.
+  if(desvio>0){ score-=Math.min(30,desvio*2.5)+Math.max(0,desvio-12)*0.8; }
   else { score+=Math.min(8,Math.abs(desvio)*1.2); }
   if(desvio>5) flags.push(['red','Preço '+desvio.toFixed(1)+'% acima da FIPE. Sem justificativa técnica clara, é caro.']);
   else if(desvio<-8) flags.push(['ok','Preço '+Math.abs(desvio).toFixed(1)+'% abaixo da FIPE. Investigue o porquê antes de comemorar.']);
 
-  var kmEsperado=kmRef*idade;
+  var kmEsperado=kmRef*idadeKm;
   var exc=kmEsperado>0?(km-kmEsperado)/kmEsperado*100:0;
   if(exc>0){ score-=Math.min(25,exc*0.15); }
-  if(exc>35) flags.push(['warn','Km '+exc.toFixed(0)+'% acima do esperado para '+idade+' anos. Vai a '+kmFinal.toLocaleString('pt-BR')+' km em '+anos+' anos — revenda castigada.']);
+  if(exc>35) flags.push(['warn','Km '+exc.toFixed(0)+'% acima do esperado para '+(idade<1?'um carro do ano':idade+' anos')+'. Vai a '+kmFinal.toLocaleString('pt-BR')+' km em '+anos+' anos — revenda castigada.']);
 
   if(correia==='banhada'){
     score-=notas?10:22;
@@ -340,8 +389,8 @@ function calcular(precoOverride, ignorarOrc){
   score-=idade*2.5;
   if(idade>=8) flags.push(['warn','Carro com '+idade+' anos. Peça de desgaste começa a aparecer em série.']);
 
-  score+=(cons-13)*3;
-  if(cons<11.5) flags.push(['warn','Consumo de '+cons+' km/L na sua rodagem custa '+brl(custoComb)+' em '+anos+' anos.']);
+  score+=Math.max(-15,Math.min(12,(consMix-12)*3));
+  if(consMix<11) flags.push(['warn','Consumo de '+consMix.toFixed(1)+' km/L no seu mix ('+Math.round(pEstr*100)+'% estrada) custa '+brl(custoComb)+' em '+anos+' anos.']);
 
   if(!ignorarOrc && preco+custoImediato>orc){ score-=15; flags.push(['red','Preço + '+brl(custoImediato)+' de custos de entrada estoura o orçamento de '+brl(orc)+'.']); }
   if(frota){ score-=4; flags.push(['warn','Ex-frota: revisão rastreável, mas rodagem intensa e muitos motoristas. Só vale com desconto real sobre a FIPE.']); }
@@ -363,7 +412,7 @@ function calcular(precoOverride, ignorarOrc){
   return {nome:$('fNome').value||'sem nome', ano:ano, km:km, preco:preco, fipe:fipe, desvio:desvio,
     tco:tco, custoKm:custoKm, score:score, alvo:alvo, anos:anos, kmPeriodo:kmPeriodo, kmFinal:kmFinal,
     comb:custoComb, ipva:custoIpva, correiaC:custoCorreia, correiaNota:correiaNota,
-    manut:custoManut, seguro:custoSeguro, resid:resid, flags:flags, cons:cons,
+    manut:custoManut, seguro:custoSeguro, resid:resid, flags:flags, cons:cons, consMix:consMix, pEstrada:pEstr*100,
     entrada:entrada, custoImediato:custoImediato, orc:orc};
 }
 
@@ -389,7 +438,10 @@ function calcularTeto(){
   }
 
   var teto=Math.min(tetoOrc,tetoQual);
-  var origem = tetoQual<=0 ? 'reprovado no critério' : (tetoQual<tetoOrc ? 'limitado pelo risco do carro' : 'limitado pelo seu orçamento');
+  var origem;
+  if(tetoQual<=0) origem='reprovado no score mínimo em qualquer preço';
+  else if(tetoOrc<=0) origem='o orçamento não cobre nem os custos de entrada';
+  else origem=(tetoQual<tetoOrc?'limitado pelo risco do carro':'limitado pelo seu orçamento');
   return {teto:teto, tetoOrc:tetoOrc, tetoQual:tetoQual, origem:origem, limiar:limiar, custoImediato:base.custoImediato};
 }
 
@@ -426,7 +478,7 @@ function avaliar(){
     $('rTeto').style.color='var(--red)';
     $('tetoBox').style.borderColor='var(--red)';
     $('tetoBox').style.background='#F4433610';
-    $('rTetoOrigem').textContent='não passa no score mínimo em nenhum preço';
+    $('rTetoOrigem').textContent=tt.origem;
   } else {
     $('rTeto').textContent=brl(tt.teto);
     $('rTeto').style.color='var(--acc)';
@@ -435,7 +487,7 @@ function avaliar(){
     $('rTetoOrigem').textContent=tt.origem;
   }
   var margem=tt.teto-r.preco;
-  $('rMargem').textContent=(margem>=0?'+':'')+brl(margem).replace('R$ ','R$ ');
+  $('rMargem').textContent=(margem>=0?'+':'−')+brl(Math.abs(margem));
   $('rMargem').style.color=margem>=0?'var(--ok)':'var(--red)';
   $('rMargemTx').textContent=margem>=0?'ainda cabe':'peça '+brl(-margem)+' de desconto';
   $('rTetoNota').innerHTML='Teto pelo orçamento: <b>'+brl(tt.tetoOrc)+'</b> (R$ '+Math.round(r.orc).toLocaleString('pt-BR')+' menos '+brl(tt.custoImediato)+' de custos de entrada). '
@@ -449,22 +501,57 @@ function avaliar(){
   else v='Não compre. O desconto necessário pra compensar os riscos é maior do que o vendedor vai aceitar.';
   $('rVeredito').textContent=v;
 
-  var rows=[['Preço de compra',r.preco],['Custos de entrada (transf./cautelar)',r.entrada],['Combustível ('+r.cons+' km/L)',r.comb],['IPVA',r.ipva],
+  var rows=[['Preço de compra',r.preco],['Custos de entrada (transf./cautelar)',r.entrada],['Combustível ('+r.consMix.toFixed(1)+' km/L no mix '+Math.round(r.pEstrada)+'% estrada)',r.comb],['IPVA',r.ipva],
     ['Sincronismo — '+r.correiaNota,r.correiaC],['Manutenção e revisões',r.manut],['Seguro estimado',r.seguro],
     ['(−) Revenda estimada',-r.resid]];
   var h='<thead><tr><th>Item</th><th class="num">Valor</th></tr></thead><tbody>';
   rows.forEach(function(x){
-    h+='<tr><td class="nm">'+x[0]+'</td><td class="num" style="color:'+(x[1]<0?'var(--ok)':'var(--txt)')+'">'+brl(x[1])+'</td></tr>';
+    // o rótulo da revenda já traz o "(−)"; repetir o sinal no valor só polui
+    h+='<tr><td class="nm">'+esc(x[0])+'</td><td class="num" style="color:'+(x[1]<0?'var(--ok)':'var(--txt)')+'">'+brl(Math.abs(x[1]))+'</td></tr>';
   });
   h+='<tr><td class="nm" style="font-weight:600">Custo total '+r.anos+' anos</td><td class="num" style="color:var(--acc);font-weight:600">'+brl(r.tco)+'</td></tr></tbody>';
   $('tBreak').innerHTML=h;
 
   var cores={ok:'var(--ok)',warn:'var(--warn)',red:'var(--red)'};
   $('rFlags').innerHTML = r.flags.length ? r.flags.map(function(f){
-    return '<div class="flag"><div class="dot" style="background:'+cores[f[0]]+'"></div><div class="tx">'+f[1]+'</div></div>';
+    return '<div class="flag"><div class="dot" style="background:'+(cores[f[0]]||'var(--txt2)')+'"></div><div class="tx">'+esc(f[1])+'</div></div>';
   }).join('') : '<div class="muted">Nenhum ponto crítico identificado.</div>';
 
   $('resultado').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ---------- impressão ----------
+// A folha de impressão isola um card por vez; a classe no body diz qual.
+function cabecalhoImpressao(r){
+  $('phTitulo').textContent=r.nome;
+  $('phSub').innerHTML=esc(r.ano+' · '+r.km.toLocaleString('pt-BR')+' km · pedido '+brl(r.preco)+' · FIPE '+brl(r.fipe))
+    +'<br>'+esc('Horizonte '+r.anos+' anos · '+Math.round(r.kmPeriodo).toLocaleString('pt-BR')+' km · '+Math.round(r.pEstrada)+'% estrada · gasolina '+brl2(n('pComb'))+'/L');
+  $('pfAval').textContent='Avaliador de Carro Usado v4 · RitmoProd · gerado em '
+    +new Date().toLocaleString('pt-BR')
+    +' · estimativa a partir dos parâmetros informados, não substitui cautelar nem laudo mecânico.';
+}
+
+function imprimir(modo){
+  if(modo==='aval'){
+    if(!ultimo){ alert('Avalie um anúncio antes de imprimir.'); return; }
+    cabecalhoImpressao(ultimo);
+  } else {
+    if(!lista.length){ alert('Nenhum anúncio salvo para imprimir.'); return; }
+    $('phSubLista').textContent=lista.length+(lista.length===1?' anúncio':' anúncios')
+      +' · ordenados por score · horizonte '+n('pAnos')+' anos · '+Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano';
+    $('pfLista').textContent='Avaliador de Carro Usado v4 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
+  }
+  document.body.classList.add(modo==='aval'?'p-aval':'p-lista');
+  window.print();
+}
+function fimImpressao(){ document.body.classList.remove('p-aval','p-lista'); }
+window.addEventListener('afterprint',fimImpressao);
+// iOS/Safari nem sempre dispara afterprint — a media query fecha a brecha.
+if(window.matchMedia){
+  var mqPrint=window.matchMedia('print');
+  var onMq=function(m){ if(!m.matches) fimImpressao(); };
+  if(mqPrint.addEventListener) mqPrint.addEventListener('change',onMq);
+  else if(mqPrint.addListener) mqPrint.addListener(onMq);
 }
 
 function salvar(){
@@ -478,17 +565,17 @@ function render(){
   var t=$('tLista');
   if(!lista.length){ t.innerHTML='<tbody><tr><td class="muted" style="font-family:var(--font-b)">Nenhum anúncio salvo ainda.</td></tr></tbody>'; return; }
   var ord=lista.slice().sort(function(a,b){return b.score-a.score});
-  var h='<thead><tr><th>#</th><th>Anúncio</th><th>Ano</th><th class="num">Km</th><th class="num">Preço</th><th class="num">vs FIPE</th><th class="num">Custo/km</th><th class="num">Custo total</th><th class="num">Alvo</th><th class="num">Máximo</th><th>Score</th><th></th></tr></thead><tbody>';
+  var h='<thead><tr><th>#</th><th>Anúncio</th><th>Ano</th><th class="num">Km</th><th class="num">Preço</th><th class="num">vs FIPE</th><th class="num">Custo/km</th><th class="num">Custo total</th><th class="num">Alvo</th><th class="num">Máximo</th><th>Score</th><th class="col-acao"></th></tr></thead><tbody>';
   ord.forEach(function(r,i){
     var cl=classe(r.score);
     var idx=lista.indexOf(r);
-    h+='<tr><td>'+(i+1)+'</td><td class="nm">'+r.nome+'</td><td>'+r.ano+'</td><td class="num">'+r.km.toLocaleString('pt-BR')+'</td>'
+    h+='<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.nome)+'</td><td>'+esc(r.ano)+'</td><td class="num">'+r.km.toLocaleString('pt-BR')+'</td>'
       +'<td class="num">'+brl(r.preco)+'</td>'
       +'<td class="num" style="color:'+(r.desvio>3?'var(--red)':(r.desvio<-3?'var(--ok)':'var(--txt2)'))+'">'+(r.desvio>0?'+':'')+r.desvio.toFixed(1)+'%</td>'
       +'<td class="num">'+brl2(r.custoKm)+'</td><td class="num">'+brl(r.tco)+'</td><td class="num" style="color:var(--ok)">'+brl(r.alvo)+'</td>'
       +'<td class="num" style="color:var(--acc);font-weight:600">'+((r.teto===undefined||r.teto<=0)?'—':brl(r.teto))+'</td>'
       +'<td><span class="badge '+cl.c+'">'+Math.round(r.score)+'</span></td>'
-      +'<td><button class="btn-ghost" style="padding:4px 10px;font-size:11px" onclick="remover('+idx+')">×</button></td></tr>';
+      +'<td class="col-acao"><button class="btn-ghost" style="padding:4px 10px;font-size:11px" onclick="remover('+idx+')">×</button></td></tr>';
   });
   t.innerHTML=h+'</tbody>';
 }
@@ -497,9 +584,8 @@ function remover(i){ lista.splice(i,1); render(); salvarLocal(); }
 function limpar(){ if(confirm('Apagar todos os anúncios salvos?')){ lista=[]; render(); salvarLocal(); } }
 
 function exportar(){
-  var dados={versao:1, data:new Date().toISOString(),
-    parametros:{kmAno:n('pKmAno'),comb:n('pComb'),ipva:n('pIpva'),anos:n('pAnos'),orc:n('pOrc'),kmRef:n('pKmRef')},
-    lista:lista};
+  var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
+  var dados={versao:4, data:new Date().toISOString(), parametros:p, lista:lista};
   var b=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(b);
@@ -514,11 +600,15 @@ function importar(e){
     try{
       var d=JSON.parse(ev.target.result);
       if(d.parametros){
-        $('pKmAno').value=d.parametros.kmAno; $('pComb').value=d.parametros.comb;
-        $('pIpva').value=d.parametros.ipva; $('pAnos').value=d.parametros.anos;
-        $('pOrc').value=d.parametros.orc; if(d.parametros.kmRef) $('pKmRef').value=d.parametros.kmRef;
+        // export antigo (v1) usava nomes curtos; o novo usa os próprios ids dos campos
+        var LEGADO={kmAno:'pKmAno',comb:'pComb',ipva:'pIpva',anos:'pAnos',orc:'pOrc',kmRef:'pKmRef'};
+        Object.keys(d.parametros).forEach(function(k){
+          var id=CAMPOS_P.indexOf(k)!==-1?k:LEGADO[k];
+          var val=d.parametros[k];
+          if(id && $(id) && val!==undefined && val!==null && val!=='') $(id).value=val;
+        });
       }
-      if(d.lista){ lista=d.lista; render(); salvarLocal(); }
+      if(Array.isArray(d.lista)){ lista=d.lista; render(); salvarLocal(); }
     }catch(err){ alert('Arquivo inválido: '+err.message); }
   };
   rd.readAsText(f);
@@ -537,9 +627,28 @@ function encher(sel,itens,valKey,txtKey,placeholder){
   });
 }
 
+// A FIPE limita requisições por minuto e, quando corta, responde HTML — não JSON.
+// Sem tratar status e timeout, o usuário via só "Unexpected token <".
+function fipeGet(url){
+  var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 8000) : null;
+  return fetch(url, ctrl?{signal:ctrl.signal}:undefined).then(function(r){
+    if(timer) clearTimeout(timer);
+    if(r.status===429) throw new Error('limite de consultas atingido, espere um minuto');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json().catch(function(){ throw new Error('resposta fora do formato esperado'); });
+  }, function(e){
+    if(timer) clearTimeout(timer);
+    if(e && e.name==='AbortError') throw new Error('tempo esgotado');
+    // "Failed to fetch" não diz nada a quem está na loja olhando um carro.
+    if(e instanceof TypeError) throw new Error('sem conexão');
+    throw e;
+  });
+}
+
 function carregarMarcas(){
   fstatus('Buscando marcas na FIPE…');
-  fetch(FIPE_API).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  fipeGet(FIPE_API)
   .then(function(d){
     encher('qMarca',d,'codigo','nome','— selecione a marca —');
     fstatus('Marcas carregadas. Escolha marca, modelo e ano.');
@@ -554,7 +663,7 @@ function carregarModelosFipe(){
   encher('qAno',[],'','','selecione o modelo');
   if(!m){ encher('qModelo',[],'','','selecione a marca'); return; }
   fstatus('Buscando modelos…');
-  fetch(FIPE_API+'/'+m+'/modelos').then(function(r){ return r.json(); })
+  fipeGet(FIPE_API+'/'+m+'/modelos')
   .then(function(d){
     encher('qModelo',d.modelos,'codigo','nome','— selecione o modelo —');
     fstatus(d.modelos.length+' versões encontradas. Escolha a versão exata do anúncio.');
@@ -565,7 +674,7 @@ function carregarAnosFipe(){
   var m=$('qMarca').value, mo=$('qModelo').value;
   if(!mo){ encher('qAno',[],'','','selecione o modelo'); return; }
   fstatus('Buscando anos…');
-  fetch(FIPE_API+'/'+m+'/modelos/'+mo+'/anos').then(function(r){ return r.json(); })
+  fipeGet(FIPE_API+'/'+m+'/modelos/'+mo+'/anos')
   .then(function(d){
     encher('qAno',d,'codigo','nome','— selecione o ano —');
     fstatus('Escolha o ano do anúncio.');
@@ -576,7 +685,7 @@ function buscarValorFipe(){
   var m=$('qMarca').value, mo=$('qModelo').value, a=$('qAno').value;
   if(!m||!mo||!a) return;
   fstatus('Consultando valor…');
-  fetch(FIPE_API+'/'+m+'/modelos/'+mo+'/anos/'+a).then(function(r){ return r.json(); })
+  fipeGet(FIPE_API+'/'+m+'/modelos/'+mo+'/anos/'+a)
   .then(function(d){
     if(d.error){ fstatus('FIPE: '+d.error,'var(--warn)'); return; }
     var v=parseFloat(String(d.Valor).replace(/[^0-9,]/g,'').replace(',','.'));
@@ -599,7 +708,7 @@ var CAMPOS_P=['pKmAno','pComb','pIpva','pAnos','pOrc','pEstrada','pAnoRef','pKmR
 function salvarLocal(){
   try{
     var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-    localStorage.setItem('avaliador_carro',JSON.stringify({v:3,parametros:p,lista:lista}));
+    localStorage.setItem('avaliador_carro',JSON.stringify({v:4,parametros:p,lista:lista}));
   }catch(e){ /* modo sem storage — export JSON continua funcionando */ }
 }
 function restaurarLocal(){
@@ -615,6 +724,9 @@ setInterval(salvarLocal,120000);
 
 // ---------- boot ----------
 restaurarLocal();
+// O ano de referência é data, não preferência: um valor salvo em 2026 não serve em 2027.
+var ANO_HOJE=new Date().getFullYear();
+if(!(n('pAnoRef')>=ANO_HOJE)) $('pAnoRef').value=ANO_HOJE;
 carregarMarcas();
 
 if('serviceWorker' in navigator){

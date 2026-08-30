@@ -8,7 +8,7 @@ instalar não aparece. Só hospedar resolve — é o mesmo caminho do GastosIA.
 
 ## Opção 1 — Vercel (recomendado, ~2 min)
 
-1. Crie uma pasta com os 5 arquivos: `index.html`, `manifest.json`, `sw.js`,
+1. Crie uma pasta com os 6 arquivos: `index.html`, `manifest.json`, `sw.js`,
    `icon-192.png`, `icon-512.png`, `icon-180.png`
 2. No terminal, dentro da pasta:
 
@@ -33,19 +33,26 @@ A URL sai como `https://garcia-oderli.github.io/<repo>/`.
 - Parâmetros e anúncios salvos ficam no aparelho (localStorage)
 - Funciona offline, **exceto** a consulta FIPE, que precisa de internet
 - Sem internet: o campo FIPE continua editável, você digita e a conta roda igual
+- **Imprimir / salvar PDF** no resultado gera uma folha limpa da avaliação;
+  **Imprimir comparativo** faz o mesmo com a lista de anúncios salvos
 
 ## Atualizar depois
 
-Ao publicar uma versão nova, mude a linha 2 do `sw.js`:
+Desde a **v4** o `index.html` é buscado pela rede antes do cache, então uma
+versão nova chega ao celular sozinha na próxima abertura com internet. Offline,
+o cache assume e o app abre igual.
 
-    const CACHE = 'avaliador-v4';
+Ainda assim, ao publicar suba a linha 2 do `sw.js` — é o que renova ícones e
+manifesto, que continuam vindo do cache:
 
-Sem trocar esse nome, o celular continua servindo a versão antiga do cache.
+    const CACHE = 'avaliador-v5';
 
 ## Fonte da FIPE
 
 API pública `parallelum.com.br/fipe/api/v1` — gratuita, sem chave, CORS liberado.
-Tem limite de requisições por minuto. Se falhar, a tela avisa e você digita o valor.
+Tem limite de requisições por minuto. Se estourar, a tela avisa ("limite de
+consultas atingido") e você digita o valor. Sem internet ela avisa "sem conexão"
+e a consulta expira em 8 segundos em vez de travar.
 Confira sempre se a versão retornada (combustível, câmbio) é a mesma do anúncio.
 
 Oderli Garcia © 2026 · RitmoProd
