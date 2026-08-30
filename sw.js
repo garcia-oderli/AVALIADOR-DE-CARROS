@@ -1,5 +1,5 @@
 // Service worker — Avaliador de Carro Usado / RitmoProd
-const CACHE = 'avaliador-v9';
+const CACHE = 'avaliador-v10';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', e => {

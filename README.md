@@ -1,113 +1,120 @@
 # Avaliador de Carro Usado — RitmoProd
 
-PWA de página única para avaliar anúncios de carro usado: puxa a FIPE do mês ao
-vivo, projeta o custo total de posse no seu horizonte de uso e devolve o preço
-máximo que ainda faz sentido pagar.
+PWA de página única que responde a uma pergunta: **quanto esse carro vale para
+mim, considerando risco, uso, custo e capacidade financeira — e qual é o máximo
+que devo pagar?**
 
-**Stack:** HTML/CSS/JS puro, sem build e sem dependências. Todo o app está em
-`index.html`.
+O produto final é a **decisão**, não o score. Score é meio.
 
-## Como se usa — quatro abas
+**Stack:** HTML/CSS/JS puro, sem build e sem dependências. Tudo em `index.html`.
+
+## Como se usa — cinco abas
 
 | Aba | O que faz |
 |---|---|
-| **Perfil** | Parâmetros de uso: km/ano, combustível, IPVA, orçamento, horizonte, score mínimo. Define uma vez. |
-| **Pagamento** | Seu carro na troca e a forma de pagamento — entrada, prazo, juros, parcela máxima. |
-| **Anúncio** | Escolhe o carro na FIPE (que **monta a ficha técnica sozinha**) e preenche preço e km. |
-| **Resultado** | Score, teto de negociação, composição do custo e o comparativo de anúncios salvos. |
+| **Perfil** | Uso (km/ano, % estrada, horizonte), limites de compra, custos de entrada e configurações avançadas. |
+| **Pagamento** | Seu carro na troca e a forma de pagamento: entrada, prazo, juros, parcela máxima. |
+| **Carro** | Escolhe o veículo na FIPE (que monta a ficha técnica sozinha), preenche preço, km, histórico, origem e cautelar. |
+| **Resultado** | Decisão, escada de preços, estratégia de negociação, score explicado, alertas e custo total. |
+| **Comparar** | Lista de anúncios salvos e comparação direta de até 4, com a melhor compra justificada. |
 
-Uma aba por vez, com uma barra de contexto embaixo que mostra o carro escolhido e
-os parâmetros ativos em qualquer aba. Primeira visita abre no Perfil; depois, no
-Anúncio. Avaliar leva direto para o Resultado.
+## Hierarquia de preços
 
-Marca e modelo são campos de busca — filtram por termo, ignoram acento
-(`citroen` acha `Citroën`) e aceitam vários termos (`virtus tsi`).
+Um conceito, um nome, um valor. Nunca dois números disputando o mesmo rótulo.
 
-### Os dois números da negociação
+| Nome | O que é |
+|---|---|
+| `precoPedido` | O que o vendedor quer. |
+| `precoFipe` | Referência de mercado — consultada ou informada, sempre identificada. |
+| `precoAlvo` | Onde a negociação deve chegar: FIPE menos os descontos que os riscos justificam. Nunca acima do teto. |
+| `tetoCaixa` | Maior preço que cabe no caixa disponível. |
+| `tetoParcela` | Maior preço que a parcela máxima suporta, dado prazo e taxa. |
+| `tetoFinanceiro` | **MENOR(tetoCaixa, tetoParcela)** |
+| `tetoRisco` | Maior preço em que o carro ainda alcança o score mínimo. |
+| `tetoFinal` | **MENOR(tetoFinanceiro, tetoRisco)** — o único "máximo que pode pagar". |
+| `descontoNecessario` | Quanto falta negociar para caber no teto. |
 
-São coisas diferentes e confundi-las custa dinheiro:
+A ordem **primeira oferta < preço alvo ≤ teto final** é garantida por construção
+e verificada em teste.
 
-- **Folga até o seu teto** — quanto ainda caberia pagar sem furar seu critério.
-  Não é margem de negociação.
-- **Negociação vs alvo** — a distância até o preço que você deve mirar. É esse
-  que se leva para a mesa.
+## Decisão
 
-## Meu carro na troca
+`avaliarDecisao()` devolve uma entre:
 
-Na aba **Pagamento**:
+- **COMPRAR** — preço no alvo ou abaixo, dentro do teto, sem pendência crítica
+- **COMPRAR COM CONDIÇÃO** — números fecham, mas há pendência a resolver antes de assinar
+- **NEGOCIAR** — acima do alvo ou do teto, com o desconto calculado
+- **CARRO APROVADO · PAGAMENTO REPROVADO** — o problema não é o carro, é a forma de pagamento
+- **DESCARTAR** — nenhum preço faz o carro alcançar o score mínimo, ou a cautelar reprovou
 
-1. Em *Consultar meu carro na FIPE*, escolha marca, modelo e ano do **seu** carro
-2. O app preenche a FIPE dele e liga o *Tenho carro para dar*
-3. Digite em *Oferta da loja* quanto eles estão **realmente** pagando
+Score baixo no preço pedido **não** condena o carro: significa que o preço está
+alto. Só é descarte quando `tetoRisco <= 0`.
 
-O passo 3 é o que importa. A oferta não é pré-preenchida de propósito: com ela
-igual à FIPE o deságio daria zero, e zero falso justo no número que esta tela
-existe para pegar. Enquanto a oferta estiver vazia, o resumo avisa e o resultado
-traz uma flag.
+## Score explicável
 
-Consulta o seu carro na mesma FIPE ao vivo e compara com o que a loja está
-oferecendo. **Dar o carro na troca não barateia o negócio** — você entrega um bem
-no valor dele. O que custa é o deságio: a loja dá desconto no carro novo e retoma
-no seu. Esse valor entra no custo total e vira alerta acima de 8% da FIPE.
+Soma ponderada de oito critérios, cada um com nota de 0 a 1. Os pesos são
+constantes editáveis em Configurações, não números soltos no código.
+
+| Critério | Peso |
+|---|---:|
+| Preço vs FIPE | 25 |
+| Quilometragem | 15 |
+| Histórico de manutenção | 15 |
+| Risco mecânico | 15 |
+| Câmbio | 10 |
+| Idade | 10 |
+| Origem/uso | 5 |
+| Consumo | 5 |
+
+A tela mostra a barra de cada critério e quantos pontos foram perdidos nele.
+Só o critério de preço depende do preço — é o que torna o score monotônico e
+permite a busca binária do teto de risco.
+
+## O que o app se recusa a fingir
+
+- **Sincronismo** só sai de um catálogo de famílias de motor identificadas. Motor
+  fora dele fica "não identificado", com alerta — nunca um chute.
+- **Correia banhada a óleo** não é troca automática: depende da comprovação do
+  óleo, do km e do intervalo.
+- **Nenhum câmbio é condenado pelo tipo.** CVT e DCT partem de base menor, mas
+  km rodado e histórico movem a nota.
+- **Corrente** aparece como "sem troca preventiva programada" — o que não é o
+  mesmo que ausência de risco.
+- **FIPE informada à mão** se identifica como manual, nunca como consulta.
+- **Carro elétrico** é recusado: o app custeia km/L e sincronismo de motor.
+
+## Custo total de propriedade
+
+Compra (preço, transferência, cautelar, revisão) + uso (combustível, IPVA,
+seguro, manutenção preventiva, pneus, freios, provisão de risco, sincronismo)
+− revenda. Sai como custo total, custo por km e custo médio mensal, no horizonte
+escolhido (1, 2, 3, 5 ou 7 anos).
+
+A revenda tem premissa declarada na tela; a troca não barateia o negócio — o que
+custa é o deságio que a loja tira do seu carro.
 
 ## Financiamento
 
-Tabela Price: entrada em dinheiro, carro na troca, prazo, juros ao mês e parcela
-máxima. Sai parcela, valor financiado, juros totais e o caixa que você precisa ter
-no ato.
+Tabela Price: `PMT = PV·i·(1+i)^n / ((1+i)^n − 1)`. A parcela máxima limita o
+valor financiável de verdade (`financiavelMax`), e os juros contados no custo
+total são os pagos **dentro do horizonte** — o contrato quase nunca coincide com
+ele, então a amortização roda mês a mês.
 
-Os juros pagos **dentro do horizonte** entram no custo total — o prazo do contrato
-quase nunca coincide com o horizonte de posse, então o cálculo amortiza mês a mês
-e considera o saldo devedor no fim.
+## Autoteste
 
-Com prazo 0 o app trata como compra à vista e o teto sai do orçamento. Financiando,
-o teto passa a sair da parcela máxima.
-
-## Ficha técnica automática
-
-O nome que a FIPE devolve (`VIRTUS 1.6 MSI Flex 16V 4p Aut.`) carrega cilindrada,
-aspiração e câmbio. O app lê isso e cruza com um catálogo de famílias de motor
-para preencher o anúncio sem digitação.
-
-O que o nome **nunca** diz é o sincronismo — e é ele que separa R$ 0 de R$ 3.600
-no ato da compra. Por isso o sincronismo só sai do catálogo de famílias
-identificadas (EA211 da VW, 1.0/1.2 turbo da GM, EcoBoost da Ford, PureTech da
-PSA, Firefly e E.torQ da Fiat, corrente nos japoneses e coreanos). Motor que não
-casa com nenhuma família fica marcado **"não identificado — confirmar"**, com
-alerta em vermelho e sem custo de sincronismo lançado.
-
-Preencher "corrente" por omissão esconderia exatamente o risco que o app existe
-para achar, então ele prefere admitir que não sabe. O consumo é estimado por
-cilindrada e aspiração, e a interface diz que é estimativa: se o anúncio ou a
-etiqueta do Inmetro trouxer o número real, corrija o campo.
-
-Carro elétrico é recusado explicitamente — o app custeia combustível em km/L e
-sincronismo de motor, e nada disso se aplica.
-
-A lista fixa de modelos continua disponível para sobrepor tudo à mão.
-
-## O que ele calcula
-
-| Saída | O que significa |
-|---|---|
-| **Score (0–100)** | Nota do anúncio: preço vs. FIPE, km vs. idade, tipo de sincronismo, câmbio, idade e consumo. |
-| **Custo total** | Compra + entrada + combustível + IPVA + sincronismo + manutenção + seguro − revenda estimada. |
-| **Custo por km** | Custo total dividido pela rodagem do período. |
-| **Alvo** | Preço de abertura da negociação: FIPE menos os descontos que os riscos identificados justificam. |
-| **Máximo** | Maior preço que ainda passa no seu score mínimo **e** cabe no orçamento. Acima dele, você sai da mesa. |
-
-O consumo informado é de estrada. O campo **% rodagem em estrada** mistura
-estrada e cidade (cidade ≈ 22% menos eficiente) por média harmônica — que é a
-forma correta de combinar km/L de dois regimes.
+`rodarTestes()` — 29 verificações cobrindo preço vs FIPE, orçamento, score
+mínimo, financiamento, correia, cautelar, histórico, os dois tetos, importação e
+exportação, monotonicidade do score, identidades do TCO e ausência de NaN.
+Botão **Rodar autoteste** em Configurações avançadas.
 
 ## Arquivos
 
 | Arquivo | Papel |
 |---|---|
-| `index.html` | App inteiro: interface, motor de cálculo, consulta FIPE, impressão. |
+| `index.html` | App inteiro, em módulos lógicos. |
 | `sw.js` | Service worker. HTML pela rede primeiro, resto do shell pelo cache. |
 | `manifest.json` | Manifesto PWA. |
-| `icon-*.png` | Ícones de instalação (192, 512, 180 para iOS). |
+| `icon-*.png` | Ícones de instalação. |
 | `COMO-INSTALAR.md` | Como hospedar e instalar no celular. |
 
 ## Rodando localmente
@@ -116,33 +123,22 @@ forma correta de combinar km/L de dois regimes.
 python3 -m http.server 8777
 ```
 
-Depois abra `http://localhost:8777`. Precisa de HTTP — em `file://` o service
-worker não registra e o botão de instalar não aparece.
+Precisa de HTTP — em `file://` o service worker não registra.
 
 ## Dados
 
-- **FIPE ao vivo:** API pública `parallelum.com.br/fipe/api/v1`, sem chave, com
-  limite de requisições por minuto. Se falhar, a tela avisa e o campo FIPE
-  continua editável.
-- **Seus dados:** parâmetros e anúncios salvos ficam no `localStorage` do
-  aparelho. Nada é enviado para servidor. Use Exportar/Importar JSON para levar
-  entre dispositivos.
-
-## Impressão
-
-Os botões **Imprimir / salvar PDF** (avaliação) e **Imprimir comparativo**
-(lista) geram uma folha limpa em fundo branco, com cabeçalho identificando o
-anúncio e os parâmetros usados. Controles e navegação saem da página impressa.
+FIPE pela API pública `parallelum.com.br/fipe/api/v1`, sem chave, com limite por
+minuto; se falhar, a tela avisa e o campo continua editável. Parâmetros e
+anúncios ficam no `localStorage` do aparelho, com versionamento e migração
+(`DATA_VERSION`). Nada vai para servidor.
 
 ## Publicando uma versão nova
 
-1. Suba `CACHE` em `sw.js` (`avaliador-v9` → `avaliador-v10`)
-2. Atualize o badge de versão no `index.html`
+1. Suba `CACHE` em `sw.js`
+2. Atualize `APP_VERSION` no `index.html`
 3. Publique
 
-Desde a v4 o HTML é buscado pela rede primeiro, então uma versão nova chega
-mesmo sem trocar o nome do cache — o bump continua sendo a garantia para os
-ícones e o manifesto.
+Desde a v4 o HTML vem da rede primeiro, então a versão nova chega sozinha.
 
 ---
 
