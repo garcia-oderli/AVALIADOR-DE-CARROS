@@ -34,6 +34,17 @@ São coisas diferentes e confundi-las custa dinheiro:
 
 ## Meu carro na troca
 
+Na aba **Pagamento**:
+
+1. Em *Consultar meu carro na FIPE*, escolha marca, modelo e ano do **seu** carro
+2. O app preenche a FIPE dele e liga o *Tenho carro para dar*
+3. Digite em *Oferta da loja* quanto eles estão **realmente** pagando
+
+O passo 3 é o que importa. A oferta não é pré-preenchida de propósito: com ela
+igual à FIPE o deságio daria zero, e zero falso justo no número que esta tela
+existe para pegar. Enquanto a oferta estiver vazia, o resumo avisa e o resultado
+traz uma flag.
+
 Consulta o seu carro na mesma FIPE ao vivo e compara com o que a loja está
 oferecendo. **Dar o carro na troca não barateia o negócio** — você entrega um bem
 no valor dele. O que custa é o deságio: a loja dá desconto no carro novo e retoma
@@ -125,7 +136,7 @@ anúncio e os parâmetros usados. Controles e navegação saem da página impres
 
 ## Publicando uma versão nova
 
-1. Suba `CACHE` em `sw.js` (`avaliador-v8` → `avaliador-v9`)
+1. Suba `CACHE` em `sw.js` (`avaliador-v9` → `avaliador-v10`)
 2. Atualize o badge de versão no `index.html`
 3. Publique
 

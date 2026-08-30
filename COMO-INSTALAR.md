@@ -52,7 +52,7 @@ o cache assume e o app abre igual.
 Ainda assim, ao publicar suba a linha 2 do `sw.js` — é o que renova ícones e
 manifesto, que continuam vindo do cache:
 
-    const CACHE = 'avaliador-v9';
+    const CACHE = 'avaliador-v10';
 
 ## Fonte da FIPE
 
