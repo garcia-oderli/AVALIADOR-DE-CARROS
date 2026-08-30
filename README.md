@@ -113,7 +113,7 @@ anúncio e os parâmetros usados. Controles e navegação saem da página impres
 
 ## Publicando uma versão nova
 
-1. Suba `CACHE` em `sw.js` (`avaliador-v6` → `avaliador-v7`)
+1. Suba `CACHE` em `sw.js` (`avaliador-v7` → `avaliador-v8`)
 2. Atualize o badge de versão no `index.html`
 3. Publique
 
