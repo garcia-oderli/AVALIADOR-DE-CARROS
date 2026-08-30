@@ -68,8 +68,36 @@ tr:hover td{background:var(--elevated)}
 .wrap{overflow-x:auto}
 footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5px solid var(--border);background:var(--bg)}
 .hint{font-family:var(--font-d);font-size:10px;color:var(--txt3);margin-top:5px;letter-spacing:.5px}
-.etapa{margin-bottom:28px}
-.etapa-cab{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid var(--border)}
+.etapa{margin-bottom:24px}
+.etapa-cab{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:12px;padding:0 0 10px;border:none;border-bottom:0.5px solid var(--border);background:transparent;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.etapa-cab:hover .etapa-t{color:var(--acc)}
+.etapa-tt{flex:1;min-width:0}
+.etapa-chev{color:var(--txt2);font-size:11px;flex-shrink:0;transition:transform .15s}
+.etapa.fechada .etapa-cab{margin-bottom:0}
+.etapa.fechada .etapa-corpo{display:none}
+.etapa.fechada .etapa-chev{transform:rotate(-90deg)}
+.etapa.fechada .etapa-n{background:var(--elevated);color:var(--txt2)}
+
+/* combobox com busca — o select de modelo da FIPE tem centenas de versões */
+.combo{position:relative}
+.combo-inp{width:100%;background:var(--elevated);border:0.5px solid var(--border);border-radius:6px;color:var(--txt);font-family:var(--font-d);font-size:14px;padding:9px 28px 9px 10px;outline:none}
+.combo-inp:focus{border-color:var(--acc)}
+.combo-inp:disabled{color:var(--txt3)}
+.combo.aberto .combo-inp{border-color:var(--acc);border-radius:6px 6px 0 0}
+.combo-seta{position:absolute;right:10px;top:12px;font-size:9px;color:var(--txt2);pointer-events:none}
+.combo-pop{position:absolute;z-index:40;left:0;right:0;top:100%;max-height:264px;overflow-y:auto;background:var(--elevated);border:0.5px solid var(--acc);border-top:none;border-radius:0 0 6px 6px;-webkit-overflow-scrolling:touch}
+.combo-cnt{position:sticky;top:0;background:var(--elevated);padding:6px 10px;border-bottom:0.5px solid var(--border);font-family:var(--font-d);font-size:10px;color:var(--txt3);letter-spacing:1px}
+.combo-op{padding:9px 10px;font-family:var(--font-b);font-size:13px;line-height:1.35;color:var(--txt);cursor:pointer;border-bottom:0.5px solid var(--border)}
+.combo-op:last-child{border-bottom:none}
+.combo-op.ativo{background:var(--acc);color:#111}
+.combo-op mark{background:transparent;color:var(--acc);font-weight:600}
+.combo-op.ativo mark{color:#111;text-decoration:underline}
+.combo-vazio{padding:12px 10px;font-family:var(--font-b);font-size:12px;color:var(--txt2)}
+@media(max-width:760px){.combo-inp{font-size:16px}} /* abaixo de 16px o iOS dá zoom ao focar */
+
+/* bloco técnico recolhido — os campos agora vêm preenchidos da FIPE */
+.btn-mini{background:transparent;color:var(--txt2);font-family:var(--font-d);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 12px;border-radius:6px;border:0.5px solid var(--border);cursor:pointer}
+.btn-mini:hover{color:var(--acc);border-color:var(--acc)}
 .etapa-n{display:flex;align-items:center;justify-content:center;width:30px;height:30px;flex-shrink:0;border-radius:6px;background:var(--acc);color:#111;font-family:var(--font-h);font-size:19px;font-weight:700;line-height:1}
 .etapa-t{font-family:var(--font-h);font-size:21px;font-weight:700;letter-spacing:.5px;line-height:1.1;color:var(--txt)}
 .etapa-s{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
@@ -87,6 +115,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   body{background:#fff;color:#111;font-size:10.5pt}
   header,footer,.no-print,.etapa-cab{display:none!important}
   .etapa{margin:0}
+  .etapa-corpo,#tecBloco{display:block!important} /* recolhido na tela não some do papel */
   main{padding:0;margin:0;max-width:none}
   .card{background:#fff;border:none;padding:0;margin:0 0 16px;break-inside:avoid}
   .print-only{display:block}
@@ -130,11 +159,14 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
 
 <main>
 
-<section class="etapa">
-<div class="etapa-cab"><span class="etapa-n">1</span><div>
-  <div class="etapa-t">Perfil</div>
-  <div class="etapa-s">como você usa o carro — vale para todo anúncio</div>
-</div></div>
+<section class="etapa fechada" id="et1">
+<button type="button" class="etapa-cab" onclick="alternarEtapa('et1')" aria-expanded="false" aria-controls="et1c">
+  <span class="etapa-n">1</span>
+  <span class="etapa-tt"><span class="etapa-t" style="display:block">Perfil</span>
+  <span class="etapa-s" id="et1s" style="display:block">como você usa o carro</span></span>
+  <span class="etapa-chev">▾</span>
+</button>
+<div class="etapa-corpo" id="et1c">
 
 <div class="card">
   <div class="section-label">Perfil de uso — seus parâmetros</div>
@@ -152,13 +184,16 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   </div>
 </div>
 
-</section>
+</div></section>
 
-<section class="etapa">
-<div class="etapa-cab"><span class="etapa-n">2</span><div>
-  <div class="etapa-t">FIPE ao vivo</div>
-  <div class="etapa-s">escolha o carro — puxa o valor e monta a ficha técnica</div>
-</div></div>
+<section class="etapa" id="et2">
+<button type="button" class="etapa-cab" onclick="alternarEtapa('et2')" aria-expanded="true" aria-controls="et2c">
+  <span class="etapa-n">2</span>
+  <span class="etapa-tt"><span class="etapa-t" style="display:block">FIPE ao vivo</span>
+  <span class="etapa-s" id="et2s" style="display:block">escolha o carro — puxa o valor e monta a ficha</span></span>
+  <span class="etapa-chev">▾</span>
+</button>
+<div class="etapa-corpo" id="et2c">
 
 <div class="card">
   <div class="section-label">FIPE ao vivo <span id="fipeRef" class="badge badge-acc" style="margin-left:6px">—</span></div>
@@ -171,43 +206,59 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <div class="row-btn no-print"><button class="btn-ghost" onclick="carregarMarcas()">Recarregar marcas</button></div>
 </div>
 
-</section>
+</div></section>
 
-<section class="etapa">
-<div class="etapa-cab"><span class="etapa-n">3</span><div>
-  <div class="etapa-t">Análise</div>
-  <div class="etapa-s">o anúncio, o veredito e a comparação</div>
-</div></div>
+<section class="etapa" id="et3">
+<button type="button" class="etapa-cab" onclick="alternarEtapa('et3')" aria-expanded="true" aria-controls="et3c">
+  <span class="etapa-n">3</span>
+  <span class="etapa-tt"><span class="etapa-t" style="display:block">Análise</span>
+  <span class="etapa-s" style="display:block">o anúncio, o veredito e a comparação</span></span>
+  <span class="etapa-chev">▾</span>
+</button>
+<div class="etapa-corpo" id="et3c">
 
 <div class="card">
   <div class="section-label">Anúncio a avaliar</div>
+  <div id="fichaStatus" class="ficha" hidden style="margin-bottom:14px"></div>
+
   <div class="grid g3">
-    <div style="grid-column:1/-1"><label>Ficha técnica</label><select id="fModelo"></select><div class="hint">a seleção da FIPE acima preenche sozinha — use esta lista só para sobrepor à mão</div></div>
-    <div style="grid-column:1/-1" id="fichaStatus" class="ficha" hidden></div>
-    <div><label>Apelido do anúncio</label><input id="fNome" placeholder="ex: Virtus loja Souza"></div>
+    <div style="grid-column:1/-1"><label>Apelido do anúncio</label><input id="fNome" placeholder="ex: Virtus loja Souza"></div>
     <div><label>Ano do modelo</label><input type="number" id="fAno" value="2019"></div>
     <div><label>Km atual</label><input type="number" id="fKm" value="70000"></div>
     <div><label>Preço pedido R$</label><input type="number" id="fPreco" value="65000"></div>
-    <div><label>FIPE do mês R$</label><input type="number" id="fFipe" value="69644"><div class="hint">consulte a FIPE da versão exata</div></div>
-    <div><label>Consumo estrada km/L</label><input type="number" step="0.1" id="fCons" value="12.5"></div>
-    <div><label>Sincronismo</label><select id="fCorreia">
-      <option value="seca">Correia seca (externa)</option>
-      <option value="banhada">Correia banhada a óleo</option>
-      <option value="corrente">Corrente</option>
-      <option value="?">Não identificado — confirmar</option>
-    </select></div>
-    <div><label>Intervalo troca (km)</label><input type="number" id="fCorreiaKm" value="120000"></div>
-    <div><label>Custo da troca R$</label><input type="number" id="fCorreiaCusto" value="1200"></div>
-    <div><label>Câmbio</label><select id="fCambio">
-      <option value="AT">Automático conversor (AT)</option>
-      <option value="CVT">CVT</option>
-      <option value="DCT">Dupla embreagem (DCT/DSG)</option>
-      <option value="MEC">Manual</option>
-    </select></div>
-    <div><label>Índice manutenção</label><input type="number" step="0.05" id="fComplex" value="1.00"><div class="hint">1,00 = aspirado simples · 1,25 = turbo</div></div>
-    <div class="chk"><input type="checkbox" id="fNotas"><span>Notas de revisão / óleo comprovadas</span></div>
-    <div class="chk"><input type="checkbox" id="fFrota"><span>Ex-frota / locadora</span></div>
-    <div class="chk"><input type="checkbox" id="fCautelar"><span>Cautelar já aprovada</span></div>
+    <div style="grid-column:1/-1"><label>FIPE do mês R$</label><input type="number" id="fFipe" value="69644"><div class="hint">vem da etapa 2 — edite só se for digitar à mão</div></div>
+  </div>
+
+  <div class="row-btn no-print" style="margin-top:12px">
+    <button type="button" class="btn-mini" id="btnTec" onclick="alternarTecnico()" aria-expanded="false" aria-controls="tecBloco">Ajustar ficha técnica</button>
+  </div>
+
+  <div id="tecBloco" hidden style="margin-top:12px">
+    <div class="grid g3">
+      <div style="grid-column:1/-1"><label>Sobrepor pela lista fixa</label><select id="fModelo"></select><div class="hint">a etapa 2 já preencheu tudo — use isto só se quiser trocar à mão</div></div>
+      <div><label>Consumo estrada km/L</label><input type="number" step="0.1" id="fCons" value="12.5"></div>
+      <div><label>Sincronismo</label><select id="fCorreia">
+        <option value="seca">Correia seca (externa)</option>
+        <option value="banhada">Correia banhada a óleo</option>
+        <option value="corrente">Corrente</option>
+        <option value="?">Não identificado — confirmar</option>
+      </select></div>
+      <div><label>Intervalo troca (km)</label><input type="number" id="fCorreiaKm" value="120000"></div>
+      <div><label>Custo da troca R$</label><input type="number" id="fCorreiaCusto" value="1200"></div>
+      <div><label>Câmbio</label><select id="fCambio">
+        <option value="AT">Automático conversor (AT)</option>
+        <option value="CVT">CVT</option>
+        <option value="DCT">Dupla embreagem (DCT/DSG)</option>
+        <option value="MEC">Manual</option>
+      </select></div>
+      <div><label>Índice manutenção</label><input type="number" step="0.05" id="fComplex" value="1.00"><div class="hint">1,00 = aspirado simples · 1,25 = turbo</div></div>
+    </div>
+  </div>
+
+  <div class="grid g3" style="margin-top:12px">
+    <div class="chk" style="margin-top:0"><input type="checkbox" id="fNotas"><span>Notas de revisão / óleo comprovadas</span></div>
+    <div class="chk" style="margin-top:0"><input type="checkbox" id="fFrota"><span>Ex-frota / locadora</span></div>
+    <div class="chk" style="margin-top:0"><input type="checkbox" id="fCautelar"><span>Cautelar já aprovada</span></div>
   </div>
   <div class="row-btn no-print">
     <button class="btn-primary" onclick="avaliar()">Avaliar</button>
@@ -265,7 +316,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <button class="btn-ghost" onclick="limpar()">Limpar lista</button>
   </div>
 </div>
-</section>
+</div></section>
 
 </main>
 
@@ -836,6 +887,143 @@ function encher(sel,itens,valKey,txtKey,placeholder){
   itens.forEach(function(it){
     var op=document.createElement('option'); op.value=it[valKey]; op.textContent=it[txtKey]; s.appendChild(op);
   });
+  if(COMBOS[sel]) COMBOS[sel].sync();
+}
+
+// ---------- combobox com busca ----------
+// A FIPE devolve centenas de versões por marca. Rolar isso num select nativo, no
+// celular, é o passo que mais dói — então o campo vira busca. O <select> original
+// segue existindo escondido e continua sendo a fonte da verdade: o resto do
+// código lê .value e ouve 'change' como antes.
+var COMBOS={};
+
+// Normaliza mantendo o comprimento em caracteres, para o destaque casar por índice.
+function norm(t){
+  return Array.from(String(t||'')).map(function(c){
+    return c.normalize('NFD').charAt(0).toLowerCase();
+  }).join('');
+}
+
+function destacar(txt,termos){
+  var chars=Array.from(String(txt)), n=norm(txt), mk=[];
+  termos.forEach(function(t){
+    if(!t) return;
+    var i=n.indexOf(t);
+    while(i!==-1){ for(var k=i;k<i+t.length;k++) mk[k]=1; i=n.indexOf(t,i+1); }
+  });
+  var out='',aberto=false;
+  for(var j=0;j<chars.length;j++){
+    if(mk[j]&&!aberto){ out+='<mark>'; aberto=true; }
+    if(!mk[j]&&aberto){ out+='</mark>'; aberto=false; }
+    out+=esc(chars[j]);
+  }
+  return out+(aberto?'</mark>':'');
+}
+
+function Combo(id){
+  var sel=$(id);
+  var wrap=document.createElement('div'); wrap.className='combo';
+  sel.parentNode.insertBefore(wrap,sel); wrap.appendChild(sel);
+  sel.style.display='none'; sel.setAttribute('tabindex','-1'); sel.setAttribute('aria-hidden','true');
+
+  var inp=document.createElement('input');
+  inp.type='text'; inp.className='combo-inp'; inp.autocomplete='off'; inp.id=id+'_busca';
+  inp.setAttribute('role','combobox'); inp.setAttribute('aria-expanded','false'); inp.setAttribute('aria-autocomplete','list');
+  var seta=document.createElement('span'); seta.className='combo-seta'; seta.textContent='▼';
+  var pop=document.createElement('div'); pop.className='combo-pop'; pop.hidden=true; pop.setAttribute('role','listbox');
+  wrap.appendChild(inp); wrap.appendChild(seta); wrap.appendChild(pop);
+
+  var itens=[], vis=[], ativo=-1, aberto=false;
+
+  function rotulo(){ var o=sel.options[sel.selectedIndex]; return (o&&o.value)?o.textContent:''; }
+
+  function sync(){
+    itens=[];
+    for(var i=0;i<sel.options.length;i++){
+      var o=sel.options[i];
+      if(o.value==='') inp.placeholder=o.textContent; else itens.push({v:o.value,t:o.textContent});
+    }
+    inp.disabled=!itens.length;
+    inp.value=rotulo();
+    fechar();
+  }
+
+  function pintar(q){
+    var termos=norm(q).split(/\s+/).filter(Boolean);
+    vis = termos.length ? itens.filter(function(it){
+      var n=norm(it.t); return termos.every(function(t){ return n.indexOf(t)!==-1; });
+    }) : itens.slice();
+    if(!vis.length){ pop.innerHTML='<div class="combo-vazio">Nada encontrado para “'+esc(q)+'”.</div>'; ativo=-1; return; }
+    var teto=300; // listas gigantes travam o celular se renderizadas inteiras
+    var h='<div class="combo-cnt">'+vis.length+(vis.length===1?' resultado':' resultados')
+      +(vis.length>teto?' · exibindo '+teto+', refine a busca':'')+'</div>';
+    vis.slice(0,teto).forEach(function(it,i){
+      h+='<div class="combo-op'+(i===ativo?' ativo':'')+'" role="option" data-i="'+i+'">'+destacar(it.t,termos)+'</div>';
+    });
+    pop.innerHTML=h;
+  }
+
+  function abrir(q){
+    if(inp.disabled) return;
+    aberto=true; wrap.classList.add('aberto'); pop.hidden=false; inp.setAttribute('aria-expanded','true');
+    pintar(q===undefined?'':q);
+  }
+  function fechar(){
+    aberto=false; wrap.classList.remove('aberto'); pop.hidden=true; inp.setAttribute('aria-expanded','false'); ativo=-1;
+  }
+  function mover(d){
+    if(!aberto){ abrir(''); return; }
+    var max=Math.min(vis.length,300);
+    if(!max) return;
+    ativo=(ativo+d+max)%max;
+    var ops=pop.querySelectorAll('.combo-op');
+    for(var i=0;i<ops.length;i++) ops[i].className='combo-op'+(i===ativo?' ativo':'');
+    if(ops[ativo]) ops[ativo].scrollIntoView({block:'nearest'});
+  }
+  function escolher(i){
+    var it=vis[i]; if(!it) return;
+    sel.value=it.v; inp.value=it.t; fechar();
+    sel.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+
+  inp.addEventListener('focus',function(){ inp.select(); abrir(''); });
+  inp.addEventListener('input',function(){ ativo=-1; abrir(inp.value); });
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){ e.preventDefault(); mover(1); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); mover(-1); }
+    else if(e.key==='Enter'){ if(aberto&&ativo>=0){ e.preventDefault(); escolher(ativo); } }
+    else if(e.key==='Escape'){ inp.value=rotulo(); fechar(); }
+  });
+  inp.addEventListener('blur',function(){ setTimeout(function(){ if(!aberto) return; inp.value=rotulo(); fechar(); },120); });
+  // mousedown no painel roubaria o foco antes do clique registrar
+  pop.addEventListener('mousedown',function(e){ e.preventDefault(); });
+  pop.addEventListener('click',function(e){
+    var alvo=e.target.closest?e.target.closest('.combo-op'):null;
+    if(alvo) escolher(parseInt(alvo.getAttribute('data-i'),10));
+  });
+
+  COMBOS[id]={sync:sync};
+  sync();
+}
+
+// ---------- etapas recolhíveis ----------
+function alternarEtapa(id,forcar){
+  var el=$(id), fechada=(forcar===undefined)?!el.classList.contains('fechada'):forcar;
+  el.classList.toggle('fechada',fechada);
+  var b=el.querySelector('.etapa-cab');
+  if(b) b.setAttribute('aria-expanded',String(!fechada));
+}
+
+function resumoPerfil(){
+  $('et1s').textContent=Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano · gasolina '
+    +brl2(n('pComb'))+'/L · '+n('pAnos')+' anos · orçamento '+brl(n('pOrc'))+' · score mín. '+n('pLimiar');
+}
+
+function alternarTecnico(){
+  var b=$('tecBloco'), aberto=b.hidden;
+  b.hidden=!aberto;
+  $('btnTec').setAttribute('aria-expanded',String(aberto));
+  $('btnTec').textContent=aberto?'Ocultar ficha técnica':'Ajustar ficha técnica';
 }
 
 // A FIPE limita requisições por minuto e, quando corta, responde HTML — não JSON.
@@ -912,6 +1100,12 @@ function buscarValorFipe(){
     var ficha=inferirFicha(d.Marca,d.Modelo,d.Combustivel);
     aplicarFicha(ficha);
 
+    // Carro escolhido: recolhe a etapa 2 e leva a tela para a análise.
+    $('et2s').textContent=marcaLimpa(d.Marca)+' '+d.Modelo+' · '+d.AnoModelo+' · FIPE '+d.Valor;
+    alternarEtapa('et2',true);
+    alternarEtapa('et3',false);
+    $('et3').scrollIntoView({behavior:'smooth',block:'start'});
+
     fstatus('FIPE '+d.Valor+' · '+d.Marca+' '+d.Modelo+' '+d.AnoModelo+' · código '+d.CodigoFipe
       +'. Ficha técnica preenchida abaixo'+(ficha.casou?'':' (motor não reconhecido — confira o sincronismo)')+'.',
       ficha.casou&&ficha.sinc?'var(--ok)':'var(--warn)');
@@ -945,6 +1139,9 @@ setInterval(salvarLocal,120000);
 
 // ---------- boot ----------
 restaurarLocal();
+Combo('qMarca'); Combo('qModelo');
+resumoPerfil();
+CAMPOS_P.forEach(function(c){ $(c).addEventListener('input',resumoPerfil); });
 // O ano de referência é data, não preferência: um valor salvo em 2026 não serve em 2027.
 var ANO_HOJE=new Date().getFullYear();
 if(!(n('pAnoRef')>=ANO_HOJE)) $('pAnoRef').value=ANO_HOJE;
