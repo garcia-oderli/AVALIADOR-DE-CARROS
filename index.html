@@ -79,15 +79,15 @@ tr:hover td{background:var(--elevated)}
 .wrap{overflow-x:auto}
 footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5px solid var(--border);background:var(--bg)}
 .hint{font-family:var(--font-d);font-size:10px;color:var(--txt3);margin-top:5px;letter-spacing:.5px}
-.etapa{margin-bottom:24px}
-.etapa-cab{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:12px;padding:0 0 10px;border:none;border-bottom:0.5px solid var(--border);background:transparent;text-align:left;cursor:pointer;font:inherit;color:inherit}
-.etapa-cab:hover .etapa-t{color:var(--acc)}
-.etapa-tt{flex:1;min-width:0}
-.etapa-chev{color:var(--txt2);font-size:11px;flex-shrink:0;transition:transform .15s}
-.etapa.fechada .etapa-cab{margin-bottom:0}
-.etapa.fechada .etapa-corpo{display:none}
-.etapa.fechada .etapa-chev{transform:rotate(-90deg)}
-.etapa.fechada .etapa-n{background:var(--elevated);color:var(--txt2)}
+/* abas — um painel por vez, em vez de tudo empilhado */
+.abas{display:flex;gap:4px;overflow-x:auto;margin-bottom:14px;border-bottom:0.5px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.abas::-webkit-scrollbar{display:none}
+.aba{flex:1 0 auto;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--txt2);font-family:var(--font-b);font-weight:500;font-size:14px;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-0.5px}
+.aba:hover{color:var(--txt)}
+.aba.ativa{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+.ctx{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:1px;margin-bottom:16px;line-height:1.7}
+.ctx b{color:var(--txt);font-weight:600}
+@media(max-width:460px){.aba{font-size:13px;padding:10px 12px}}
 
 /* combobox com busca — o select de modelo da FIPE tem centenas de versões */
 .combo{position:relative}
@@ -124,9 +124,10 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   @page{margin:14mm}
   :root{--bg:#fff;--surface:#fff;--elevated:#fff;--border:#999;--txt:#111;--txt2:#444;--txt3:#666}
   body{background:#fff;color:#111;font-size:10.5pt}
-  header,footer,.no-print,.etapa-cab{display:none!important}
-  .etapa{margin:0}
-  .etapa-corpo,#tecBloco{display:block!important} /* recolhido na tela não some do papel */
+  header,footer,.no-print,.abas,.ctx{display:none!important}
+  /* aba fechada na tela não pode sumir do papel; vem depois do [hidden] para vencer */
+  .painel,#tecBloco{display:block!important}
+  .painel{margin:0}
   main{padding:0;margin:0;max-width:none}
   .card{background:#fff;border:none;padding:0;margin:0 0 16px;break-inside:avoid}
   .print-only{display:block}
@@ -165,20 +166,19 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <text x="77" y="65" font-family="'IBM Plex Mono','Courier New',monospace" font-size="8" fill="#888888" letter-spacing="3">ANÁLISE · PRODUÇÃO · RITMO</text>
   <rect width="319" height="79" fill="none" stroke="#2A2A2A" stroke-width="0.5" rx="6"/>
 </svg>
-<span class="badge badge-acc">Avaliador v7 · troca e financiamento</span>
+<span class="badge badge-acc">Avaliador v8 · abas</span>
 </header>
 
 <main>
+<div class="abas" role="tablist" aria-label="Seções do avaliador">
+  <button type="button" class="aba" role="tab" id="ab-perfil"    aria-controls="pn-perfil"    onclick="irAba('perfil')">Perfil</button>
+  <button type="button" class="aba" role="tab" id="ab-pagamento" aria-controls="pn-pagamento" onclick="irAba('pagamento')">Pagamento</button>
+  <button type="button" class="aba" role="tab" id="ab-anuncio"   aria-controls="pn-anuncio"   onclick="irAba('anuncio')">Anúncio</button>
+  <button type="button" class="aba" role="tab" id="ab-resultado" aria-controls="pn-resultado" onclick="irAba('resultado')">Resultado</button>
+</div>
+<div class="ctx" id="ctx"></div>
 
-<section class="etapa fechada" id="et1">
-<button type="button" class="etapa-cab" onclick="alternarEtapa('et1')" aria-expanded="false" aria-controls="et1c">
-  <span class="etapa-n">1</span>
-  <span class="etapa-tt"><span class="etapa-t" style="display:block">Perfil</span>
-  <span class="etapa-s" id="et1s" style="display:block">como você usa o carro</span></span>
-  <span class="etapa-chev">▾</span>
-</button>
-<div class="etapa-corpo" id="et1c">
-
+<section class="painel" id="pn-perfil" role="tabpanel" aria-labelledby="ab-perfil" hidden>
 <div class="card">
   <div class="section-label">Perfil de uso — seus parâmetros</div>
   <div class="grid g4">
@@ -194,7 +194,9 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <div><label>Score mínimo aceitável</label><input type="number" id="pLimiar" value="60"><div class="hint">abaixo disso você não compra</div></div>
   </div>
 </div>
+</section>
 
+<section class="painel" id="pn-pagamento" role="tabpanel" aria-labelledby="ab-pagamento" hidden>
 <div class="card">
   <div class="section-label">Meu carro na troca</div>
   <div class="grid g3">
@@ -227,18 +229,9 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   </div>
   <div class="muted" style="margin-top:10px">Com prazo 0 o app trata como compra à vista e o teto sai do orçamento. Financiando, o teto passa a sair da parcela máxima.</div>
 </div>
+</section>
 
-</div></section>
-
-<section class="etapa" id="et2">
-<button type="button" class="etapa-cab" onclick="alternarEtapa('et2')" aria-expanded="true" aria-controls="et2c">
-  <span class="etapa-n">2</span>
-  <span class="etapa-tt"><span class="etapa-t" style="display:block">FIPE ao vivo</span>
-  <span class="etapa-s" id="et2s" style="display:block">escolha o carro — puxa o valor e monta a ficha</span></span>
-  <span class="etapa-chev">▾</span>
-</button>
-<div class="etapa-corpo" id="et2c">
-
+<section class="painel" id="pn-anuncio" role="tabpanel" aria-labelledby="ab-anuncio" hidden>
 <div class="card">
   <div class="section-label">FIPE ao vivo <span id="fipeRef" class="badge badge-acc" style="margin-left:6px">—</span></div>
   <div class="grid g3">
@@ -249,17 +242,6 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <div class="muted" id="fipeStatus" style="margin-top:10px">Selecione marca, modelo e ano. Além do valor da FIPE, isso preenche sozinho a ficha técnica do anúncio abaixo — motor, câmbio, sincronismo e consumo.</div>
   <div class="row-btn no-print"><button class="btn-ghost" onclick="carregarMarcas()">Recarregar marcas</button></div>
 </div>
-
-</div></section>
-
-<section class="etapa" id="et3">
-<button type="button" class="etapa-cab" onclick="alternarEtapa('et3')" aria-expanded="true" aria-controls="et3c">
-  <span class="etapa-n">3</span>
-  <span class="etapa-tt"><span class="etapa-t" style="display:block">Análise</span>
-  <span class="etapa-s" style="display:block">o anúncio, o veredito e a comparação</span></span>
-  <span class="etapa-chev">▾</span>
-</button>
-<div class="etapa-corpo" id="et3c">
 
 <div class="card">
   <div class="section-label">Anúncio a avaliar</div>
@@ -312,7 +294,9 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <input type="file" id="imp" accept=".json" style="display:none" onchange="importar(event)">
   </div>
 </div>
+</section>
 
+<section class="painel" id="pn-resultado" role="tabpanel" aria-labelledby="ab-resultado" hidden>
 <div class="card" id="resultado" style="display:none">
   <div class="ph print-only"><div class="ph-t" id="phTitulo">Avaliação</div><div class="ph-s" id="phSub"></div></div>
   <div class="section-label">Resultado</div>
@@ -324,7 +308,10 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <div class="grid g3 kpis">
       <div><div class="kpi-label">Mire aqui (alvo)</div><div class="kpi-value" id="rAlvo2" style="color:var(--ok)">—</div><div class="kpi-delta mut">abertura da negociação</div></div>
       <div><div class="kpi-label">Máximo que você pode pagar</div><div class="kpi-value kpi-forte" id="rTeto" style="color:var(--acc)">—</div><div class="kpi-delta mut" id="rTetoOrigem"></div></div>
-      <div><div class="kpi-label">Margem sobre o pedido</div><div class="kpi-value" id="rMargem">—</div><div class="kpi-delta mut" id="rMargemTx"></div></div>
+      <div><div class="kpi-label">Folga até o seu teto</div><div class="kpi-value" id="rMargem">—</div><div class="kpi-delta mut" id="rMargemTx"></div></div>
+    </div>
+    <div class="grid g3 kpis" style="margin-top:14px;padding-top:14px;border-top:0.5px solid #F5A62330">
+      <div><div class="kpi-label">Negociação vs alvo</div><div class="kpi-value" id="rVsAlvo">—</div><div class="kpi-delta mut" id="rVsAlvoTx"></div></div>
     </div>
     <div class="muted" id="rTetoNota" style="margin-top:12px;padding-top:12px;border-top:0.5px solid #F5A62330"></div>
   </div>
@@ -367,8 +354,7 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
     <button class="btn-ghost" onclick="limpar()">Limpar lista</button>
   </div>
 </div>
-</div></section>
-
+</section>
 </main>
 
 <footer>
@@ -900,10 +886,25 @@ function avaliar(){
     $('tetoBox').style.background='#F5A62310';
     $('rTetoOrigem').textContent=tt.origem;
   }
-  var margem=tt.teto-r.preco;
+  // Duas distâncias diferentes, e confundi-las custa dinheiro:
+  // até o TETO = quanto ainda caberia pagar sem furar o critério;
+  // até o ALVO = o que se leva para a mesa de negociação.
+  // O alvo efetivo é o que a tela manda mirar: se o teto ficou abaixo do alvo
+  // teórico, é o teto que vale. Comparar contra o alvo cru mostraria dois
+  // números diferentes chamados "alvo" na mesma tela.
+  var alvoEfetivo=Math.min(r.alvo,Math.max(0,tt.teto));
+  var margem=tt.teto-r.preco, vsAlvo=r.preco-alvoEfetivo;
   $('rMargem').textContent=(margem>=0?'+':'−')+brl(Math.abs(margem));
   $('rMargem').style.color=margem>=0?'var(--ok)':'var(--red)';
-  $('rMargemTx').textContent=margem>=0?'ainda cabe':'peça '+brl(-margem)+' de desconto';
+  $('rMargemTx').textContent=margem>=0
+    ? 'daria para pagar até '+brl(tt.teto)
+    : 'acima do teto — peça '+brl(-margem)+' de desconto';
+
+  $('rVsAlvo').textContent=(vsAlvo>0?'−':'+')+brl(Math.abs(vsAlvo));
+  $('rVsAlvo').style.color=vsAlvo>0?'var(--warn)':'var(--ok)';
+  $('rVsAlvoTx').textContent=vsAlvo>0
+    ? 'peça isso de desconto para chegar no alvo'
+    : 'o pedido já está abaixo do seu alvo';
   $('rTetoNota').innerHTML=(r.financiando
       ? 'Teto pela parcela de '+brl(r.parcelaMax)+' em '+r.prazo+'x: <b>'+brl(tt.tetoOrc)+'</b>. '
       : 'Teto pelo orçamento: <b>'+brl(tt.tetoOrc)+'</b> ('+brl(r.orc)+(r.troca>0?' mais '+brl(r.troca)+' da troca':'')+' menos '+brl(tt.custoImediato)+' de custos de entrada). ')
@@ -936,7 +937,7 @@ function avaliar(){
     return '<div class="flag"><div class="dot" style="background:'+(cores[f[0]]||'var(--txt2)')+'"></div><div class="tx">'+esc(f[1])+'</div></div>';
   }).join('') : '<div class="muted">Nenhum ponto crítico identificado.</div>';
 
-  $('resultado').scrollIntoView({behavior:'smooth',block:'start'});
+  irAba('resultado');
 }
 
 // ---------- impressão ----------
@@ -950,7 +951,7 @@ function cabecalhoImpressao(r){
       +' a '+r.taxa.toFixed(2).replace('.',',')+'% a.m. · entrada '+brl(r.entradaFin)
       +(r.troca>0?' · troca '+brl(r.troca):'')+' · juros '+brl(r.jurosTotais));
   }
-  $('pfAval').textContent='Avaliador de Carro Usado v7 · RitmoProd · gerado em '
+  $('pfAval').textContent='Avaliador de Carro Usado v8 · RitmoProd · gerado em '
     +new Date().toLocaleString('pt-BR')
     +' · estimativa a partir dos parâmetros informados, não substitui cautelar nem laudo mecânico.';
 }
@@ -963,7 +964,7 @@ function imprimir(modo){
     if(!lista.length){ alert('Nenhum anúncio salvo para imprimir.'); return; }
     $('phSubLista').textContent=lista.length+(lista.length===1?' anúncio':' anúncios')
       +' · ordenados por score · horizonte '+n('pAnos')+' anos · '+Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano';
-    $('pfLista').textContent='Avaliador de Carro Usado v7 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
+    $('pfLista').textContent='Avaliador de Carro Usado v8 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
   }
   document.body.classList.add(modo==='aval'?'p-aval':'p-lista');
   window.print();
@@ -1009,7 +1010,7 @@ function limpar(){ if(confirm('Apagar todos os anúncios salvos?')){ lista=[]; r
 
 function exportar(){
   var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-  var dados={versao:7, data:new Date().toISOString(), parametros:p, lista:lista};
+  var dados={versao:8, data:new Date().toISOString(), parametros:p, lista:lista};
   var b=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(b);
@@ -1168,12 +1169,36 @@ function Combo(id){
   sync();
 }
 
-// ---------- etapas recolhíveis ----------
-function alternarEtapa(id,forcar){
-  var el=$(id), fechada=(forcar===undefined)?!el.classList.contains('fechada'):forcar;
-  el.classList.toggle('fechada',fechada);
-  var b=el.querySelector('.etapa-cab');
-  if(b) b.setAttribute('aria-expanded',String(!fechada));
+// ---------- abas ----------
+var ABAS=['perfil','pagamento','anuncio','resultado'];
+var abaAtual='anuncio';
+
+function irAba(nome){
+  if(ABAS.indexOf(nome)===-1) return;
+  abaAtual=nome;
+  ABAS.forEach(function(a){
+    var ativo=(a===nome);
+    $('pn-'+a).hidden=!ativo;
+    var b=$('ab-'+a);
+    b.classList.toggle('ativa',ativo);
+    b.setAttribute('aria-selected',String(ativo));
+    b.tabIndex=ativo?0:-1;
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Barra de contexto: o que está selecionado continua visível em qualquer aba.
+var carroEscolhido='';
+function contexto(){
+  var q=[];
+  q.push(carroEscolhido?'<b>'+esc(carroEscolhido)+'</b>':'nenhum carro escolhido — vá em Anúncio');
+  q.push(Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano');
+  q.push(n('pAnos')+' anos');
+  q.push('orçamento '+brl(n('pOrc')));
+  if(n('pPrazo')>0) q.push(Math.round(n('pPrazo'))+'x a '+n('pTaxa').toFixed(2).replace('.',',')+'%');
+  else q.push('à vista');
+  if($('mTroca').value==='sim'&&n('mOferta')>0) q.push('troca '+brl(n('mOferta')));
+  $('ctx').innerHTML=q.join(' · ');
 }
 
 function resumoTroca(){
@@ -1186,10 +1211,7 @@ function resumoTroca(){
   el.style.color=pct>8?'var(--red)':'var(--warn)';
 }
 
-function resumoPerfil(){
-  $('et1s').textContent=Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano · gasolina '
-    +brl2(n('pComb'))+'/L · '+n('pAnos')+' anos · orçamento '+brl(n('pOrc'))+' · score mín. '+n('pLimiar');
-}
+function resumoPerfil(){ contexto(); }
 
 function alternarTecnico(){
   var b=$('tecBloco'), aberto=b.hidden;
@@ -1289,11 +1311,8 @@ function aoAcharAnuncio(d, fstatus){
     var ficha=inferirFicha(d.Marca,d.Modelo,d.Combustivel);
     aplicarFicha(ficha);
 
-    // Carro escolhido: recolhe a etapa 2 e leva a tela para a análise.
-    $('et2s').textContent=marcaLimpa(d.Marca)+' '+d.Modelo+' · '+d.AnoModelo+' · FIPE '+d.Valor;
-    alternarEtapa('et2',true);
-    alternarEtapa('et3',false);
-    $('et3').scrollIntoView({behavior:'smooth',block:'start'});
+    carroEscolhido=marcaLimpa(d.Marca)+' '+d.Modelo+' '+d.AnoModelo;
+    contexto();
 
     fstatus('FIPE '+d.Valor+' · '+d.Marca+' '+d.Modelo+' '+d.AnoModelo+' · código '+d.CodigoFipe
       +'. Ficha técnica preenchida abaixo'+(ficha.casou?'':' (motor não reconhecido — confira o sincronismo)')+'.',
@@ -1315,7 +1334,7 @@ var CAMPOS_P=['pKmAno','pComb','pIpva','pAnos','pOrc','pEstrada','pAnoRef','pKmR
 function salvarLocal(){
   try{
     var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-    localStorage.setItem('avaliador_carro',JSON.stringify({v:7,parametros:p,lista:lista}));
+    localStorage.setItem('avaliador_carro',JSON.stringify({v:8,parametros:p,lista:lista}));
   }catch(e){ /* modo sem storage — export JSON continua funcionando */ }
 }
 function restaurarLocal(){
@@ -1336,6 +1355,10 @@ Combo('qMarca'); Combo('qModelo'); Combo('mMarca'); Combo('mModelo');
 fipeAnuncio = ligarFipe('q','fipeStatus',aoAcharAnuncio);
 var fipeMeuCarro = ligarFipe('m','mStatus',aoAcharMeuCarro);
 resumoPerfil(); resumoTroca();
+// Primeira visita começa no Perfil; quem já tem dados salvos cai direto no Anúncio.
+var jaUsou=false;
+try{ jaUsou=!!localStorage.getItem('avaliador_carro'); }catch(e){}
+irAba(jaUsou?'anuncio':'perfil');
 CAMPOS_P.forEach(function(c){ $(c).addEventListener('input',resumoPerfil); });
 ['mTroca','mFipe','mOferta'].forEach(function(c){ $(c).addEventListener('input',resumoTroca); });
 $('mTroca').addEventListener('change',resumoTroca);
