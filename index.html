@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Avaliador de Carro Usado · RitmoProd</title>
+<meta name="description" content="Quanto esse carro vale para você, considerando risco, uso, custo e capacidade financeira — e qual é o máximo a pagar.">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111111">
 <meta name="mobile-web-app-capable" content="yes">
@@ -12,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Avaliador">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#111111; --surface:#1C1C1C; --elevated:#2A2A2A; --border:#2A2A2A;
@@ -34,30 +35,30 @@ main{padding:20px;max-width:1180px;margin:0 auto}
 @media(max-width:760px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:460px){
   .g2,.g3,.g4{grid-template-columns:1fr}
-  /* KPI é rótulo curto + número: empilhar um por linha desperdiça a tela toda */
   .grid.kpis{grid-template-columns:repeat(2,1fr);gap:16px 10px}
   .kpis .kpi-value{font-size:21px}
   .kpis .kpi-forte{font-size:25px}
   .kpis .kpi-label{font-size:9px;letter-spacing:1px}
   .kpis .kpi-delta{font-size:10px}
-  .scoreval{font-size:44px}
 }
 label{display:block;font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
 input,select{width:100%;background:var(--elevated);border:0.5px solid var(--border);border-radius:6px;color:var(--txt);font-family:var(--font-d);font-size:14px;padding:9px 10px;outline:none}
-input:focus,select:focus{border-color:var(--acc)}
-.chk{display:flex;align-items:center;gap:8px;margin-top:22px}
-.chk input{width:auto}
+input:focus,select:focus,button:focus-visible,.aba:focus-visible{border-color:var(--acc);outline:2px solid var(--acc);outline-offset:1px}
+@media(max-width:760px){input,select{font-size:16px}} /* abaixo de 16px o iOS dá zoom ao focar */
+.chk{display:flex;align-items:center;gap:8px}
+.chk input{width:auto;min-width:18px;min-height:18px}
 .chk span{font-family:var(--font-b);font-size:13px;color:var(--txt)}
-.btn-primary{background:var(--acc);color:#111;font-family:var(--font-b);font-weight:600;font-size:13px;padding:9px 20px;border-radius:6px;border:none;cursor:pointer}
-.btn-ghost{background:transparent;color:var(--txt2);font-family:var(--font-b);font-size:13px;padding:9px 20px;border-radius:6px;border:0.5px solid var(--border);cursor:pointer}
+.btn-primary{background:var(--acc);color:#111;font-family:var(--font-b);font-weight:600;font-size:13px;padding:10px 20px;border-radius:6px;border:none;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--txt2);font-family:var(--font-b);font-size:13px;padding:10px 20px;border-radius:6px;border:0.5px solid var(--border);cursor:pointer}
 .btn-primary:hover{filter:brightness(1.1)} .btn-ghost:hover{color:var(--txt);border-color:var(--txt3)}
+.btn-mini{background:transparent;color:var(--txt2);font-family:var(--font-d);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 12px;border-radius:6px;border:0.5px solid var(--border);cursor:pointer}
+.btn-mini:hover{color:var(--acc);border-color:var(--acc)}
 .row-btn{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .kpi-label{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:2px;text-transform:uppercase}
 .kpi-value{font-family:var(--font-h);font-size:28px;font-weight:700;color:var(--txt);line-height:1.15;margin-top:4px}
 .kpi-forte{font-size:34px}
-.kpi-delta{font-family:var(--font-d);font-size:11px;color:var(--ok);margin-top:2px}
-.kpi-delta.neg{color:var(--red)}
-.kpi-delta.mut{color:var(--txt2)}
+.kpi-delta{font-family:var(--font-d);font-size:11px;color:var(--txt2);margin-top:2px}
+.kpi-delta.pos{color:var(--ok)} .kpi-delta.neg{color:var(--red)}
 .badge{display:inline-block;font-family:var(--font-d);font-size:10px;font-weight:600;padding:3px 10px;border-radius:3px;letter-spacing:1px;text-transform:uppercase}
 .badge-ok{background:#4CAF5015;color:var(--ok);border:0.5px solid #4CAF5030}
 .badge-warn{background:#FF980015;color:var(--warn);border:0.5px solid #FF980030}
@@ -66,21 +67,16 @@ input:focus,select:focus{border-color:var(--acc)}
 table{width:100%;border-collapse:collapse;font-family:var(--font-b);font-size:13px;color:var(--txt)}
 th{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:2px;text-transform:uppercase;padding:8px 10px;border-bottom:0.5px solid var(--border);text-align:left;white-space:nowrap}
 td{padding:10px;border-bottom:0.5px solid var(--border);font-family:var(--font-d);font-size:13px}
-td.nm{font-family:var(--font-b);white-space:normal;min-width:190px}
+td.nm{font-family:var(--font-b);white-space:normal;min-width:170px}
 tr:hover td{background:var(--elevated)}
-.num{text-align:right;white-space:nowrap}
-.scorebox{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-bottom:14px;border-bottom:0.5px solid var(--border);margin-bottom:14px}
-.scoreval{font-family:var(--font-h);font-size:56px;font-weight:700;line-height:1}
-.flag{display:flex;gap:9px;padding:9px 0;border-bottom:0.5px solid var(--border);align-items:flex-start}
-.flag:last-child{border-bottom:none}
-.flag .dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex-shrink:0}
-.flag .tx{font-size:13px;line-height:1.5}
+th.num,td.num{text-align:right;white-space:nowrap}
 .muted{color:var(--txt2);font-size:12px;line-height:1.6}
 .wrap{overflow-x:auto}
 footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5px solid var(--border);background:var(--bg)}
-.hint{font-family:var(--font-d);font-size:10px;color:var(--txt3);margin-top:5px;letter-spacing:.5px}
-/* abas — um painel por vez, em vez de tudo empilhado */
-.abas{display:flex;gap:4px;overflow-x:auto;margin-bottom:14px;border-bottom:0.5px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.hint{font-family:var(--font-d);font-size:10px;color:var(--txt3);margin-top:5px;letter-spacing:.5px;line-height:1.5}
+
+/* abas */
+.abas{display:flex;gap:4px;overflow-x:auto;margin-bottom:14px;border-bottom:0.5px solid var(--border);scrollbar-width:none}
 .abas::-webkit-scrollbar{display:none}
 .aba{flex:1 0 auto;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--txt2);font-family:var(--font-b);font-weight:500;font-size:14px;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-0.5px}
 .aba:hover{color:var(--txt)}
@@ -89,14 +85,14 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
 .ctx b{color:var(--txt);font-weight:600}
 @media(max-width:460px){.aba{font-size:13px;padding:10px 12px}}
 
-/* combobox com busca — o select de modelo da FIPE tem centenas de versões */
+/* combobox com busca */
 .combo{position:relative}
 .combo-inp{width:100%;background:var(--elevated);border:0.5px solid var(--border);border-radius:6px;color:var(--txt);font-family:var(--font-d);font-size:14px;padding:9px 28px 9px 10px;outline:none}
 .combo-inp:focus{border-color:var(--acc)}
 .combo-inp:disabled{color:var(--txt3)}
 .combo.aberto .combo-inp{border-color:var(--acc);border-radius:6px 6px 0 0}
 .combo-seta{position:absolute;right:10px;top:12px;font-size:9px;color:var(--txt2);pointer-events:none}
-.combo-pop{position:absolute;z-index:40;left:0;right:0;top:100%;max-height:264px;overflow-y:auto;background:var(--elevated);border:0.5px solid var(--acc);border-top:none;border-radius:0 0 6px 6px;-webkit-overflow-scrolling:touch}
+.combo-pop{position:absolute;z-index:40;left:0;right:0;top:100%;max-height:264px;overflow-y:auto;background:var(--elevated);border:0.5px solid var(--acc);border-top:none;border-radius:0 0 6px 6px}
 .combo-cnt{position:sticky;top:0;background:var(--elevated);padding:6px 10px;border-bottom:0.5px solid var(--border);font-family:var(--font-d);font-size:10px;color:var(--txt3);letter-spacing:1px}
 .combo-op{padding:9px 10px;font-family:var(--font-b);font-size:13px;line-height:1.35;color:var(--txt);cursor:pointer;border-bottom:0.5px solid var(--border)}
 .combo-op:last-child{border-bottom:none}
@@ -104,57 +100,83 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
 .combo-op mark{background:transparent;color:var(--acc);font-weight:600}
 .combo-op.ativo mark{color:#111;text-decoration:underline}
 .combo-vazio{padding:12px 10px;font-family:var(--font-b);font-size:12px;color:var(--txt2)}
-@media(max-width:760px){.combo-inp{font-size:16px}} /* abaixo de 16px o iOS dá zoom ao focar */
+@media(max-width:760px){.combo-inp{font-size:16px}}
 
-/* bloco técnico recolhido — os campos agora vêm preenchidos da FIPE */
-.btn-mini{background:transparent;color:var(--txt2);font-family:var(--font-d);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 12px;border-radius:6px;border:0.5px solid var(--border);cursor:pointer}
-.btn-mini:hover{color:var(--acc);border-color:var(--acc)}
-.etapa-n{display:flex;align-items:center;justify-content:center;width:30px;height:30px;flex-shrink:0;border-radius:6px;background:var(--acc);color:#111;font-family:var(--font-h);font-size:19px;font-weight:700;line-height:1}
-.etapa-t{font-family:var(--font-h);font-size:21px;font-weight:700;letter-spacing:.5px;line-height:1.1;color:var(--txt)}
-.etapa-s{font-family:var(--font-d);font-size:10px;color:var(--txt2);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+/* veredito — o elemento dominante da tela */
+.vered{border:1px solid var(--acc);border-radius:10px;padding:20px;margin-bottom:16px;background:#F5A62308}
+.vered.ok{border-color:var(--ok);background:#4CAF5008}
+.vered.warn{border-color:var(--warn);background:#FF980008}
+.vered.red{border-color:var(--red);background:#F4433608}
+.vered-topo{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+.vered-score{font-family:var(--font-h);font-size:62px;font-weight:700;line-height:.95}
+.vered-sc2{font-family:var(--font-d);font-size:11px;color:var(--txt2);letter-spacing:1px}
+.vered-dec{font-family:var(--font-h);font-size:34px;font-weight:700;letter-spacing:1px;line-height:1.05}
+.vered-txt{font-size:14px;line-height:1.65;color:var(--txt);max-width:70ch}
+.vered-txt b{color:var(--acc)}
+
+/* escada de preços */
+.escada{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px}
+@media(max-width:640px){.escada{grid-template-columns:repeat(2,1fr)}}
+.deg{background:var(--surface);padding:14px}
+.deg-r{font-family:var(--font-d);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt2)}
+.deg-v{font-family:var(--font-h);font-size:26px;font-weight:700;margin-top:5px;line-height:1.1}
+.deg-o{font-family:var(--font-d);font-size:10px;color:var(--txt3);margin-top:3px;line-height:1.5}
+.deg.destaque{background:var(--elevated)}
+
+/* barras do score */
+.crit{display:grid;grid-template-columns:118px 1fr 62px;gap:10px;align-items:center;padding:6px 0;font-size:12px}
+.crit-n{font-family:var(--font-b);color:var(--txt2)}
+.crit-b{height:7px;background:var(--elevated);border-radius:4px;overflow:hidden}
+.crit-f{height:100%;border-radius:4px}
+.crit-p{font-family:var(--font-d);font-size:11px;text-align:right}
+@media(max-width:460px){.crit{grid-template-columns:96px 1fr 56px;font-size:11px}}
+
+/* alertas */
+.al{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);align-items:flex-start}
+.al:last-child{border-bottom:none}
+.al-t{font-family:var(--font-d);font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:3px;flex-shrink:0;margin-top:2px;text-transform:uppercase}
+.al-x{font-size:13px;line-height:1.55}
 .ficha{background:var(--elevated);border:0.5px solid var(--border);border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.65}
 .ficha .l1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .ficha .mt{font-family:var(--font-d);font-size:13px;color:var(--txt);letter-spacing:.5px}
 .ficha .obs{color:var(--txt2);font-size:12px;line-height:1.6}
 .ficha .alerta{color:var(--warn)} .ficha .grave{color:var(--red)}
 
-/* ---------- impressão / PDF ---------- */
+/* impressão */
 .print-only{display:none}
 @media print{
   @page{margin:14mm}
   :root{--bg:#fff;--surface:#fff;--elevated:#fff;--border:#999;--txt:#111;--txt2:#444;--txt3:#666}
   body{background:#fff;color:#111;font-size:10.5pt}
   header,footer,.no-print,.abas,.ctx{display:none!important}
-  /* aba fechada na tela não pode sumir do papel; vem depois do [hidden] para vencer */
-  .painel,#tecBloco{display:block!important}
-  .painel{margin:0}
   main{padding:0;margin:0;max-width:none}
   .card{background:#fff;border:none;padding:0;margin:0 0 16px;break-inside:avoid}
   .print-only{display:block}
+  /* precisa vir depois de [hidden] — mesma especificidade, desempate por ordem */
+  .painel,#tecBloco,#cfgBloco{display:block!important}
   body.p-aval .card:not(#resultado){display:none!important}
   body.p-lista .card:not(#listaCard){display:none!important}
-  .scoreval{font-size:42pt}
-  .kpi-value{font-size:17pt}
-  .section-label{color:#666}
-  table{font-size:9pt}
-  th,td{padding:5px 6px;border-bottom:0.5px solid #ccc}
-  .col-acao{display:none!important}
+  .vered{border:1px solid #111!important;background:transparent!important}
+  .escada{border:0.5px solid #999}
+  .deg{background:#fff!important}
+  .vered-score{font-size:44pt} .vered-dec{font-size:22pt} .deg-v{font-size:16pt}
+  table{font-size:9pt} th,td{padding:5px 6px;border-bottom:0.5px solid #ccc}
   tr:hover td{background:transparent}
+  .col-acao{display:none!important}
   .wrap{overflow:visible}
-  .grid,.flag,.scorebox{break-inside:avoid}
+  .grid,.al,.crit{break-inside:avoid}
   .badge{background:transparent!important;border:0.5px solid currentColor!important}
-  #tetoBox{border:1px solid #111!important;background:transparent!important}
+  .crit-b{border:0.5px solid #ccc}
   .ph{border-bottom:1.5px solid #111;padding-bottom:9px;margin-bottom:16px}
   .ph-t{font-family:var(--font-h);font-size:19pt;font-weight:700;color:#111;line-height:1.1}
   .ph-s{font-family:var(--font-d);font-size:8.5pt;color:#444;margin-top:6px;letter-spacing:.3px;line-height:1.6}
-  .pf{margin-top:16px;padding-top:8px;border-top:0.5px solid #999;font-family:var(--font-d);font-size:7.5pt;color:#666;letter-spacing:.3px}
+  .pf{margin-top:16px;padding-top:8px;border-top:0.5px solid #999;font-family:var(--font-d);font-size:7.5pt;color:#666}
 }
 </style>
 </head>
 <body>
-
 <header>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" height="40">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" height="40" role="img" aria-label="RitmoProd">
   <rect width="320" height="80" fill="#111111" rx="6"/>
   <rect x="0" y="0" width="320" height="2" fill="#F5A623" rx="1"/>
   <rect x="20" y="52" width="7" height="12" fill="#2A2A2A" rx="1"/>
@@ -166,195 +188,349 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
   <text x="77" y="65" font-family="'IBM Plex Mono','Courier New',monospace" font-size="8" fill="#888888" letter-spacing="3">ANÁLISE · PRODUÇÃO · RITMO</text>
   <rect width="319" height="79" fill="none" stroke="#2A2A2A" stroke-width="0.5" rx="6"/>
 </svg>
-<span class="badge badge-acc">Avaliador v9 · abas</span>
+<span class="badge badge-acc" id="verApp">Avaliador</span>
 </header>
 
 <main>
-<div class="abas" role="tablist" aria-label="Seções do avaliador">
+<div class="abas" role="tablist" aria-label="Seções">
   <button type="button" class="aba" role="tab" id="ab-perfil"    aria-controls="pn-perfil"    onclick="irAba('perfil')">Perfil</button>
   <button type="button" class="aba" role="tab" id="ab-pagamento" aria-controls="pn-pagamento" onclick="irAba('pagamento')">Pagamento</button>
-  <button type="button" class="aba" role="tab" id="ab-anuncio"   aria-controls="pn-anuncio"   onclick="irAba('anuncio')">Anúncio</button>
+  <button type="button" class="aba" role="tab" id="ab-carro"     aria-controls="pn-carro"     onclick="irAba('carro')">Carro</button>
   <button type="button" class="aba" role="tab" id="ab-resultado" aria-controls="pn-resultado" onclick="irAba('resultado')">Resultado</button>
+  <button type="button" class="aba" role="tab" id="ab-comparar"  aria-controls="pn-comparar"  onclick="irAba('comparar')">Comparar</button>
 </div>
 <div class="ctx" id="ctx"></div>
 
+<!-- ============ PERFIL ============ -->
 <section class="painel" id="pn-perfil" role="tabpanel" aria-labelledby="ab-perfil" hidden>
 <div class="card">
-  <div class="section-label">Perfil de uso — seus parâmetros</div>
+  <div class="section-label">Perfil de uso</div>
   <div class="grid g4">
-    <div><label>Km por ano</label><input type="number" id="pKmAno" value="20400"></div>
-    <div><label>Preço gasolina R$/L</label><input type="number" step="0.01" id="pComb" value="6.49"><div class="hint">confira na bomba que você usa</div></div>
-    <div><label>IPVA %</label><input type="number" step="0.1" id="pIpva" value="4"></div>
-    <div><label>Horizonte (anos)</label><input type="number" id="pAnos" value="3"></div>
-    <div><label>Orçamento máx. R$</label><input type="number" id="pOrc" value="70000"></div>
-    <div><label>% rodagem em estrada</label><input type="number" id="pEstrada" value="85"><div class="hint">o resto entra como cidade, que rende ~22% menos</div></div>
-    <div><label>Ano de referência</label><input type="number" id="pAnoRef" value="2026"><div class="hint">preenchido com o ano corrente</div></div>
-    <div><label>Km/ano de referência</label><input type="number" id="pKmRef" value="12000"><div class="hint">média do mercado, p/ julgar km alto</div></div>
-    <div><label>Custos de entrada R$</label><input type="number" id="pEntrada" value="2200"><div class="hint">transferência + cautelar + 1ª revisão</div></div>
-    <div><label>Score mínimo aceitável</label><input type="number" id="pLimiar" value="60"><div class="hint">abaixo disso você não compra</div></div>
+    <div><label for="pPerfil">Perfil</label><select id="pPerfil" onchange="aplicarPerfil()">
+      <option value="economico">Econômico — pouca rodagem</option>
+      <option value="misto">Misto — uso normal</option>
+      <option value="estrada">Estrada — alta rodagem</option>
+      <option value="custom">Personalizado</option>
+    </select><div class="hint">muda só os parâmetros de uso</div></div>
+    <div><label for="pKmAno">Km por ano</label><input type="number" id="pKmAno" value="20400" min="0"></div>
+    <div><label for="pEstrada">% em estrada</label><input type="number" id="pEstrada" value="85" min="0" max="100"><div class="hint">o resto entra como cidade, ~22% menos eficiente</div></div>
+    <div><label for="pAnos">Horizonte</label><select id="pAnos">
+      <option value="1">1 ano</option><option value="2">2 anos</option>
+      <option value="3" selected>3 anos</option><option value="5">5 anos</option><option value="7">7 anos</option>
+    </select></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-label">Limites de compra</div>
+  <div class="grid g4">
+    <div><label for="pOrc">Caixa disponível R$</label><input type="number" id="pOrc" value="70000" min="0"><div class="hint">o que você tem para desembolsar</div></div>
+    <div><label for="pLimiar">Score mínimo</label><input type="number" id="pLimiar" value="60" min="0" max="100"><div class="hint">abaixo disso você não compra</div></div>
+    <div><label for="pAnoRef">Ano de referência</label><input type="number" id="pAnoRef" value="2026"><div class="hint">preenchido com o ano corrente</div></div>
+    <div><label for="pKmRef">Km/ano de referência</label><input type="number" id="pKmRef" value="12000" min="1"><div class="hint">média do mercado, p/ julgar km alto</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-label">Custos de entrada</div>
+  <div class="grid g3">
+    <div><label for="pTransf">Transferência R$</label><input type="number" id="pTransf" value="1200" min="0"></div>
+    <div><label for="pCautelarC">Cautelar R$</label><input type="number" id="pCautelarC" value="350" min="0"></div>
+    <div><label for="pRevisao">Revisão inicial R$</label><input type="number" id="pRevisao" value="650" min="0"></div>
+  </div>
+</div>
+
+<div class="row-btn no-print">
+  <button type="button" class="btn-mini" id="btnCfg" onclick="alternarCfg()" aria-expanded="false" aria-controls="cfgBloco">Configurações avançadas</button>
+</div>
+<div id="cfgBloco" hidden style="margin-top:14px">
+  <div class="card">
+    <div class="section-label">Custos de uso — premissas</div>
+    <div class="grid g4">
+      <div><label for="pComb">Gasolina R$/L</label><input type="number" step="0.01" id="pComb" value="6.49" min="0"></div>
+      <div><label for="pIpva">IPVA %</label><input type="number" step="0.1" id="pIpva" value="4" min="0"></div>
+      <div><label for="pSeguro">Seguro % da FIPE/ano</label><input type="number" step="0.1" id="pSeguro" value="4" min="0"></div>
+      <div><label for="pManutKm">Manutenção R$/km</label><input type="number" step="0.01" id="pManutKm" value="0.11" min="0"><div class="hint">preventiva base, antes do índice</div></div>
+      <div><label for="pPneuKm">Pneus a cada km</label><input type="number" id="pPneuKm" value="50000" min="1"></div>
+      <div><label for="pPneuC">Jogo de pneus R$</label><input type="number" id="pPneuC" value="2400" min="0"></div>
+      <div><label for="pFreioKm">Freios a cada km</label><input type="number" id="pFreioKm" value="40000" min="1"></div>
+      <div><label for="pFreioC">Freios R$</label><input type="number" id="pFreioC" value="900" min="0"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-label">Pesos do score — soma 100</div>
+    <div class="grid g4" id="gradePesos"></div>
+    <div class="muted" id="somaPesos" style="margin-top:10px"></div>
+    <div class="row-btn"><button type="button" class="btn-ghost" onclick="resetPesos()">Restaurar pesos padrão</button></div>
+  </div>
+  <div class="card">
+    <div class="section-label">Faixas de classificação</div>
+    <div class="grid g4">
+      <div><label for="cFForte">Compra forte a partir de</label><input type="number" id="cFForte" value="80" min="0" max="100"></div>
+      <div><label for="cFBoa">Boa compra a partir de</label><input type="number" id="cFBoa" value="70" min="0" max="100"></div>
+      <div><label for="cFAceita">Aceitável a partir de</label><input type="number" id="cFAceita" value="60" min="0" max="100"></div>
+      <div><label for="cFAtencao">Atenção a partir de</label><input type="number" id="cFAtencao" value="45" min="0" max="100"></div>
+    </div>
+    <div class="muted" style="margin-top:10px">Abaixo da última faixa: descartar.</div>
+  </div>
+  <div class="card">
+    <div class="section-label">Dados</div>
+    <div class="row-btn" style="margin-top:0">
+      <button type="button" class="btn-ghost" onclick="exportar()">Exportar JSON</button>
+      <button type="button" class="btn-ghost" onclick="document.getElementById('imp').click()">Importar JSON</button>
+      <input type="file" id="imp" accept=".json,application/json" style="display:none" onchange="importar(event)" aria-label="Arquivo JSON para importar">
+      <button type="button" class="btn-ghost" onclick="mostrarTestes()">Rodar autoteste</button>
+    </div>
+    <div class="muted" id="impStatus" style="margin-top:10px"></div>
+    <div class="wrap" id="saidaTestes" hidden style="margin-top:12px"></div>
   </div>
 </div>
 </section>
 
+<!-- ============ PAGAMENTO ============ -->
 <section class="painel" id="pn-pagamento" role="tabpanel" aria-labelledby="ab-pagamento" hidden>
 <div class="card">
   <div class="section-label">Meu carro na troca</div>
   <div class="grid g3">
-    <div><label>Tenho carro para dar</label><select id="mTroca">
-      <option value="nao">Não</option>
-      <option value="sim">Sim</option>
+    <div><label for="mTroca">Tenho carro para dar</label><select id="mTroca">
+      <option value="nao">Não</option><option value="sim">Sim</option>
     </select></div>
-    <div><label>FIPE do meu carro R$</label><input type="number" id="mFipe" value="0"></div>
-    <div><label>Oferta da loja R$</label><input type="number" id="mOferta" value="0"><div class="hint">quanto estão pagando pelo seu</div></div>
+    <div><label for="mFipe">FIPE do meu carro R$</label><input type="number" id="mFipe" value="0" min="0"></div>
+    <div><label for="mOferta">Oferta da loja R$</label><input type="number" id="mOferta" value="0" min="0"><div class="hint">quanto estão realmente pagando</div></div>
   </div>
   <div style="margin-top:12px">
-    <label>Consultar meu carro na FIPE</label>
+    <label for="mMarca_busca">Consultar meu carro na FIPE</label>
     <div class="grid g3">
-      <select id="mMarca"><option value="">carregando…</option></select>
-      <select id="mModelo"><option value="">selecione a marca</option></select>
-      <select id="mAno"><option value="">selecione o modelo</option></select>
+      <select id="mMarca" aria-label="Marca do meu carro"><option value="">carregando…</option></select>
+      <select id="mModelo" aria-label="Modelo do meu carro"><option value="">selecione a marca</option></select>
+      <select id="mAno" aria-label="Ano do meu carro"><option value="">selecione o modelo</option></select>
     </div>
   </div>
   <div class="muted" id="mResumo" style="margin-top:10px">Sem troca.</div>
-  <div class="muted" id="mStatus" style="margin-top:10px">Opcional. Serve para medir quanto a loja está tirando do seu carro e para entrar como entrada no financiamento.</div>
+  <div class="muted" id="mStatus" style="margin-top:8px" role="status">Opcional. Mede quanto a loja está tirando do seu carro e entra como entrada.</div>
 </div>
 
 <div class="card">
-  <div class="section-label">Pagamento</div>
+  <div class="section-label">Forma de pagamento</div>
   <div class="grid g4">
-    <div><label>Entrada em dinheiro R$</label><input type="number" id="pEntradaFin" value="0"><div class="hint">além do carro na troca</div></div>
-    <div><label>Prazo (meses)</label><input type="number" id="pPrazo" value="0"><div class="hint">0 = compra à vista</div></div>
-    <div><label>Juros % ao mês</label><input type="number" step="0.01" id="pTaxa" value="1.79"><div class="hint">taxa do contrato, não do anúncio</div></div>
-    <div><label>Parcela máxima R$</label><input type="number" id="pParcelaMax" value="1500"><div class="hint">o que cabe no seu mês</div></div>
+    <div><label for="pEntradaFin">Entrada em dinheiro R$</label><input type="number" id="pEntradaFin" value="0" min="0"><div class="hint">além do carro na troca</div></div>
+    <div><label for="pPrazo">Prazo (meses)</label><input type="number" id="pPrazo" value="0" min="0" max="96"><div class="hint">0 = compra à vista</div></div>
+    <div><label for="pTaxa">Juros % ao mês</label><input type="number" step="0.01" id="pTaxa" value="1.79" min="0"><div class="hint">taxa do contrato, não do anúncio</div></div>
+    <div><label for="pParcelaMax">Parcela máxima R$</label><input type="number" id="pParcelaMax" value="1500" min="0"><div class="hint">o que cabe no seu mês</div></div>
   </div>
-  <div class="muted" style="margin-top:10px">Com prazo 0 o app trata como compra à vista e o teto sai do orçamento. Financiando, o teto passa a sair da parcela máxima.</div>
+  <div class="grid g2" style="margin-top:12px">
+    <div><label for="pCet">CET % ao ano (opcional)</label><input type="number" step="0.01" id="pCet" value="0" min="0"><div class="hint">se o contrato informar, entra no relatório</div></div>
+    <div><div class="muted" id="pagResumo" style="padding-top:24px">Compra à vista.</div></div>
+  </div>
 </div>
 </section>
 
-<section class="painel" id="pn-anuncio" role="tabpanel" aria-labelledby="ab-anuncio" hidden>
+<!-- ============ CARRO ============ -->
+<section class="painel" id="pn-carro" role="tabpanel" aria-labelledby="ab-carro" hidden>
 <div class="card">
   <div class="section-label">FIPE ao vivo <span id="fipeRef" class="badge badge-acc" style="margin-left:6px">—</span></div>
   <div class="grid g3">
-    <div><label>Marca</label><select id="qMarca"><option value="">carregando…</option></select></div>
-    <div><label>Modelo / versão</label><select id="qModelo"><option value="">selecione a marca</option></select></div>
-    <div><label>Ano</label><select id="qAno"><option value="">selecione o modelo</option></select></div>
+    <div><label for="qMarca_busca">Marca</label><select id="qMarca" aria-label="Marca"><option value="">carregando…</option></select></div>
+    <div><label for="qModelo_busca">Modelo / versão</label><select id="qModelo" aria-label="Modelo"><option value="">selecione a marca</option></select></div>
+    <div><label for="qAno">Ano</label><select id="qAno"><option value="">selecione o modelo</option></select></div>
   </div>
-  <div class="muted" id="fipeStatus" style="margin-top:10px">Selecione marca, modelo e ano. Além do valor da FIPE, isso preenche sozinho a ficha técnica do anúncio abaixo — motor, câmbio, sincronismo e consumo.</div>
-  <div class="row-btn no-print"><button class="btn-ghost" onclick="carregarMarcas()">Recarregar marcas</button></div>
+  <div class="muted" id="fipeStatus" style="margin-top:10px" role="status">Escolha marca, modelo e ano. Puxa o valor da FIPE e monta a ficha técnica.</div>
+  <div class="row-btn no-print"><button type="button" class="btn-ghost" onclick="carregarMarcas()">Recarregar marcas</button></div>
 </div>
 
 <div class="card">
   <div class="section-label">Anúncio a avaliar</div>
   <div id="fichaStatus" class="ficha" hidden style="margin-bottom:14px"></div>
-
   <div class="grid g3">
-    <div style="grid-column:1/-1"><label>Apelido do anúncio</label><input id="fNome" placeholder="ex: Virtus loja Souza"></div>
-    <div><label>Ano do modelo</label><input type="number" id="fAno" value="2019"></div>
-    <div><label>Km atual</label><input type="number" id="fKm" value="70000"></div>
-    <div><label>Preço pedido R$</label><input type="number" id="fPreco" value="65000"></div>
-    <div style="grid-column:1/-1"><label>FIPE do mês R$</label><input type="number" id="fFipe" value="69644"><div class="hint">vem da etapa 2 — edite só se for digitar à mão</div></div>
+    <div style="grid-column:1/-1"><label for="fNome">Apelido do anúncio</label><input id="fNome" placeholder="ex: Virtus loja Souza"></div>
+    <div><label for="fAno">Ano do modelo</label><input type="number" id="fAno" value="2019"></div>
+    <div><label for="fKm">Km atual</label><input type="number" id="fKm" value="70000" min="0"></div>
+    <div><label for="fPreco">Preço pedido R$</label><input type="number" id="fPreco" value="65000" min="0"></div>
+    <div><label for="fFipe">FIPE do mês R$</label><input type="number" id="fFipe" value="69644" min="0"><div class="hint" id="fFipeOrigem">vem da consulta acima — edite só para digitar à mão</div></div>
+    <div><label for="fHist">Histórico de manutenção</label><select id="fHist">
+      <option value="nao">Não comprovado</option>
+      <option value="parcial">Parcial</option>
+      <option value="sim">Comprovado</option>
+    </select></div>
+    <div><label for="fOrigem">Origem / uso</label><select id="fOrigem">
+      <option value="particular">Particular</option>
+      <option value="frota">Ex-frota / locadora</option>
+    </select></div>
   </div>
 
-  <div class="row-btn no-print" style="margin-top:12px">
+  <div class="card" style="margin:14px 0 0;background:var(--elevated)">
+    <div class="section-label">Cautelar</div>
+    <div class="grid g2">
+      <div><label for="fCautelar">Situação</label><select id="fCautelar" onchange="sincCautelar()">
+        <option value="nao">Não feita</option>
+        <option value="feita">Feita e aprovada</option>
+        <option value="reprovada">Feita e reprovou</option>
+      </select></div>
+      <div><div class="muted" id="cautResumo" style="padding-top:24px"></div></div>
+    </div>
+    <div id="cautLista" hidden style="margin-top:12px">
+      <div class="grid g2" id="gradeCautelar"></div>
+    </div>
+  </div>
+
+  <div class="row-btn no-print">
     <button type="button" class="btn-mini" id="btnTec" onclick="alternarTecnico()" aria-expanded="false" aria-controls="tecBloco">Ajustar ficha técnica</button>
   </div>
-
   <div id="tecBloco" hidden style="margin-top:12px">
     <div class="grid g3">
-      <div style="grid-column:1/-1"><label>Sobrepor pela lista fixa</label><select id="fModelo"></select><div class="hint">a etapa 2 já preencheu tudo — use isto só se quiser trocar à mão</div></div>
-      <div><label>Consumo estrada km/L</label><input type="number" step="0.1" id="fCons" value="12.5"></div>
-      <div><label>Sincronismo</label><select id="fCorreia">
+      <div style="grid-column:1/-1"><label for="fModelo">Sobrepor pela lista fixa</label><select id="fModelo"></select><div class="hint">a consulta acima já preencheu — use só para trocar à mão</div></div>
+      <div><label for="fCons">Consumo estrada km/L</label><input type="number" step="0.1" id="fCons" value="12.5" min="0"></div>
+      <div><label for="fCorreia">Sincronismo</label><select id="fCorreia">
         <option value="seca">Correia seca (externa)</option>
         <option value="banhada">Correia banhada a óleo</option>
         <option value="corrente">Corrente</option>
         <option value="?">Não identificado — confirmar</option>
       </select></div>
-      <div><label>Intervalo troca (km)</label><input type="number" id="fCorreiaKm" value="120000"></div>
-      <div><label>Custo da troca R$</label><input type="number" id="fCorreiaCusto" value="1200"></div>
-      <div><label>Câmbio</label><select id="fCambio">
+      <div><label for="fCorreiaKm">Intervalo troca (km)</label><input type="number" id="fCorreiaKm" value="120000" min="0"></div>
+      <div><label for="fCorreiaCusto">Custo da troca R$</label><input type="number" id="fCorreiaCusto" value="1200" min="0"></div>
+      <div><label for="fCambio">Câmbio</label><select id="fCambio">
         <option value="AT">Automático conversor (AT)</option>
         <option value="CVT">CVT</option>
         <option value="DCT">Dupla embreagem (DCT/DSG)</option>
         <option value="MEC">Manual</option>
       </select></div>
-      <div><label>Índice manutenção</label><input type="number" step="0.05" id="fComplex" value="1.00"><div class="hint">1,00 = aspirado simples · 1,25 = turbo</div></div>
+      <div><label for="fComplex">Índice manutenção</label><input type="number" step="0.05" id="fComplex" value="1.00" min="0.5" max="2"><div class="hint">1,00 = aspirado simples · 1,25 = turbo</div></div>
+      <div><label for="fOleo">Óleo na especificação</label><select id="fOleo">
+        <option value="nao">Não comprovado</option>
+        <option value="sim">Comprovado</option>
+      </select><div class="hint">decisivo em correia banhada a óleo</div></div>
     </div>
   </div>
 
-  <div class="grid g3" style="margin-top:12px">
-    <div class="chk" style="margin-top:0"><input type="checkbox" id="fNotas"><span>Notas de revisão / óleo comprovadas</span></div>
-    <div class="chk" style="margin-top:0"><input type="checkbox" id="fFrota"><span>Ex-frota / locadora</span></div>
-    <div class="chk" style="margin-top:0"><input type="checkbox" id="fCautelar"><span>Cautelar já aprovada</span></div>
-  </div>
   <div class="row-btn no-print">
-    <button class="btn-primary" onclick="avaliar()">Avaliar</button>
-    <button class="btn-primary" onclick="salvar()">Avaliar e salvar na lista</button>
-    <button class="btn-ghost" onclick="exportar()">Exportar JSON</button>
-    <button class="btn-ghost" onclick="document.getElementById('imp').click()">Importar JSON</button>
-    <input type="file" id="imp" accept=".json" style="display:none" onchange="importar(event)">
+    <button type="button" class="btn-primary" onclick="avaliar()">Avaliar</button>
+    <button type="button" class="btn-primary" onclick="salvar()">Avaliar e salvar</button>
+    <button type="button" class="btn-ghost" onclick="limparAnuncio()">Limpar anúncio</button>
   </div>
 </div>
 </section>
 
+<!-- ============ RESULTADO ============ -->
 <section class="painel" id="pn-resultado" role="tabpanel" aria-labelledby="ab-resultado" hidden>
 <div class="card" id="resultado" style="display:none">
   <div class="ph print-only"><div class="ph-t" id="phTitulo">Avaliação</div><div class="ph-s" id="phSub"></div></div>
-  <div class="section-label">Resultado</div>
-  <div class="scorebox">
-    <div><div class="kpi-label">Score</div><div class="scoreval" id="rScore">—</div></div>
-    <div><div id="rBadge"></div><div class="muted" id="rVeredito" style="margin-top:8px;max-width:520px"></div></div>
+
+  <div class="vered" id="veredBox">
+    <div class="vered-topo">
+      <div>
+        <div class="vered-score" id="rScore">—</div>
+        <div class="vered-sc2" id="rScore2">de 100</div>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div class="vered-dec" id="rDecisao">—</div>
+        <div class="vered-sc2" id="rClasse" style="margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="vered-txt" id="rVeredito"></div>
   </div>
-  <div id="tetoBox" style="border:0.5px solid var(--acc);background:#F5A62310;border-radius:8px;padding:16px;margin-bottom:16px">
-    <div class="grid g3 kpis">
-      <div><div class="kpi-label">Mire aqui (alvo)</div><div class="kpi-value" id="rAlvo2" style="color:var(--ok)">—</div><div class="kpi-delta mut">abertura da negociação</div></div>
-      <div><div class="kpi-label">Máximo que você pode pagar</div><div class="kpi-value kpi-forte" id="rTeto" style="color:var(--acc)">—</div><div class="kpi-delta mut" id="rTetoOrigem"></div></div>
-      <div><div class="kpi-label">Folga até o seu teto</div><div class="kpi-value" id="rMargem">—</div><div class="kpi-delta mut" id="rMargemTx"></div></div>
+
+  <div class="escada" id="escada">
+    <div class="deg"><div class="deg-r">Preço pedido</div><div class="deg-v" id="ePedido">—</div><div class="deg-o">o que o vendedor quer</div></div>
+    <div class="deg"><div class="deg-r">FIPE</div><div class="deg-v" id="eFipe">—</div><div class="deg-o" id="eFipeO">referência de mercado</div></div>
+    <div class="deg destaque"><div class="deg-r">Preço alvo</div><div class="deg-v" id="eAlvo" style="color:var(--ok)">—</div><div class="deg-o" id="eAlvoO">onde a negociação deve chegar</div></div>
+    <div class="deg destaque"><div class="deg-r">Teto máximo</div><div class="deg-v" id="eTeto" style="color:var(--acc)">—</div><div class="deg-o" id="eTetoO">limite absoluto</div></div>
+  </div>
+
+  <div class="card" style="background:var(--elevated);margin-bottom:16px">
+    <div class="section-label">Estratégia de negociação</div>
+    <div class="grid g4 kpis">
+      <div><div class="kpi-label">Primeira oferta</div><div class="kpi-value" id="nOferta" style="color:var(--ok)">—</div><div class="kpi-delta">abra por aqui</div></div>
+      <div><div class="kpi-label">Preço alvo</div><div class="kpi-value" id="nAlvo">—</div><div class="kpi-delta">onde fechar</div></div>
+      <div><div class="kpi-label">Teto máximo</div><div class="kpi-value kpi-forte" id="nTeto" style="color:var(--acc)">—</div><div class="kpi-delta" id="nTetoO"></div></div>
+      <div><div class="kpi-label" id="nDescL">Desconto necessário</div><div class="kpi-value" id="nDesc">—</div><div class="kpi-delta" id="nDescO"></div></div>
     </div>
-    <div class="grid g3 kpis" style="margin-top:14px;padding-top:14px;border-top:0.5px solid #F5A62330">
-      <div><div class="kpi-label">Negociação vs alvo</div><div class="kpi-value" id="rVsAlvo">—</div><div class="kpi-delta mut" id="rVsAlvoTx"></div></div>
+    <div class="muted" id="nTexto" style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--border)"></div>
+  </div>
+
+  <div class="grid g2" style="margin-bottom:16px">
+    <div>
+      <div class="section-label">De onde vem o score</div>
+      <div id="rCriterios"></div>
+      <div class="muted" id="rScoreNota" style="margin-top:10px"></div>
     </div>
-    <div class="muted" id="rTetoNota" style="margin-top:12px;padding-top:12px;border-top:0.5px solid #F5A62330"></div>
+    <div>
+      <div class="section-label">Pontos que decidem</div>
+      <div id="rAlertas"></div>
+    </div>
+  </div>
+
+  <div class="grid g4 kpis" style="margin-bottom:16px">
+    <div><div class="kpi-label">Custo total <span id="rAnosA"></span></div><div class="kpi-value" id="rTco">—</div><div class="kpi-delta">compra + uso − revenda</div></div>
+    <div><div class="kpi-label">Custo por km</div><div class="kpi-value" id="rCustoKm">—</div><div class="kpi-delta" id="rKmTotal"></div></div>
+    <div><div class="kpi-label">Custo médio mensal</div><div class="kpi-value" id="rCustoMes">—</div><div class="kpi-delta" id="rMesesTx"></div></div>
+    <div><div class="kpi-label">Preço vs FIPE</div><div class="kpi-value" id="rDesvio">—</div><div class="kpi-delta" id="rDesvioTx"></div></div>
+  </div>
+
+  <div class="grid g4 kpis" id="boxFin" style="margin-bottom:16px" hidden>
+    <div><div class="kpi-label">Parcela</div><div class="kpi-value" id="rParcela">—</div><div class="kpi-delta" id="rParcelaTx"></div></div>
+    <div><div class="kpi-label">Valor financiado</div><div class="kpi-value" id="rFinanciado">—</div><div class="kpi-delta" id="rEntradaTx"></div></div>
+    <div><div class="kpi-label">Juros do contrato</div><div class="kpi-value" id="rJuros" style="color:var(--red)">—</div><div class="kpi-delta" id="rJurosTx"></div></div>
+    <div><div class="kpi-label">Caixa na compra</div><div class="kpi-value" id="rCaixa">—</div><div class="kpi-delta" id="rCaixaTx"></div></div>
   </div>
   <div class="muted" id="finNota" style="margin-bottom:16px" hidden></div>
-  <div class="grid g4 kpis" id="boxFin" style="margin-bottom:16px" hidden>
-    <div><div class="kpi-label">Parcela</div><div class="kpi-value" id="rParcela">—</div><div class="kpi-delta mut" id="rParcelaTx"></div></div>
-    <div><div class="kpi-label">Valor financiado</div><div class="kpi-value" id="rFinanciado">—</div><div class="kpi-delta mut" id="rEntradaTx"></div></div>
-    <div><div class="kpi-label">Juros no período</div><div class="kpi-value" id="rJuros" style="color:var(--red)">—</div><div class="kpi-delta mut" id="rJurosTx"></div></div>
-    <div><div class="kpi-label">Caixa na compra</div><div class="kpi-value" id="rCaixa">—</div><div class="kpi-delta mut" id="rCaixaTx"></div></div>
-  </div>
-  <div class="grid g4 kpis" style="margin-bottom:16px">
-    <div><div class="kpi-label">Custo total <span id="rAnosA"></span> anos</div><div class="kpi-value" id="rTco">—</div><div class="kpi-delta mut">compra + uso − revenda</div></div>
-    <div><div class="kpi-label">Custo por km</div><div class="kpi-value" id="rCustoKm">—</div><div class="kpi-delta mut" id="rKmTotal"></div></div>
-    <div><div class="kpi-label">Preço vs FIPE</div><div class="kpi-value" id="rDesvio">—</div><div class="kpi-delta" id="rDesvioTx"></div></div>
-    <div><div class="kpi-label">Preço alvo p/ negociar</div><div class="kpi-value" id="rAlvo">—</div><div class="kpi-delta mut">teto que eu pagaria</div></div>
-  </div>
+
   <div class="grid g2">
     <div>
       <div class="section-label">Composição do custo</div>
       <div class="wrap"><table id="tBreak"></table></div>
+      <div class="muted" id="rPremissas" style="margin-top:10px"></div>
     </div>
     <div>
-      <div class="section-label">Pontos de atenção</div>
-      <div id="rFlags"></div>
+      <div class="section-label">Quilometragem</div>
+      <div class="wrap"><table id="tKm"></table></div>
+      <div class="section-label" style="margin-top:16px">Sincronismo e câmbio</div>
+      <div class="muted" id="rMecanica"></div>
     </div>
   </div>
+
   <div class="pf print-only" id="pfAval"></div>
   <div class="row-btn no-print">
-    <button class="btn-primary" onclick="imprimir('aval')">Imprimir / salvar PDF</button>
+    <button type="button" class="btn-primary" onclick="imprimir('aval')">Gerar relatório / PDF</button>
+    <button type="button" class="btn-ghost" onclick="salvar()">Salvar na lista</button>
   </div>
 </div>
+<div class="card" id="semResultado">
+  <div class="muted">Nenhuma avaliação ainda. Vá em <b>Carro</b>, escolha o veículo e clique em Avaliar.</div>
+</div>
+</section>
 
+<!-- ============ COMPARAR ============ -->
+<section class="painel" id="pn-comparar" role="tabpanel" aria-labelledby="ab-comparar" hidden>
 <div class="card" id="listaCard">
   <div class="ph print-only"><div class="ph-t">Comparativo de anúncios</div><div class="ph-s" id="phSubLista"></div></div>
-  <div class="section-label">Comparativo — anúncios salvos</div>
-  <div class="wrap"><table id="tLista"><tbody><tr><td class="muted" style="font-family:var(--font-b)">Nenhum anúncio salvo ainda.</td></tr></tbody></table></div>
+  <div class="section-label">Anúncios salvos</div>
+  <div class="row-btn no-print" style="margin:0 0 12px">
+    <label for="ordem" style="margin:0;align-self:center">Ordenar por</label>
+    <select id="ordem" style="width:auto" onchange="render()">
+      <option value="score">Score</option>
+      <option value="custoKm">Custo por km</option>
+      <option value="tco">Custo total</option>
+      <option value="preco">Preço pedido</option>
+      <option value="desconto">Desconto necessário</option>
+    </select>
+    <button type="button" class="btn-ghost" onclick="compararSelecionados()">Comparar selecionados</button>
+    <button type="button" class="btn-ghost" onclick="imprimir('lista')">Imprimir comparativo</button>
+    <button type="button" class="btn-ghost" onclick="limpar()">Limpar lista</button>
+  </div>
+  <div class="wrap"><table id="tLista"><tbody><tr><td class="muted">Nenhum anúncio salvo ainda.</td></tr></tbody></table></div>
   <div class="pf print-only" id="pfLista"></div>
-  <div class="row-btn no-print">
-    <button class="btn-ghost" onclick="imprimir('lista')">Imprimir comparativo</button>
-    <button class="btn-ghost" onclick="limpar()">Limpar lista</button>
+</div>
+<div class="card" id="boxComparar" hidden>
+  <div class="section-label">Comparação direta</div>
+  <div class="wrap"><table id="tComparar"></table></div>
+  <div class="card" style="background:var(--elevated);margin:16px 0 0">
+    <div class="section-label">Melhor compra</div>
+    <div class="vered-dec" id="cMelhor" style="font-size:26px;color:var(--ok)">—</div>
+    <div class="muted" id="cPorque" style="margin-top:10px"></div>
   </div>
 </div>
 </section>
+
 </main>
 
 <footer>
@@ -364,58 +540,89 @@ footer{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:0.5p
 </footer>
 
 <script>
-// ---------- biblioteca de modelos (sobreposição manual) ----------
-// Sem preço aqui de propósito: a FIPE do mês é a única fonte de valor. Uma tabela
-// de preço embutida no código envelhece em silêncio e briga com a consulta ao vivo.
-var MODELOS = [
-  {id:'custom', nome:'— Preencher manualmente / detectado pela FIPE —'},
-  {id:'onixplus_tb', nome:'Chevrolet Onix Plus 1.0 Turbo (Aut.)', cons:14.5, correia:'banhada', correiaKm:240000, correiaCusto:3600, cambio:'AT', complex:1.25},
-  {id:'onix_tb', nome:'Chevrolet Onix Hatch 1.0 Turbo (Aut.)', cons:14.0, correia:'banhada', correiaKm:240000, correiaCusto:3600, cambio:'AT', complex:1.25},
-  {id:'virtus_16', nome:'VW Virtus 1.6 MSI (Aut.)', cons:12.5, correia:'seca', correiaKm:120000, correiaCusto:1200, cambio:'AT', complex:1.00},
-  {id:'virtus_tsi', nome:'VW Virtus 200 TSI 1.0 (Aut.)', cons:14.0, correia:'seca', correiaKm:120000, correiaCusto:1400, cambio:'AT', complex:1.20},
-  {id:'polo_16', nome:'VW Polo 1.6 MSI (Aut.)', cons:12.8, correia:'seca', correiaKm:120000, correiaCusto:1200, cambio:'AT', complex:1.00},
-  {id:'etios_sd', nome:'Toyota Etios Sedan 1.5 (Aut.)', cons:13.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:0.85},
-  {id:'yaris_sd', nome:'Toyota Yaris Sedan 1.5 (CVT)', cons:13.5, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:0.90},
-  {id:'hb20s_16', nome:'Hyundai HB20S 1.6 (Aut.)', cons:12.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:1.00},
-  {id:'versa_16', nome:'Nissan Versa 1.6 (CVT)', cons:13.5, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.10},
-  {id:'sentra_20', nome:'Nissan Sentra 2.0 (CVT)', cons:11.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.15},
-  {id:'cronos_13', nome:'Fiat Cronos 1.3 (CVT)', cons:13.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'CVT', complex:1.05},
-  {id:'prisma_14', nome:'Chevrolet Prisma 1.4 (Aut.)', cons:12.0, correia:'corrente', correiaKm:0, correiaCusto:0, cambio:'AT', complex:0.95}
+/* =====================================================================
+   AVALIADOR DE CARRO USADO · RitmoProd
+   Responde: quanto esse carro vale para MIM, e qual o máximo a pagar.
+   Módulos: CONFIG · MODELOS · ESTADO · UTIL · FIPE · FINANCIAMENTO ·
+            CUSTOS · SCORE · TETO · DECISÃO · PERSISTÊNCIA · UI · TESTES
+   ===================================================================== */
+
+/* ============================== CONFIG ============================== */
+var APP_VERSION='4.0.0';
+var DATA_VERSION=4;
+
+// Pesos do score, em pontos. Somam 100. Editáveis em Configurações.
+var PESOS_PADRAO={preco:25,km:15,historico:15,risco:15,cambio:10,idade:10,origem:5,consumo:5};
+var PESOS=Object.assign({},PESOS_PADRAO);
+var ROTULO_PESO={preco:'Preço vs FIPE',km:'Quilometragem',historico:'Histórico',
+  risco:'Risco mecânico',cambio:'Câmbio',idade:'Idade',origem:'Origem/uso',consumo:'Consumo'};
+
+var FAIXAS_PADRAO={forte:80,boa:70,aceita:60,atencao:45};
+var FAIXAS=Object.assign({},FAIXAS_PADRAO);
+
+// Premissas de cálculo, todas em um lugar só — sem número mágico solto no motor.
+var C={
+  consumoCidade:0.78,     // cidade rende ~22% menos que estrada
+  ipvaQueda:0.92,         // base do IPVA cai ~8% ao ano
+  deprecAno:0.91,         // FIPE cai ~9% ao ano
+  deprecKmPeso:0.22,      // peso do km excedente sobre a revenda
+  deprecKmPiso:0.70,      // a revenda não cai além disso por km
+  deprecHistBonus:0.03,   // histórico comprovado segura a revenda
+  fatorIdadeManut:0.05,   // manutenção sobe 5% por ano acima de 5 anos
+  provisaoTurbo:0.06,     // provisão de risco por 1.000 km rodados
+  provisaoCVT:0.05, provisaoDCT:0.08, provisaoAT:0.03, provisaoMEC:0.015,
+  aberturaOferta:0.94,    // primeira oferta = 94% do alvo
+  descBase:0.05           // desconto mínimo sobre a FIPE no preço alvo
+};
+
+var PERFIS={
+  economico:{pKmAno:9000, pEstrada:40},
+  misto:{pKmAno:15000, pEstrada:60},
+  estrada:{pKmAno:30000, pEstrada:90}
+};
+
+var ITENS_CAUTELAR=[
+  ['cEstrutura','Estrutura / chassi'],['cSinistro','Sem registro de sinistro'],
+  ['cLeilao','Sem passagem por leilão'],['cRestricao','Sem restrição / gravame'],
+  ['cKm','Quilometragem coerente'],['cIdent','Identificação (motor e chassi)'],
+  ['cEnchente','Sem indício de enchente'],['cDebitos','Sem débitos pendentes']
 ];
 
-// ---------- ficha técnica automática a partir do nome da FIPE ----------
-// A FIPE devolve algo como "VIRTUS 1.6 MSI Flex 16V 4p Aut.". Dali dá para tirar
-// cilindrada, aspiração e câmbio com segurança. O que o nome NUNCA diz é o
-// sincronismo — e é justamente ele que separa R$ 0 de R$ 3.600 no ato da compra.
-// Por isso sincronismo só sai do catálogo abaixo, de famílias identificadas.
-// O que não casa fica marcado como NÃO IDENTIFICADO em vez de receber um chute:
-// preencher "corrente" por omissão esconderia exatamente o risco que o app existe
-// para achar. A ordem importa — a primeira família que casar vence.
-var FAMILIAS = [
-  // Volkswagen — linha EA211 (1.0 MPI, 1.0/1.4 TSI, 1.6 MSI) usa correia dentada seca
-  {m:/volks|^vw\b/i, re:/\b2\.0\b[\s\S]*\bTSI\b/i,                sinc:'corrente', cons:9.5, cx:1.30, ref:'VW EA888 2.0 TSI'},
-  {m:/volks|^vw\b/i, re:/\bTSI\b/i,                                  sinc:'seca', km:120000, cst:1400, cx:1.20, ref:'VW EA211 turbo'},
-  {m:/volks|^vw\b/i, re:/\b(MSI|MPI)\b/i,                            sinc:'seca', km:120000, cst:1200, cx:1.00, ref:'VW EA211 aspirado'},
+/* ============================== MODELOS ============================== */
+// Sobreposição manual. Sem preço aqui: a FIPE do mês é a única fonte de valor.
+var MODELOS=[
+  {id:'custom',nome:'— Preencher manualmente / detectado pela FIPE —'},
+  {id:'onixplus_tb',nome:'Chevrolet Onix Plus 1.0 Turbo (Aut.)',cons:14.5,correia:'banhada',correiaKm:240000,correiaCusto:3600,cambio:'AT',complex:1.25},
+  {id:'onix_tb',nome:'Chevrolet Onix Hatch 1.0 Turbo (Aut.)',cons:14.0,correia:'banhada',correiaKm:240000,correiaCusto:3600,cambio:'AT',complex:1.25},
+  {id:'virtus_16',nome:'VW Virtus 1.6 MSI (Aut.)',cons:12.5,correia:'seca',correiaKm:120000,correiaCusto:1200,cambio:'AT',complex:1.00},
+  {id:'virtus_tsi',nome:'VW Virtus 200 TSI 1.0 (Aut.)',cons:14.0,correia:'seca',correiaKm:120000,correiaCusto:1400,cambio:'AT',complex:1.20},
+  {id:'polo_16',nome:'VW Polo 1.6 MSI (Aut.)',cons:12.8,correia:'seca',correiaKm:120000,correiaCusto:1200,cambio:'AT',complex:1.00},
+  {id:'etios_sd',nome:'Toyota Etios Sedan 1.5 (Aut.)',cons:13.0,correia:'corrente',correiaKm:0,correiaCusto:0,cambio:'AT',complex:0.85},
+  {id:'yaris_sd',nome:'Toyota Yaris Sedan 1.5 (CVT)',cons:13.5,correia:'corrente',correiaKm:0,correiaCusto:0,cambio:'CVT',complex:0.90},
+  {id:'hb20s_16',nome:'Hyundai HB20S 1.6 (Aut.)',cons:12.0,correia:'corrente',correiaKm:0,correiaCusto:0,cambio:'AT',complex:1.00},
+  {id:'versa_16',nome:'Nissan Versa 1.6 (CVT)',cons:13.5,correia:'corrente',correiaKm:0,correiaCusto:0,cambio:'CVT',complex:1.10},
+  {id:'sentra_20',nome:'Nissan Sentra 2.0 (CVT)',cons:11.0,correia:'corrente',correiaKm:0,correiaCusto:0,cambio:'CVT',complex:1.15},
+  {id:'cronos_13',nome:'Fiat Cronos 1.3 (CVT)',cons:13.0,correia:'corrente',correiaKm:0,correiaCusto:0,cambio:'CVT',complex:1.05},
+  {id:'prisma_14',nome:'Chevrolet Prisma 1.4 (Aut.)',cons:12.0,correia:'corrente',correiaKm:0,correiaCusto:0,cambio:'AT',complex:0.95}
+];
 
-  // Chevrolet — o 1.0/1.2 turbo (Onix 2020+, Onix Plus, Tracker) tem correia em banho de óleo
-  {m:/chevrolet|^gm\b/i, re:/\b1\.[02]\b[\s\S]*\b(TURBO|TB)\b/i,   sinc:'banhada', km:240000, cst:3600, cx:1.25, ref:'GM 1.0/1.2 turbo — correia em banho de óleo'},
+// O nome da FIPE dá cilindrada, aspiração e câmbio. Nunca dá o sincronismo — e é
+// ele que separa R$ 0 de R$ 3.600 na compra. Por isso sincronismo só sai daqui.
+// Motor que não casa fica NÃO IDENTIFICADO em vez de receber um chute.
+var FAMILIAS=[
+  {m:/volks|^vw\b/i, re:/\b2\.0\b[\s\S]*\bTSI\b/i,            sinc:'corrente', cons:9.5, cx:1.30, ref:'VW EA888 2.0 TSI'},
+  {m:/volks|^vw\b/i, re:/\bTSI\b/i,                           sinc:'seca', km:120000, cst:1400, cx:1.20, ref:'VW EA211 turbo'},
+  {m:/volks|^vw\b/i, re:/\b(MSI|MPI)\b/i,                     sinc:'seca', km:120000, cst:1200, cx:1.00, ref:'VW EA211 aspirado'},
+  {m:/chevrolet|^gm\b/i, re:/\b1\.[02]\b[\s\S]*\b(TURBO|TB)\b/i, sinc:'banhada', km:240000, cst:3600, cx:1.25, ref:'GM 1.0/1.2 turbo — correia em banho de óleo'},
   {m:/chevrolet|^gm\b/i, re:/\b(ONIX|PRISMA|COBALT|SPIN|JOY|MONTANA)\b/i, sinc:'corrente', cx:0.95, ref:'GM SPE/4 aspirado'},
-
-  // Ford — o 1.0 EcoBoost também é correia em banho de óleo
-  {m:/ford/i, re:/\bECOBOOST\b|\b1\.0\b[\s\S]*\bTURBO\b/i,        sinc:'banhada', km:240000, cst:3600, cx:1.25, ref:'Ford 1.0 EcoBoost — correia em banho de óleo'},
-  {m:/ford/i, re:/\b(KA|FIESTA|ECOSPORT|FOCUS)\b/i,                   sinc:'seca', km:120000, cst:1300, cx:1.00, ref:'Ford Sigma/Rocam'},
-
-  // PSA / Stellantis — o 1.2 PureTech é o caso mais conhecido de correia em óleo
-  {m:/peugeot|citro/i, re:/\bPURETECH\b|\b1\.2\b/i,                  sinc:'banhada', km:180000, cst:3200, cx:1.25, ref:'PSA 1.2 PureTech — correia em banho de óleo'},
-  {m:/peugeot|citro/i, re:/\bTHP\b/i,                                 sinc:'corrente', cx:1.30, ref:'PSA 1.6 THP'},
-
-  // Fiat — os turbo da família GSE eu não confirmo, então não afirmo
-  {m:/fiat|jeep|ram/i, re:/\bTURBO\b|\bT\d{3}\b|\bGSE\b/i,          sinc:null, cx:1.25, ref:'Fiat/Jeep turbo — sincronismo não confirmado'},
-  {m:/fiat/i, re:/\bFIREFLY\b/i,                                      sinc:'seca', km:100000, cst:1300, cx:0.95, ref:'Fiat Firefly'},
-  {m:/fiat|jeep/i, re:/\bE\.?TORQ\b|\b1\.[68]\b/i,                   sinc:'seca', km:120000, cst:1400, cx:1.05, ref:'Fiat E.torQ'},
-  {m:/fiat/i, re:/\bFIRE\b|\b1\.[04]\b/i,                            sinc:'seca', km:100000, cst:1100, cx:0.90, ref:'Fiat Fire'},
-
-  // Japoneses e coreanos de linha: corrente de comando em toda a gama vendida aqui
+  {m:/ford/i, re:/\bECOBOOST\b|\b1\.0\b[\s\S]*\bTURBO\b/i,    sinc:'banhada', km:240000, cst:3600, cx:1.25, ref:'Ford 1.0 EcoBoost — correia em banho de óleo'},
+  {m:/ford/i, re:/\b(KA|FIESTA|ECOSPORT|FOCUS)\b/i,           sinc:'seca', km:120000, cst:1300, cx:1.00, ref:'Ford Sigma/Rocam'},
+  {m:/peugeot|citro/i, re:/\bPURETECH\b|\b1\.2\b/i,           sinc:'banhada', km:180000, cst:3200, cx:1.25, ref:'PSA 1.2 PureTech — correia em banho de óleo'},
+  {m:/peugeot|citro/i, re:/\bTHP\b/i,                         sinc:'corrente', cx:1.30, ref:'PSA 1.6 THP'},
+  {m:/fiat|jeep|ram/i, re:/\bTURBO\b|\bT\d{3}\b|\bGSE\b/i,    sinc:null, cx:1.25, ref:'Fiat/Jeep turbo — sincronismo não confirmado'},
+  {m:/fiat/i, re:/\bFIREFLY\b/i,                              sinc:'seca', km:100000, cst:1300, cx:0.95, ref:'Fiat Firefly'},
+  {m:/fiat|jeep/i, re:/\bE\.?TORQ\b|\b1\.[68]\b/i,            sinc:'seca', km:120000, cst:1400, cx:1.05, ref:'Fiat E.torQ'},
+  {m:/fiat/i, re:/\bFIRE\b|\b1\.[04]\b/i,                     sinc:'seca', km:100000, cst:1100, cx:0.90, ref:'Fiat Fire'},
   {m:/toyota/i,  re:/./, sinc:'corrente', cx:0.88, ref:'Toyota — corrente'},
   {m:/honda/i,   re:/./, sinc:'corrente', cx:0.92, ref:'Honda — corrente'},
   {m:/hyundai/i, re:/./, sinc:'corrente', cx:1.00, ref:'Hyundai Gamma/Kappa — corrente'},
@@ -423,48 +630,260 @@ var FAMILIAS = [
   {m:/nissan/i,  re:/./, sinc:'corrente', cx:1.10, ref:'Nissan HR/MR — corrente'},
   {m:/renault/i, re:/./, sinc:'corrente', cx:1.05, ref:'Renault SCe/TCe — corrente'}
 ];
-
 var CAMBIO_TXT={AT:'automático (conversor)',CVT:'CVT',DCT:'dupla embreagem',MEC:'manual'};
 
-// Lê o que dá para ler do nome: cilindrada, aspiração, câmbio e combustível.
+/* ============================== ESTADO ============================== */
+var lista=[];              // anúncios salvos
+var ultimo=null;           // última avaliação
+var nomeAuto=true;         // apelido ainda é automático?
+var carroEscolhido='', carroTroca='';
+var fipeManual=true;       // o valor da FIPE veio de consulta ou foi digitado?
+var fipeMesRef='';
+var abaAtual='carro';
+
+/* ============================== UTIL ============================== */
+function $(id){return document.getElementById(id)}
+function n(id){var e=$(id); if(!e) return 0; var v=parseFloat(e.value); return isFinite(v)?v:0}
+function v(id){var e=$(id); return e?e.value:''}
+function chk(id){var e=$(id); return !!(e&&e.checked)}
+function clamp(x,a,b){return x<a?a:(x>b?b:x)}
+function num(x){return isFinite(x)?x:0}
+function brl(x){return 'R$ '+Math.round(num(x)).toLocaleString('pt-BR')}
+function brl2(x){return 'R$ '+num(x).toFixed(2).replace('.',',')}
+function pct(x,casas){return num(x).toFixed(casas===undefined?1:casas).replace('.',',')+'%'}
+function mil(x){return Math.round(num(x)).toLocaleString('pt-BR')}
+var ESC={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+function esc(x){return String(x==null?'':x).replace(/[&<>"']/g,function(c){return ESC[c]})}
+function marcaLimpa(m){return String(m||'').replace(/^[A-Za-z]{2,4}\s*-\s*/,'').trim()}
+// Normaliza preservando o comprimento em caracteres, p/ o destaque casar por índice.
+function norm(t){return Array.from(String(t||'')).map(function(c){return c.normalize('NFD').charAt(0).toLowerCase()}).join('')}
+
+/* ============================== COMBOBOX ============================== */
+// A FIPE devolve centenas de versões por marca. O <select> original segue
+// escondido como fonte da verdade: .value e o evento change valem como antes.
+var COMBOS={};
+function destacar(txt,termos){
+  var chars=Array.from(String(txt)), nn=norm(txt), mk=[];
+  termos.forEach(function(t){
+    if(!t) return;
+    var i=nn.indexOf(t);
+    while(i!==-1){ for(var k=i;k<i+t.length;k++) mk[k]=1; i=nn.indexOf(t,i+1); }
+  });
+  var out='',ab=false;
+  for(var j=0;j<chars.length;j++){
+    if(mk[j]&&!ab){ out+='<mark>'; ab=true; }
+    if(!mk[j]&&ab){ out+='</mark>'; ab=false; }
+    out+=esc(chars[j]);
+  }
+  return out+(ab?'</mark>':'');
+}
+function Combo(id){
+  var sel=$(id); if(!sel) return;
+  var wrap=document.createElement('div'); wrap.className='combo';
+  sel.parentNode.insertBefore(wrap,sel); wrap.appendChild(sel);
+  sel.style.display='none'; sel.setAttribute('tabindex','-1'); sel.setAttribute('aria-hidden','true');
+  var inp=document.createElement('input');
+  inp.type='text'; inp.className='combo-inp'; inp.autocomplete='off'; inp.id=id+'_busca';
+  inp.setAttribute('role','combobox'); inp.setAttribute('aria-expanded','false'); inp.setAttribute('aria-autocomplete','list');
+  var lab=sel.getAttribute('aria-label'); if(lab) inp.setAttribute('aria-label',lab);
+  var seta=document.createElement('span'); seta.className='combo-seta'; seta.textContent='▼'; seta.setAttribute('aria-hidden','true');
+  var pop=document.createElement('div'); pop.className='combo-pop'; pop.hidden=true; pop.setAttribute('role','listbox');
+  wrap.appendChild(inp); wrap.appendChild(seta); wrap.appendChild(pop);
+  var itens=[],vis=[],ativo=-1,aberto=false;
+  function rotulo(){var o=sel.options[sel.selectedIndex];return (o&&o.value)?o.textContent:''}
+  function sync(){
+    itens=[];
+    for(var i=0;i<sel.options.length;i++){
+      var o=sel.options[i];
+      if(o.value==='') inp.placeholder=o.textContent; else itens.push({v:o.value,t:o.textContent});
+    }
+    inp.disabled=!itens.length; inp.value=rotulo(); fechar();
+  }
+  function pintar(q){
+    var termos=norm(q).split(/\s+/).filter(Boolean);
+    vis=termos.length?itens.filter(function(it){var x=norm(it.t);return termos.every(function(t){return x.indexOf(t)!==-1})}):itens.slice();
+    if(!vis.length){pop.innerHTML='<div class="combo-vazio">Nada encontrado para “'+esc(q)+'”.</div>';ativo=-1;return}
+    var teto=300; // lista gigante renderizada inteira trava o celular
+    var h='<div class="combo-cnt">'+vis.length+(vis.length===1?' resultado':' resultados')+(vis.length>teto?' · exibindo '+teto+', refine':'')+'</div>';
+    vis.slice(0,teto).forEach(function(it,i){
+      h+='<div class="combo-op'+(i===ativo?' ativo':'')+'" role="option" data-i="'+i+'">'+destacar(it.t,termos)+'</div>';
+    });
+    pop.innerHTML=h;
+  }
+  function abrir(q){if(inp.disabled)return;aberto=true;wrap.classList.add('aberto');pop.hidden=false;inp.setAttribute('aria-expanded','true');pintar(q===undefined?'':q)}
+  function fechar(){aberto=false;wrap.classList.remove('aberto');pop.hidden=true;inp.setAttribute('aria-expanded','false');ativo=-1}
+  function mover(d){
+    if(!aberto){abrir('');return}
+    var max=Math.min(vis.length,300); if(!max)return;
+    ativo=(ativo+d+max)%max;
+    var ops=pop.querySelectorAll('.combo-op');
+    for(var i=0;i<ops.length;i++) ops[i].className='combo-op'+(i===ativo?' ativo':'');
+    if(ops[ativo]) ops[ativo].scrollIntoView({block:'nearest'});
+  }
+  function escolher(i){var it=vis[i];if(!it)return;sel.value=it.v;inp.value=it.t;fechar();sel.dispatchEvent(new Event('change',{bubbles:true}))}
+  inp.addEventListener('focus',function(){inp.select();abrir('')});
+  inp.addEventListener('input',function(){ativo=-1;abrir(inp.value)});
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){e.preventDefault();mover(1)}
+    else if(e.key==='ArrowUp'){e.preventDefault();mover(-1)}
+    else if(e.key==='Enter'){if(aberto&&ativo>=0){e.preventDefault();escolher(ativo)}}
+    else if(e.key==='Escape'){inp.value=rotulo();fechar()}
+  });
+  inp.addEventListener('blur',function(){setTimeout(function(){if(!aberto)return;inp.value=rotulo();fechar()},120)});
+  pop.addEventListener('mousedown',function(e){e.preventDefault()}); // não roubar o foco antes do clique
+  pop.addEventListener('click',function(e){
+    var alvo=e.target.closest?e.target.closest('.combo-op'):null;
+    if(alvo) escolher(parseInt(alvo.getAttribute('data-i'),10));
+  });
+  COMBOS[id]={sync:sync}; sync();
+}
+
+/* ============================== FIPE ============================== */
+var FIPE_API='https://parallelum.com.br/fipe/api/v1/carros/marcas';
+
+function encher(sel,itens,valKey,txtKey,placeholder){
+  var s=$(sel); s.innerHTML='';
+  var o=document.createElement('option'); o.value=''; o.textContent=placeholder; s.appendChild(o);
+  (itens||[]).forEach(function(it){
+    var op=document.createElement('option'); op.value=it[valKey]; op.textContent=it[txtKey]; s.appendChild(op);
+  });
+  if(COMBOS[sel]) COMBOS[sel].sync();
+}
+
+// A FIPE limita requisições por minuto e, quando corta, responde HTML — não JSON.
+// Sem tratar status e timeout, o usuário via só "Unexpected token <".
+function fipeGet(url){
+  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var timer=ctrl?setTimeout(function(){ctrl.abort()},8000):null;
+  return fetch(url,ctrl?{signal:ctrl.signal}:undefined).then(function(r){
+    if(timer) clearTimeout(timer);
+    if(r.status===429) throw new Error('limite de consultas atingido, espere um minuto');
+    if(!r.ok) throw new Error('serviço respondeu '+r.status);
+    return r.json().catch(function(){throw new Error('resposta fora do formato esperado')});
+  },function(e){
+    if(timer) clearTimeout(timer);
+    if(e&&e.name==='AbortError') throw new Error('tempo esgotado');
+    if(e instanceof TypeError) throw new Error('sem conexão');
+    throw e;
+  });
+}
+
+// A mesma cascata serve aos dois carros: o do anúncio (q) e o meu, na troca (m).
+function ligarFipe(pre,statusId,aoAchar){
+  var qs=function(s){return $(pre+s)};
+  var st=function(t,cor){var e=$(statusId);e.textContent=t;e.style.color=cor||'var(--txt2)'};
+  function marcas(){
+    st('Buscando marcas na FIPE…');
+    return fipeGet(FIPE_API).then(function(d){
+      encher(pre+'Marca',d,'codigo','nome','— selecione a marca —');
+      st('Marcas carregadas. Escolha marca, modelo e ano.');
+    }).catch(function(err){
+      encher(pre+'Marca',[],'','','indisponível');
+      st('FIPE indisponível ('+err.message+'). Digite o valor manualmente no campo FIPE.','var(--warn)');
+    });
+  }
+  function modelos(){
+    var m=qs('Marca').value;
+    encher(pre+'Ano',[],'','','selecione o modelo');
+    if(!m){encher(pre+'Modelo',[],'','','selecione a marca');return}
+    st('Buscando modelos…');
+    fipeGet(FIPE_API+'/'+m+'/modelos').then(function(d){
+      encher(pre+'Modelo',d.modelos,'codigo','nome','— selecione o modelo —');
+      st(d.modelos.length+' versões. Busque pela versão exata do anúncio.');
+    }).catch(function(err){st('Erro ao buscar modelos: '+err.message,'var(--red)')});
+  }
+  function anos(){
+    var m=qs('Marca').value, mo=qs('Modelo').value;
+    if(!mo){encher(pre+'Ano',[],'','','selecione o modelo');return}
+    st('Buscando anos…');
+    fipeGet(FIPE_API+'/'+m+'/modelos/'+mo+'/anos').then(function(d){
+      encher(pre+'Ano',d,'codigo','nome','— selecione o ano —');
+      st('Escolha o ano e o combustível.');
+    }).catch(function(err){st('Erro ao buscar anos: '+err.message,'var(--red)')});
+  }
+  function valor(){
+    var m=qs('Marca').value, mo=qs('Modelo').value, a=qs('Ano').value;
+    if(!m||!mo||!a) return;
+    st('Consultando valor…');
+    fipeGet(FIPE_API+'/'+m+'/modelos/'+mo+'/anos/'+a).then(function(d){
+      if(d.error){st('FIPE: '+d.error,'var(--warn)');return}
+      aoAchar(d,st);
+    }).catch(function(err){st('Erro na consulta: '+err.message+'. Digite a FIPE à mão.','var(--red)')});
+  }
+  qs('Marca').addEventListener('change',modelos);
+  qs('Modelo').addEventListener('change',anos);
+  qs('Ano').addEventListener('change',valor);
+  return {marcas:marcas};
+}
+function valorFipeNum(t){return Math.round(parseFloat(String(t).replace(/[^0-9,]/g,'').replace(',','.'))||0)}
+
+var fipeAnuncio=null, fipeMeuCarro=null;
+function carregarMarcas(){if(fipeAnuncio) fipeAnuncio.marcas()}
+
+function aoAcharAnuncio(d,st){
+  $('fFipe').value=valorFipeNum(d.Valor);
+  fipeManual=false;
+  fipeMesRef=String(d.MesReferencia||'').trim();
+  // A FIPE marca zero-km como ano 32000; nesse caso o ano do modelo é o corrente.
+  var ano=parseInt(String(d.AnoModelo),10);
+  if(ano===32000) ano=new Date().getFullYear();
+  if(ano&&ano>1990&&ano<2100) $('fAno').value=ano;
+  if(!v('fNome')||nomeAuto){ $('fNome').value=marcaLimpa(d.Marca)+' '+d.Modelo; nomeAuto=true; }
+  $('fipeRef').textContent=fipeMesRef||'—';
+  $('fFipeOrigem').textContent='consultado na FIPE de '+(fipeMesRef||'—')+' · '+String(d.Combustivel||'');
+  var ficha=inferirFicha(d.Marca,d.Modelo,d.Combustivel);
+  aplicarFicha(ficha);
+  carroEscolhido=marcaLimpa(d.Marca)+' '+d.Modelo+' '+d.AnoModelo;
+  contexto();
+  salvarLocal(); // valor posto por código não dispara change; sem isto some no reload
+  st('FIPE '+d.Valor+' · '+d.Marca+' '+d.Modelo+' '+d.AnoModelo+' · '+String(d.Combustivel||'')+' · código '+d.CodigoFipe
+    +'. Confira se a versão e o combustível batem com o anúncio.',
+    ficha.casou&&ficha.sinc?'var(--ok)':'var(--warn)');
+}
+function aoAcharMeuCarro(d,st){
+  $('mFipe').value=valorFipeNum(d.Valor);
+  // Não pré-preenche a oferta: isso zerava o deságio antes de a loja falar.
+  $('mTroca').value='sim';
+  carroTroca=marcaLimpa(d.Marca)+' '+d.Modelo+' '+d.AnoModelo;
+  st('Seu carro: '+d.Valor+' na FIPE de '+String(d.MesReferencia||'').trim()+'. Falta a oferta da loja.','var(--ok)');
+  resumoTroca(); contexto(); salvarLocal();
+}
+// Valor digitado à mão deixa de se apresentar como consulta.
+function marcarFipeManual(){
+  fipeManual=true; fipeMesRef='';
+  $('fFipeOrigem').textContent='valor informado manualmente';
+  $('fipeRef').textContent='manual';
+}
+
+/* ============================== FICHA TÉCNICA ============================== */
 function lerNomeFipe(marca,modelo,combustivel){
   var t=(String(marca||'')+' '+String(modelo||'')).toUpperCase();
   var mc=t.match(/\b(\d)[.,](\d)\b/);
   var cil=mc?parseFloat(mc[1]+'.'+mc[2]):0;
   var turbo=/\b(TSI|TFSI|TB|TURBO|T\d{3}|ECOBOOST|TGDI|THP|DIG-T|PURETECH|MULTIJET|CRDI|BLUEHDI|TDI)\b/.test(t);
   var cambio;
-  // A ordem separa CVT e dupla embreagem do "Aut." genérico — os três têm risco bem diferente.
+  // A ordem separa CVT e dupla embreagem do "Aut." genérico — riscos diferentes.
   if(/\b(CVT|X.?TRONIC|LINEARTRONIC|MULTIDRIVE)\b/.test(t)) cambio='CVT';
   else if(/\b(DSG|DCT|DUALOGIC|EDC|POWERSHIFT|TCT|PDK)\b|AUTOMATIZAD/.test(t)) cambio='DCT';
   else if(/\bAUT\b|\bAUTOM/.test(t)) cambio='AT';
   else cambio='MEC';
   var diesel=/DIESEL/i.test(String(combustivel||''))||/\b(MULTIJET|CRDI|BLUEHDI|TDI|CRD)\b/.test(t);
   if(diesel) turbo=true; // diesel de passeio vendido aqui é turbo sem exceção prática
-  // Elétrico não tem km/L: o app inteiro custeia combustível, então avisa em vez de inventar.
   var eletrico=/EL[ÉE]TRIC|100%\s*EL|\bBEV\b|\bEV\b/.test(t)||/EL[ÉE]TRIC/i.test(String(combustivel||''));
   return {cil:cil,turbo:turbo,cambio:cambio,diesel:diesel,eletrico:eletrico,txt:t};
 }
-
-// Consumo de estrada estimado por cilindrada e aspiração. É chute educado, e a
-// interface diz isso — o número real do anúncio sempre ganha.
 function consumoEstimado(p){
-  // Diesel roda mais por litro, mas quem monta 2.4+ aqui é picape pesada.
   if(p.diesel) return p.cil>=2.5?11.5:13.0;
   var base;
   if(!p.cil) base=12.0;
-  else if(p.cil<=1.0) base=13.5;
-  else if(p.cil<=1.3) base=13.0;
-  else if(p.cil<=1.4) base=12.5;
-  else if(p.cil<=1.6) base=12.3;
-  else if(p.cil<=1.8) base=11.8;
-  else if(p.cil<=2.0) base=11.0;
-  else base=9.0;
-  if(p.turbo) base+=(p.cil&&p.cil<=1.3)?0.7:-0.8; // turbo pequeno rende mais; turbo grande, menos
+  else if(p.cil<=1.0) base=13.5; else if(p.cil<=1.3) base=13.0;
+  else if(p.cil<=1.4) base=12.5; else if(p.cil<=1.6) base=12.3;
+  else if(p.cil<=1.8) base=11.8; else if(p.cil<=2.0) base=11.0; else base=9.0;
+  if(p.turbo) base+=(p.cil&&p.cil<=1.3)?0.7:-0.8;
   if(p.cambio==='CVT') base+=0.3;
   if(p.cambio==='MEC') base+=0.4;
   return Math.round(base*10)/10;
 }
-
 function complexEstimado(p){
   if(p.diesel) return 1.30;
   if(p.turbo) return 1.22;
@@ -472,710 +891,473 @@ function complexEstimado(p){
   if(p.cil<=1.6) return 1.00;
   return 1.10;
 }
-
 function inferirFicha(marca,modelo,combustivel){
   var p=lerNomeFipe(marca,modelo,combustivel), fam=null;
   for(var i=0;i<FAMILIAS.length;i++){
-    if(FAMILIAS[i].m.test(String(marca||''))&&FAMILIAS[i].re.test(p.txt)){ fam=FAMILIAS[i]; break; }
+    if(FAMILIAS[i].m.test(String(marca||''))&&FAMILIAS[i].re.test(p.txt)){fam=FAMILIAS[i];break}
   }
   return {
-    cons: (fam&&fam.cons)||consumoEstimado(p),
-    cambio: p.cambio,
-    complex: (fam&&fam.cx)||complexEstimado(p),
-    sinc: fam?fam.sinc:null,
-    sincKm: (fam&&fam.km)||0,
-    sincCusto: (fam&&fam.cst)||0,
-    ref: fam?fam.ref:null,
-    casou: !!fam,
-    eletrico: p.eletrico,
-    motor: p.eletrico ? 'elétrico'
-      : (p.cil?p.cil.toFixed(1).replace('.',','):'cilindrada não lida')
-        +(p.diesel?' turbodiesel':(p.turbo?' turbo':' aspirado')),
-    p: p
+    cons:(fam&&fam.cons)||consumoEstimado(p),
+    cambio:p.cambio, complex:(fam&&fam.cx)||complexEstimado(p),
+    sinc:fam?fam.sinc:null, sincKm:(fam&&fam.km)||0, sincCusto:(fam&&fam.cst)||0,
+    ref:fam?fam.ref:null, casou:!!fam, eletrico:p.eletrico,
+    motor:p.eletrico?'elétrico':((p.cil?p.cil.toFixed(1).replace('.',','):'cilindrada não lida')
+      +(p.diesel?' turbodiesel':(p.turbo?' turbo':' aspirado'))),
+    p:p
   };
 }
-
-// Escreve a ficha nos campos do anúncio e mostra o que foi deduzido e o que falta confirmar.
 function aplicarFicha(f){
-  // Sincronismo desconhecido tem de LIMPAR o campo. Herdar o do carro anterior é
-  // pior que chutar: a conta rodaria com a correia banhada de outro anúncio.
+  // Sincronismo desconhecido LIMPA o campo: herdar o do carro anterior faria a
+  // conta rodar com a correia banhada de outro anúncio.
   if(!f.sinc){ $('fCorreia').value='?'; $('fCorreiaKm').value=0; $('fCorreiaCusto').value=0; }
-  else {
+  else{
     $('fCorreia').value=f.sinc;
     $('fCorreiaKm').value=f.sinc==='corrente'?0:f.sincKm;
     $('fCorreiaCusto').value=f.sinc==='corrente'?0:f.sincCusto;
   }
-  if(!f.eletrico){ // num elétrico o km/L não significa nada, então não escreve
-    $('fCons').value=f.cons;
-    $('fCambio').value=f.cambio;
-    $('fComplex').value=f.complex.toFixed(2);
-  }
-  $('fModelo').value='custom'; // a lista fixa para de mandar; quem manda é a FIPE
+  if(!f.eletrico){ $('fCons').value=f.cons; $('fCambio').value=f.cambio; $('fComplex').value=f.complex.toFixed(2); }
+  $('fModelo').value='custom';
   mostrarFicha(f);
 }
-
 function mostrarFicha(f){
-  var cls,rot,corpo;
+  var el=$('fichaStatus'), cls,rot,corpo;
   if(f.eletrico){
-    $('fichaStatus').innerHTML=
-      '<div class="l1"><span class="badge badge-red">fora do escopo</span>'
-      +'<span class="mt">veículo elétrico</span></div>'
-      +'<span class="grave">Este avaliador custeia combustível em km/L e sincronismo de motor — nada disso'
-      +' se aplica a um elétrico. O custo total sairia errado. Use os campos à mão por sua conta,'
-      +' ou avalie este anúncio fora daqui.</span>';
-    $('fichaStatus').hidden=false;
-    return;
+    el.innerHTML='<div class="l1"><span class="badge badge-red">fora do escopo</span><span class="mt">veículo elétrico</span></div>'
+      +'<span class="grave">Este avaliador custeia combustível em km/L e sincronismo de motor — nada disso se aplica a um elétrico. O custo total sairia errado.</span>';
+    el.hidden=false; return;
   }
   if(!f.sinc){
     cls='badge-red'; rot='sincronismo a confirmar';
     corpo='<span class="grave">Não identifiquei o sincronismo deste motor'+(f.ref?' ('+esc(f.ref)+')':'')
-      +'. Confirme no manual antes de fechar negócio: se for <b>correia banhada a óleo</b>, some a troca preventiva ao preço.</span>';
+      +'. Confirme no manual: se for correia banhada a óleo, some a troca preventiva ao preço.</span>';
   } else if(f.sinc==='banhada'){
     cls='badge-warn'; rot='correia banhada a óleo';
-    corpo='<span class="alerta">'+esc(f.ref)+'. Troca a cada '+f.sincKm.toLocaleString('pt-BR')+' km, ~'+brl(f.sincCusto)
-      +'. Motor com interferência: sem histórico de óleo comprovado, orce a troca já na compra.</span>';
+    corpo='<span class="alerta">'+esc(f.ref)+'. Intervalo de '+mil(f.sincKm)+' km, ~'+brl(f.sincCusto)
+      +'. Motor com interferência: o risco depende do óleo usado, não da idade do carro.</span>';
   } else if(f.sinc==='seca'){
     cls='badge-acc'; rot='correia dentada seca';
-    corpo=esc(f.ref)+'. Troca a cada '+f.sincKm.toLocaleString('pt-BR')+' km, ~'+brl(f.sincCusto)+'.';
+    corpo=esc(f.ref)+'. Troca a cada '+mil(f.sincKm)+' km, ~'+brl(f.sincCusto)+'.';
   } else {
     cls='badge-ok'; rot='corrente de comando';
-    corpo=esc(f.ref)+'. Sem troca de sincronismo prevista.';
+    corpo=esc(f.ref)+'. Sem troca preventiva programada — o que não significa ausência de risco.';
   }
-  $('fichaStatus').innerHTML=
-    '<div class="l1"><span class="badge '+cls+'">'+rot+'</span>'
-    +'<span class="mt">'+esc(f.motor)+' · câmbio '+esc(CAMBIO_TXT[f.cambio]||f.cambio)+'</span></div>'
-    +corpo
-    +'<div class="obs" style="margin-top:8px">Consumo de '+f.cons.toFixed(1).replace('.',',')
-    +' km/L é estimativa por cilindrada e aspiração, não medição. Se o anúncio ou a etiqueta do Inmetro trouxer o número real, corrija o campo.</div>';
-  $('fichaStatus').hidden=false;
+  el.innerHTML='<div class="l1"><span class="badge '+cls+'">'+rot+'</span><span class="mt">'+esc(f.motor)
+    +' · câmbio '+esc(CAMBIO_TXT[f.cambio]||f.cambio)+'</span></div>'+corpo
+    +'<div class="obs" style="margin-top:8px">Consumo de '+String(f.cons).replace('.',',')
+    +' km/L é estimativa por cilindrada e aspiração, não medição. Se o anúncio ou o Inmetro trouxer o número real, corrija.</div>';
+  el.hidden=false;
 }
 
-var lista = [];
-var ultimo = null;
-var nomeAuto = true; // vira false assim que o usuário digita o próprio apelido
-
-function $(id){return document.getElementById(id)}
-function n(id){return parseFloat($(id).value)||0}
-function brl(v){return 'R$ '+Math.round(v).toLocaleString('pt-BR')}
-function brl2(v){return 'R$ '+v.toFixed(2).replace('.',',')}
-var ESC={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
-function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return ESC[c]})}
-function marcaLimpa(m){ return String(m||'').replace(/^[A-Za-z]{2,4}\s*-\s*/,'').trim(); }
-
-// popula o select
-(function(){
-  var s=$('fModelo');
-  MODELOS.forEach(function(m){
-    var o=document.createElement('option'); o.value=m.id; o.textContent=m.nome; s.appendChild(o);
-  });
-  s.value='custom';
-  s.addEventListener('change',carregarModelo);
-})();
-
-// Sobreposição manual: só entra quando o usuário escolhe um carro da lista fixa.
-function carregarModelo(){
-  var m=MODELOS.filter(function(x){return x.id===$('fModelo').value})[0];
-  if(!m||m.id==='custom') return;
-  $('fCons').value=m.cons;
-  $('fCorreia').value=m.correia;
-  $('fCorreiaKm').value=m.correiaKm;
-  $('fCorreiaCusto').value=m.correiaCusto;
-  $('fCambio').value=m.cambio;
-  $('fComplex').value=m.complex.toFixed(2);
-  if(!$('fNome').value||nomeAuto){ $('fNome').value=m.nome; nomeAuto=true; }
-  mostrarFicha({
-    cons:m.cons, cambio:m.cambio, complex:m.complex, sinc:m.correia,
-    sincKm:m.correiaKm, sincCusto:m.correiaCusto, casou:true,
-    ref:'ficha da lista fixa — '+m.nome,
-    motor:'conforme a lista'
-  });
+/* ============================== FINANCIAMENTO ============================== */
+// Tabela Price. PMT = PV·i·(1+i)^n / ((1+i)^n − 1)
+function fatorPrice(taxaMes,prazo){
+  var i=taxaMes/100;
+  if(!(prazo>0)) return 0;
+  return i>0 ? (1-Math.pow(1+i,-prazo))/i : prazo;   // PV por unidade de parcela
 }
-
-// ---------- financiamento (tabela Price) ----------
-// Devolve a parcela, os juros pagos DENTRO do horizonte e o saldo devedor no fim
-// dele — o horizonte quase nunca coincide com o prazo do contrato.
+function parcelaDe(pv,prazo,taxaMes){
+  var f=fatorPrice(taxaMes,prazo);
+  return (pv>0&&f>0) ? pv/f : 0;
+}
+// Maior valor financiável para uma parcela máxima — §39
+function financiavelMax(parcelaMax,prazo,taxaMes){
+  return Math.max(0, parcelaMax*fatorPrice(taxaMes,prazo));
+}
+// Juros pagos DENTRO do horizonte e saldo devedor no fim dele: o prazo do
+// contrato quase nunca coincide com o horizonte de posse.
 function simularFin(valor,prazo,taxaMes,mesesHorizonte){
-  var r={parcela:0,juros:0,jurosTotais:0,saldo:0,total:0,meses:0};
+  var r={parcela:0,juros:0,jurosTotais:0,saldo:0,total:0,meses:0,pctJuros:0};
   if(!(valor>0)||!(prazo>0)) return r;
   var i=taxaMes/100;
-  r.parcela = i>0 ? valor*i/(1-Math.pow(1+i,-prazo)) : valor/prazo;
+  r.parcela=parcelaDe(valor,prazo,taxaMes);
   var saldo=valor, meses=Math.min(prazo,Math.max(0,Math.round(mesesHorizonte)));
-  for(var k=0;k<meses;k++){
-    var j=saldo*i;
-    r.juros+=j;
-    saldo=saldo+j-r.parcela;
-    if(saldo<0) saldo=0;
-  }
+  for(var k=0;k<meses;k++){ var j=saldo*i; r.juros+=j; saldo=saldo+j-r.parcela; if(saldo<0) saldo=0; }
   r.saldo=saldo; r.meses=meses;
   r.total=r.parcela*prazo; r.jurosTotais=r.total-valor;
+  r.pctJuros=valor>0?r.jurosTotais/valor*100:0;
   return r;
 }
 
-// ---------- motor de cálculo ----------
-function calcular(precoOverride, ignorarOrc){
-  var kmAno=n('pKmAno'), comb=n('pComb'), ipvaP=n('pIpva')/100, anos=n('pAnos');
-  var orc=n('pOrc'), anoRef=n('pAnoRef'), kmRef=n('pKmRef');
-  var entrada=n('pEntrada');
-  var ano=n('fAno'), km=n('fKm'), fipe=n('fFipe'), cons=n('fCons');
-  var preco=(precoOverride!==undefined && precoOverride!==null)?precoOverride:n('fPreco');
-  var correia=$('fCorreia').value, cKm=n('fCorreiaKm'), cCusto=n('fCorreiaCusto');
-  var cambio=$('fCambio').value, complex=n('fComplex');
-  var notas=$('fNotas').checked, frota=$('fFrota').checked, cautelar=$('fCautelar').checked;
-  var temTroca=$('mTroca').value==='sim', fipeMeu=n('mFipe'), oferta=n('mOferta');
-  var troca=temTroca?oferta:0;
-  // Deságio na troca: a loja dá desconto no carro novo e retoma no seu. Isso é
-  // dinheiro perdido neste negócio, então entra no custo.
-  var perdaTroca=(temTroca&&fipeMeu>0)?Math.max(0,fipeMeu-oferta):0;
-  var entradaFin=n('pEntradaFin'), prazo=Math.round(n('pPrazo')), taxa=n('pTaxa'), parcelaMax=n('pParcelaMax');
-  var financiando=prazo>0;
-
-  var kmPeriodo=kmAno*anos;
-  var kmFinal=km+kmPeriodo;
-  var idade=Math.max(0,anoRef-ano);
-  var idadeKm=Math.max(0.5,idade); // carro do ano também pode chegar rodado
-
-  // combustível — o consumo informado é de estrada; na cidade o carro rende ~22% menos.
-  // Média harmônica ponderada: é como se mistura km/L de dois regimes sem errar a conta.
-  var pEstr=Math.min(100,Math.max(0,n('pEstrada')))/100;
-  var consE=cons>0?cons:1;
-  var consC=consE*0.78;
-  var consMix=1/(pEstr/consE+(1-pEstr)/consC);
-  var litros=kmPeriodo/consMix;
-  var custoComb=litros*comb;
-
-  // IPVA — base cai ~8%/ano
-  var custoIpva=0, base=fipe;
-  for(var i=0;i<anos;i++){ custoIpva+=base*ipvaP; base*=0.92; }
-
-  // sincronismo
-  var custoCorreia=0, correiaNota='';
-  if(correia==='?'){ correiaNota='não identificado — confirme no manual'; }
-  else if(correia==='corrente'){ correiaNota='corrente — sem troca prevista'; }
-  else if(correia==='banhada'){
-    // banhada a óleo sem histórico de óleo comprovado = troca preventiva imediata
-    custoCorreia=cCusto*(notas?0.5:1);
-    correiaNota=notas?'troca preventiva provável no período':'troca preventiva imediata (histórico de óleo não comprovado)';
-  } else {
-    if(cKm>0 && kmFinal>=cKm){ custoCorreia=cCusto; correiaNota='vence dentro do período ('+cKm.toLocaleString('pt-BR')+' km)'; }
-    else { correiaNota='não vence no período'; }
-  }
-
-  // manutenção corrente: R$ 0,16/km base × índice de complexidade × fator idade
-  var fatorIdade=1+Math.max(0,idade-5)*0.05;
-  var custoManut=kmPeriodo*0.16*complex*fatorIdade;
-
-  // seguro estimado: 4% da FIPE ao ano
-  var custoSeguro=0, bs=fipe;
-  for(var j=0;j<anos;j++){ custoSeguro+=bs*0.04; bs*=0.92; }
-
-  // valor de revenda: depreciação ~9%/ano sobre FIPE + penalidade por km alto
-  var resid=fipe*Math.pow(0.91,anos);
-  var kmEsperadoFinal=kmRef*(idadeKm+anos);
-  var excFinal=kmEsperadoFinal>0?(kmFinal-kmEsperadoFinal)/kmEsperadoFinal:0;
-  if(excFinal>0) resid*=Math.max(0.70,1-excFinal*0.22);
-
-  // dinheiro que sai já na compra, além do preço do carro
-  var custoImediato=entrada+(correia==='banhada'?custoCorreia:0);
-
-  // ---- financiamento ----
-  var aFinanciar=financiando?Math.max(0,preco-troca-entradaFin):0;
-  var fin=simularFin(aFinanciar,prazo,taxa,anos*12);
-  // Caixa que sai da sua conta no ato: financiando, só a entrada; à vista, o
-  // que faltar depois da troca. A troca não é caixa — é um bem que você entrega.
-  var caixaCompra=(financiando?entradaFin:Math.max(0,preco-troca))+custoImediato;
-
-  // Teto que a forma de pagamento suporta, antes de olhar para o carro.
-  var tetoPag;
-  if(financiando){
-    var iT=taxa/100;
-    var fator=iT>0?(1-Math.pow(1+iT,-prazo))/iT:prazo;
-    tetoPag=troca+entradaFin+parcelaMax*fator;
-    if(entradaFin+custoImediato>orc) tetoPag=0; // nem a entrada cabe no caixa
-  } else {
-    tetoPag=orc+troca-custoImediato;
-  }
-
-  // Trocar não barateia o negócio: você entrega um bem no valor dele. O que
-  // custa é o deságio. Os juros, sim, são dinheiro novo saindo.
-  var tco=preco+entrada+perdaTroca+fin.juros+custoComb+custoIpva+custoCorreia+custoManut+custoSeguro-resid;
-  var custoKm=tco/(kmPeriodo||1);
-  var desvio=fipe>0?(preco-fipe)/fipe*100:0;
-
-  // ---------- score ----------
-  var score=100, flags=[];
-
-  // A penalidade satura em 30 pontos até +12%, mas continua subindo acima disso.
-  // Se ela travasse de vez, o score ficaria constante e a busca do teto perderia o pé.
-  if(desvio>0){ score-=Math.min(30,desvio*2.5)+Math.max(0,desvio-12)*0.8; }
-  else { score+=Math.min(8,Math.abs(desvio)*1.2); }
-  if(desvio>5) flags.push(['red','Preço '+desvio.toFixed(1)+'% acima da FIPE. Sem justificativa técnica clara, é caro.']);
-  else if(desvio<-8) flags.push(['ok','Preço '+Math.abs(desvio).toFixed(1)+'% abaixo da FIPE. Investigue o porquê antes de comemorar.']);
-
-  var kmEsperado=kmRef*idadeKm;
-  var exc=kmEsperado>0?(km-kmEsperado)/kmEsperado*100:0;
-  if(exc>0){ score-=Math.min(25,exc*0.15); }
-  if(exc>35) flags.push(['warn','Km '+exc.toFixed(0)+'% acima do esperado para '+(idade<1?'um carro do ano':idade+' anos')+'. Vai a '+kmFinal.toLocaleString('pt-BR')+' km em '+anos+' anos — revenda castigada.']);
-
-  if(correia==='?'){
-    // Informação que falta é risco que existe: não dá para orçar o que não se sabe.
-    score-=8;
-    flags.push(['red','Sincronismo não identificado. Sem saber se é corrente, correia seca ou banhada a óleo, não dá para orçar a manutenção nem medir o risco de quebra. Confirme no manual do carro antes de negociar.']);
-  }
-  if(correia==='banhada'){
-    score-=notas?10:22;
-    flags.push([notas?'warn':'red','Correia banhada a óleo. Motor com interferência: se romper, vai cabeçote. '+(notas?'Notas de óleo apresentadas reduzem o risco, mas não zeram.':'Sem comprovação do óleo usado, o risco não é auditável. Orce '+brl(cCusto)+' de troca preventiva na compra.')]);
-  } else if(correia==='seca' && cKm>0 && kmFinal>=cKm){
-    flags.push(['warn','Correia seca vence no período. Custo previsto: '+brl(cCusto)+'.']);
-  }
-
-  if(cambio==='CVT'){ score-=12; flags.push(['warn','Câmbio CVT com '+Math.round(kmAno/1000)+' mil km/ano. É o componente que mais falha nesse regime de uso.']); }
-  if(cambio==='DCT'){ score-=15; flags.push(['red','Dupla embreagem em uso intenso: reparo caro e sensível a trânsito parado.']); }
-
-  score-=idade*2.5;
-  if(idade>=8) flags.push(['warn','Carro com '+idade+' anos. Peça de desgaste começa a aparecer em série.']);
-
-  score+=Math.max(-15,Math.min(12,(consMix-12)*3));
-  if(consMix<11) flags.push(['warn','Consumo de '+consMix.toFixed(1)+' km/L no seu mix ('+Math.round(pEstr*100)+'% estrada) custa '+brl(custoComb)+' em '+anos+' anos.']);
-
-  if(!ignorarOrc && caixaCompra>orc){
-    score-=15;
-    flags.push(['red','Você precisa de '+brl(caixaCompra)+' em caixa no ato'
-      +(financiando?' (entrada + custos de entrada)':' (preço − troca + custos de entrada)')
-      +', e seu orçamento é '+brl(orc)+'.']);
-  }
-  if(financiando && aFinanciar>0){
-    if(fin.parcela>parcelaMax && parcelaMax>0){
-      score-=12;
-      flags.push(['red','Parcela de '+brl(fin.parcela)+' em '+prazo+'x acima da sua máxima de '+brl(parcelaMax)+'.']);
-    }
-    if(fin.jurosTotais>preco*0.25){
-      score-=5;
-      flags.push(['red','Juros do contrato somam '+brl(fin.jurosTotais)+' — '+Math.round(fin.jurosTotais/preco*100)+'% do preço do carro. A '+taxa.toFixed(2).replace('.',',')+'% ao mês em '+prazo+'x, você paga quase dois carros.']);
-    } else if(fin.jurosTotais>preco*0.15){
-      flags.push(['warn','Juros do contrato somam '+brl(fin.jurosTotais)+' em '+prazo+'x. Encurtar o prazo ou aumentar a entrada corta isso rápido.']);
-    }
-  }
-  if(temTroca && fipeMeu>0 && !(oferta>0)){
-    flags.push(['warn','Você marcou que tem carro na troca e a FIPE dele é '+brl(fipeMeu)+', mas não informou a oferta da loja. Sem esse número o deságio da troca fica de fora da conta.']);
-  }
-  if(perdaTroca>0 && fipeMeu>0){
-    var pctTroca=perdaTroca/fipeMeu*100;
-    if(pctTroca>8){
-      score-=8;
-      flags.push(['red','A loja está pagando '+brl(oferta)+' no seu carro, '+pctTroca.toFixed(0)+'% abaixo da FIPE ('+brl(fipeMeu)+'). São '+brl(perdaTroca)+' de desconto que você está dando sem perceber — negocie a troca separado do preço do carro.']);
-    } else {
-      flags.push(['warn','Sua troca sai '+pctTroca.toFixed(0)+'% abaixo da FIPE ('+brl(perdaTroca)+'). Dentro do normal de loja, mas é margem para negociar.']);
-    }
-  }
-  if(frota){ score-=4; flags.push(['warn','Ex-frota: revisão rastreável, mas rodagem intensa e muitos motoristas. Só vale com desconto real sobre a FIPE.']); }
-  if(!cautelar) flags.push(['warn','Cautelar ainda não feita. Não feche sem ela.']);
-  if(!notas) flags.push(['warn','Sem nota de revisão. Peça o histórico antes de negociar preço.']);
-
-  score=Math.max(0,Math.min(100,score));
-
-  // preço alvo: FIPE ajustada pelos riscos identificados
-  var descAlvo=0.05;
-  if(correia==='?') descAlvo+=0.03;
-  if(correia==='banhada') descAlvo+=notas?0.04:0.08;
-  if(cambio==='CVT') descAlvo+=0.03;
-  if(cambio==='DCT') descAlvo+=0.05;
-  if(exc>0) descAlvo+=Math.min(0.10,exc*0.0015);
-  if(frota) descAlvo+=0.03;
-  descAlvo+=Math.max(0,idade-5)*0.01;
-  var alvo=fipe*(1-Math.min(0.30,descAlvo));
-
-  return {nome:$('fNome').value||'sem nome', ano:ano, km:km, preco:preco, fipe:fipe, desvio:desvio,
-    tco:tco, custoKm:custoKm, score:score, alvo:alvo, anos:anos, kmPeriodo:kmPeriodo, kmFinal:kmFinal,
-    comb:custoComb, ipva:custoIpva, correiaC:custoCorreia, correiaNota:correiaNota,
-    manut:custoManut, seguro:custoSeguro, resid:resid, flags:flags, cons:cons, consMix:consMix, pEstrada:pEstr*100,
-    entrada:entrada, custoImediato:custoImediato, orc:orc,
-    financiando:financiando, aFinanciar:aFinanciar, parcela:fin.parcela, juros:fin.juros,
-    jurosTotais:fin.jurosTotais, saldoFim:fin.saldo, prazo:prazo, taxa:taxa,
-    entradaFin:entradaFin, troca:troca, perdaTroca:perdaTroca, fipeMeu:fipeMeu,
-    caixaCompra:caixaCompra, tetoPag:tetoPag, parcelaMax:parcelaMax};
-}
-
-// Teto: maior preço que ainda passa no seu critério, respeitando orçamento.
-// Score cai monotonicamente com o preço, então busca binária resolve.
-function calcularTeto(){
-  var limiar=n('pLimiar'), orc=n('pOrc'), fipe=n('fFipe');
-  var base=calcular(undefined,true);
-
-  // 1) teto financeiro: à vista sai do orçamento, financiando sai da parcela máxima
-  var tetoOrc=base.tetoPag;
-
-  // 2) teto de qualidade: preço em que o score bate no limiar
-  var lo=1000, hi=Math.max(fipe*1.6, orc*1.6), tetoQual=lo;
-  if(calcular(lo,true).score<limiar){
-    tetoQual=0; // nem de graça esse carro passa no seu critério
-  } else {
-    for(var i=0;i<45;i++){
-      var mid=(lo+hi)/2;
-      if(calcular(mid,true).score>=limiar){ lo=mid; } else { hi=mid; }
-    }
-    tetoQual=lo;
-  }
-
-  var teto=Math.min(tetoOrc,tetoQual);
-  var origem;
-  if(tetoQual<=0) origem='reprovado no score mínimo em qualquer preço';
-  else if(tetoOrc<=0) origem=base.financiando?'nem a entrada cabe no seu caixa':'o orçamento não cobre nem os custos de entrada';
-  else origem=(tetoQual<tetoOrc?'limitado pelo risco do carro'
-    :(base.financiando?'limitado pela parcela máxima':'limitado pelo seu orçamento'));
-  return {teto:teto, tetoOrc:tetoOrc, tetoQual:tetoQual, origem:origem, limiar:limiar, custoImediato:base.custoImediato};
-}
-
-function classe(s){
-  if(s>=75) return {t:'Compra forte',c:'badge-ok',cor:'var(--ok)'};
-  if(s>=60) return {t:'Aceitável',c:'badge-acc',cor:'var(--acc)'};
-  if(s>=45) return {t:'Atenção',c:'badge-warn',cor:'var(--warn)'};
-  return {t:'Descartar',c:'badge-red',cor:'var(--red)'};
-}
-
-function avaliar(){
-  var r=calcular(); ultimo=r;
-  var cl=classe(r.score);
-  $('resultado').style.display='block';
-  $('rScore').textContent=Math.round(r.score);
-  $('rScore').style.color=cl.cor;
-  $('rBadge').innerHTML='<span class="badge '+cl.c+'">'+cl.t+'</span>';
-  $('rAnosA').textContent=r.anos;
-  $('rTco').textContent=brl(r.tco);
-  $('rCustoKm').textContent=brl2(r.custoKm);
-  $('rKmTotal').textContent=r.kmPeriodo.toLocaleString('pt-BR')+' km no período';
-  $('rDesvio').textContent=(r.desvio>0?'+':'')+r.desvio.toFixed(1)+'%';
-  $('rDesvio').style.color=r.desvio>3?'var(--red)':(r.desvio<-3?'var(--ok)':'var(--txt)');
-  $('rDesvioTx').textContent='FIPE '+brl(r.fipe);
-  $('rDesvioTx').className='kpi-delta '+(r.desvio>3?'neg':'');
-  $('rAlvo').textContent=brl(r.alvo);
-
-  // --- financiamento ---
-  if(r.financiando && r.aFinanciar>0){
-    $('boxFin').hidden=false;
-    $('rParcela').textContent=brl(r.parcela);
-    $('rParcela').style.color=(r.parcelaMax>0&&r.parcela>r.parcelaMax)?'var(--red)':'var(--txt)';
-    $('rParcelaTx').textContent=r.prazo+'x · '+r.taxa.toFixed(2).replace('.',',')+'% a.m.'
-      +(r.parcelaMax>0?' · máx '+brl(r.parcelaMax):'');
-    $('rFinanciado').textContent=brl(r.aFinanciar);
-    $('rEntradaTx').textContent='entrada '+brl(r.entradaFin)+(r.troca>0?' + troca '+brl(r.troca):'');
-    $('rJuros').textContent=brl(r.jurosTotais);
-    $('rJurosTx').textContent=Math.round(r.jurosTotais/(r.preco||1)*100)+'% do preço · '+brl(r.juros)+' dentro dos '+r.anos+' anos';
-    $('rCaixa').textContent=brl(r.caixaCompra);
-    $('rCaixaTx').textContent='sai da sua conta no ato';
-    $('finNota').hidden=true;
-  } else if(r.financiando){
-    // Prazo preenchido mas nada a financiar: dizer isso é melhor que sumir calado.
-    $('boxFin').hidden=true; $('finNota').hidden=false;
-    $('finNota').textContent='Prazo de '+r.prazo+'x preenchido, mas entrada de '+brl(r.entradaFin)
-      +(r.troca>0?' mais '+brl(r.troca)+' da troca':'')+' já cobrem os '+brl(r.preco)+' do carro — nada a financiar.';
-  } else {
-    $('boxFin').hidden=true; $('finNota').hidden=true;
-  }
-
-  // --- teto máximo ---
-  var tt=calcularTeto();
-  r.teto=tt.teto; r.tetoOrigem=tt.origem;
-  $('rAlvo2').textContent=brl(Math.min(r.alvo, Math.max(0,tt.teto)));
-  if(tt.teto<=0){
-    $('rTeto').textContent='Não comprar';
-    $('rTeto').style.color='var(--red)';
-    $('tetoBox').style.borderColor='var(--red)';
-    $('tetoBox').style.background='#F4433610';
-    $('rTetoOrigem').textContent=tt.origem;
-  } else {
-    $('rTeto').textContent=brl(tt.teto);
-    $('rTeto').style.color='var(--acc)';
-    $('tetoBox').style.borderColor='var(--acc)';
-    $('tetoBox').style.background='#F5A62310';
-    $('rTetoOrigem').textContent=tt.origem;
-  }
-  // Duas distâncias diferentes, e confundi-las custa dinheiro:
-  // até o TETO = quanto ainda caberia pagar sem furar o critério;
-  // até o ALVO = o que se leva para a mesa de negociação.
-  // O alvo efetivo é o que a tela manda mirar: se o teto ficou abaixo do alvo
-  // teórico, é o teto que vale. Comparar contra o alvo cru mostraria dois
-  // números diferentes chamados "alvo" na mesma tela.
-  var alvoEfetivo=Math.min(r.alvo,Math.max(0,tt.teto));
-  var margem=tt.teto-r.preco, vsAlvo=r.preco-alvoEfetivo;
-  $('rMargem').textContent=(margem>=0?'+':'−')+brl(Math.abs(margem));
-  $('rMargem').style.color=margem>=0?'var(--ok)':'var(--red)';
-  $('rMargemTx').textContent=margem>=0
-    ? 'daria para pagar até '+brl(tt.teto)
-    : 'acima do teto — peça '+brl(-margem)+' de desconto';
-
-  $('rVsAlvo').textContent=(vsAlvo>0?'−':'+')+brl(Math.abs(vsAlvo));
-  $('rVsAlvo').style.color=vsAlvo>0?'var(--warn)':'var(--ok)';
-  $('rVsAlvoTx').textContent=vsAlvo>0
-    ? 'peça isso de desconto para chegar no alvo'
-    : 'o pedido já está abaixo do seu alvo';
-  $('rTetoNota').innerHTML=(r.financiando
-      ? 'Teto pela parcela de '+brl(r.parcelaMax)+' em '+r.prazo+'x: <b>'+brl(tt.tetoOrc)+'</b>. '
-      : 'Teto pelo orçamento: <b>'+brl(tt.tetoOrc)+'</b> ('+brl(r.orc)+(r.troca>0?' mais '+brl(r.troca)+' da troca':'')+' menos '+brl(tt.custoImediato)+' de custos de entrada). ')
-    +'Teto pelo risco do carro (score '+tt.limiar+'): <b>'+(tt.tetoQual<=0?'reprovado':brl(tt.tetoQual))+'</b>. '
-    +'Vale o menor dos dois. Acima de '+(tt.teto<=0?'qualquer valor':brl(tt.teto))+', você sai da mesa.';
-
-  var v;
-  if(r.score>=75) v='Os números fecham. Confirme cautelar e histórico e negocie perto de '+brl(r.alvo)+'.';
-  else if(r.score>=60) v='Dá pra comprar, mas só no preço certo. Acima de '+brl(r.alvo)+' você está pagando pelo risco de outro.';
-  else if(r.score>=45) v='Tem problema estrutural aqui — leia os pontos de atenção. Só compense com desconto grande.';
-  else v='Não compre. O desconto necessário pra compensar os riscos é maior do que o vendedor vai aceitar.';
-  $('rVeredito').textContent=v;
-
-  var rows=[['Preço de compra',r.preco],['Custos de entrada (transf./cautelar)',r.entrada]];
-  if(r.perdaTroca>0) rows.push(['Deságio na troca do seu carro',r.perdaTroca]);
-  if(r.juros>0) rows.push(['Juros do financiamento nos '+r.anos+' anos',r.juros]);
-  rows=rows.concat([['Combustível ('+r.consMix.toFixed(1)+' km/L no mix '+Math.round(r.pEstrada)+'% estrada)',r.comb],['IPVA',r.ipva],
-    ['Sincronismo — '+r.correiaNota,r.correiaC],['Manutenção e revisões',r.manut],['Seguro estimado',r.seguro],
-    ['(−) Revenda estimada',-r.resid]]);
-  var h='<thead><tr><th>Item</th><th class="num">Valor</th></tr></thead><tbody>';
-  rows.forEach(function(x){
-    // o rótulo da revenda já traz o "(−)"; repetir o sinal no valor só polui
-    h+='<tr><td class="nm">'+esc(x[0])+'</td><td class="num" style="color:'+(x[1]<0?'var(--ok)':'var(--txt)')+'">'+brl(Math.abs(x[1]))+'</td></tr>';
-  });
-  h+='<tr><td class="nm" style="font-weight:600">Custo total '+r.anos+' anos</td><td class="num" style="color:var(--acc);font-weight:600">'+brl(r.tco)+'</td></tr></tbody>';
-  $('tBreak').innerHTML=h;
-
-  var cores={ok:'var(--ok)',warn:'var(--warn)',red:'var(--red)'};
-  $('rFlags').innerHTML = r.flags.length ? r.flags.map(function(f){
-    return '<div class="flag"><div class="dot" style="background:'+(cores[f[0]]||'var(--txt2)')+'"></div><div class="tx">'+esc(f[1])+'</div></div>';
-  }).join('') : '<div class="muted">Nenhum ponto crítico identificado.</div>';
-
-  irAba('resultado');
-}
-
-// ---------- impressão ----------
-// A folha de impressão isola um card por vez; a classe no body diz qual.
-function cabecalhoImpressao(r){
-  $('phTitulo').textContent=r.nome;
-  $('phSub').innerHTML=esc(r.ano+' · '+r.km.toLocaleString('pt-BR')+' km · pedido '+brl(r.preco)+' · FIPE '+brl(r.fipe))
-    +'<br>'+esc('Horizonte '+r.anos+' anos · '+Math.round(r.kmPeriodo).toLocaleString('pt-BR')+' km · '+Math.round(r.pEstrada)+'% estrada · gasolina '+brl2(n('pComb'))+'/L');
-  if(r.financiando&&r.aFinanciar>0){
-    $('phSub').innerHTML+='<br>'+esc('Financiado '+brl(r.aFinanciar)+' em '+r.prazo+'x de '+brl(r.parcela)
-      +' a '+r.taxa.toFixed(2).replace('.',',')+'% a.m. · entrada '+brl(r.entradaFin)
-      +(r.troca>0?' · troca '+brl(r.troca):'')+' · juros '+brl(r.jurosTotais));
-  }
-  $('pfAval').textContent='Avaliador de Carro Usado v9 · RitmoProd · gerado em '
-    +new Date().toLocaleString('pt-BR')
-    +' · estimativa a partir dos parâmetros informados, não substitui cautelar nem laudo mecânico.';
-}
-
-function imprimir(modo){
-  if(modo==='aval'){
-    if(!ultimo){ alert('Avalie um anúncio antes de imprimir.'); return; }
-    cabecalhoImpressao(ultimo);
-  } else {
-    if(!lista.length){ alert('Nenhum anúncio salvo para imprimir.'); return; }
-    $('phSubLista').textContent=lista.length+(lista.length===1?' anúncio':' anúncios')
-      +' · ordenados por score · horizonte '+n('pAnos')+' anos · '+Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano';
-    $('pfLista').textContent='Avaliador de Carro Usado v9 · RitmoProd · gerado em '+new Date().toLocaleString('pt-BR');
-  }
-  document.body.classList.add(modo==='aval'?'p-aval':'p-lista');
-  window.print();
-}
-function fimImpressao(){ document.body.classList.remove('p-aval','p-lista'); }
-window.addEventListener('afterprint',fimImpressao);
-// iOS/Safari nem sempre dispara afterprint — a media query fecha a brecha.
-if(window.matchMedia){
-  var mqPrint=window.matchMedia('print');
-  var onMq=function(m){ if(!m.matches) fimImpressao(); };
-  if(mqPrint.addEventListener) mqPrint.addEventListener('change',onMq);
-  else if(mqPrint.addListener) mqPrint.addListener(onMq);
-}
-
-function salvar(){
-  avaliar();
-  lista.push(ultimo);
-  render();
-  salvarLocal();
-}
-
-function render(){
-  var t=$('tLista');
-  if(!lista.length){ t.innerHTML='<tbody><tr><td class="muted" style="font-family:var(--font-b)">Nenhum anúncio salvo ainda.</td></tr></tbody>'; return; }
-  var ord=lista.slice().sort(function(a,b){return b.score-a.score});
-  var h='<thead><tr><th>#</th><th>Anúncio</th><th>Ano</th><th class="num">Km</th><th class="num">Preço</th><th class="num">vs FIPE</th><th class="num">Custo/km</th><th class="num">Custo total</th><th class="num">Alvo</th><th class="num">Máximo</th><th>Score</th><th class="col-acao"></th></tr></thead><tbody>';
-  ord.forEach(function(r,i){
-    var cl=classe(r.score);
-    var idx=lista.indexOf(r);
-    h+='<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.nome)+'</td><td>'+esc(r.ano)+'</td><td class="num">'+r.km.toLocaleString('pt-BR')+'</td>'
-      +'<td class="num">'+brl(r.preco)+'</td>'
-      +'<td class="num" style="color:'+(r.desvio>3?'var(--red)':(r.desvio<-3?'var(--ok)':'var(--txt2)'))+'">'+(r.desvio>0?'+':'')+r.desvio.toFixed(1)+'%</td>'
-      +'<td class="num">'+brl2(r.custoKm)+'</td><td class="num">'+brl(r.tco)+'</td><td class="num" style="color:var(--ok)">'+brl(r.alvo)+'</td>'
-      +'<td class="num" style="color:var(--acc);font-weight:600">'+((r.teto===undefined||r.teto<=0)?'—':brl(r.teto))+'</td>'
-      +'<td><span class="badge '+cl.c+'">'+Math.round(r.score)+'</span></td>'
-      +'<td class="col-acao"><button class="btn-ghost" style="padding:4px 10px;font-size:11px" onclick="remover('+idx+')">×</button></td></tr>';
-  });
-  t.innerHTML=h+'</tbody>';
-}
-
-function remover(i){ lista.splice(i,1); render(); salvarLocal(); }
-function limpar(){ if(confirm('Apagar todos os anúncios salvos?')){ lista=[]; render(); salvarLocal(); } }
-
-function exportar(){
-  var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-  var dados={versao:9, data:new Date().toISOString(), parametros:p, lista:lista};
-  var b=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(b);
-  a.download='avaliacao_carros_'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-}
-
-function importar(e){
-  var f=e.target.files[0]; if(!f) return;
-  var rd=new FileReader();
-  rd.onload=function(ev){
-    try{
-      var d=JSON.parse(ev.target.result);
-      if(d.parametros){
-        // export antigo (v1) usava nomes curtos; o novo usa os próprios ids dos campos
-        var LEGADO={kmAno:'pKmAno',comb:'pComb',ipva:'pIpva',anos:'pAnos',orc:'pOrc',kmRef:'pKmRef'};
-        Object.keys(d.parametros).forEach(function(k){
-          var id=CAMPOS_P.indexOf(k)!==-1?k:LEGADO[k];
-          var val=d.parametros[k];
-          if(id && $(id) && val!==undefined && val!==null && val!=='') $(id).value=val;
-        });
-      }
-      if(Array.isArray(d.lista)){ lista=d.lista; render(); salvarLocal(); }
-    }catch(err){ alert('Arquivo inválido: '+err.message); }
+/* ============================== REVENDA ============================== */
+// §16 — premissa explícita, nunca caixa preta.
+function calcularRevenda(e){
+  var fipeProj=e.fipe*Math.pow(C.deprecAno,e.anos);
+  var kmEsperadoFim=e.kmRef*(e.idadeKm+e.anos);
+  var exc=kmEsperadoFim>0?(e.kmFinal-kmEsperadoFim)/kmEsperadoFim:0;
+  var fatorKm=exc>0?Math.max(C.deprecKmPiso,1-exc*C.deprecKmPeso):1;
+  var fatorHist=e.historico==='sim'?(1+C.deprecHistBonus):(e.historico==='nao'?(1-C.deprecHistBonus):1);
+  var valor=fipeProj*fatorKm*fatorHist;
+  var partes=[Math.round(C.deprecAno*100)+'% ao ano de depreciação de tabela'];
+  if(exc>0) partes.push('menos '+pct((1-fatorKm)*100,0)+' por km acima do esperado no fim do período');
+  if(fatorHist!==1) partes.push((fatorHist>1?'mais ':'menos ')+pct(Math.abs(fatorHist-1)*100,0)+' por histórico '+(e.historico==='sim'?'comprovado':'não comprovado'));
+  return {
+    valor:valor, fipeProjetada:fipeProj, fatorKm:fatorKm, fatorHist:fatorHist,
+    pctFipeHoje:e.fipe>0?valor/e.fipe*100:0,
+    premissa:partes.join(', ')+'. Estimativa, não cotação.'
   };
-  rd.readAsText(f);
-  e.target.value='';
 }
 
-// ---------- FIPE ao vivo ----------
-var FIPE_API='https://parallelum.com.br/fipe/api/v1/carros/marcas';
+/* ============================== CUSTOS ============================== */
+function calcularCustos(e){
+  // Combustível: o consumo informado é de estrada; a cidade rende ~22% menos.
+  // Média harmônica ponderada é a forma correta de misturar km/L de dois regimes.
+  var pEstr=clamp(e.estrada,0,100)/100;
+  var consE=e.cons>0?e.cons:1, consC=consE*C.consumoCidade;
+  var consMix=1/(pEstr/consE+(1-pEstr)/consC);
+  var combustivel=e.kmPeriodo/consMix*e.precoComb;
 
-function fstatus(txt,cor){ var e=$('fipeStatus'); e.textContent=txt; e.style.color=cor||'var(--txt2)'; }
-function encher(sel,itens,valKey,txtKey,placeholder){
-  var s=$(sel); s.innerHTML='';
-  var o=document.createElement('option'); o.value=''; o.textContent=placeholder; s.appendChild(o);
-  itens.forEach(function(it){
-    var op=document.createElement('option'); op.value=it[valKey]; op.textContent=it[txtKey]; s.appendChild(op);
+  var ipva=0, base=e.fipe;
+  for(var i=0;i<e.anos;i++){ ipva+=base*e.ipvaPct/100; base*=C.ipvaQueda; }
+  var seguro=0, bs=e.fipe;
+  for(var j=0;j<e.anos;j++){ seguro+=bs*e.seguroPct/100; bs*=C.ipvaQueda; }
+
+  var fatorIdade=1+Math.max(0,e.idade-5)*C.fatorIdadeManut;
+  var manutPrev=e.kmPeriodo*e.manutKm*e.complex*fatorIdade;
+  var pneus=e.pneuKm>0?Math.floor(e.kmPeriodo/e.pneuKm)*e.pneuCusto:0;
+  var freios=e.freioKm>0?Math.floor(e.kmPeriodo/e.freioKm)*e.freioCusto:0;
+
+  // Provisão de risco por componente, proporcional ao que se vai rodar.
+  var provCambio={CVT:C.provisaoCVT,DCT:C.provisaoDCT,AT:C.provisaoAT,MEC:C.provisaoMEC}[e.cambio]||C.provisaoAT;
+  var manutRisco=(e.kmPeriodo/1000)*(provCambio*100);
+  if(e.complex>=1.15) manutRisco+=(e.kmPeriodo/1000)*(C.provisaoTurbo*100);
+
+  // Sincronismo: só entra quando há evidência de que vence no período.
+  var sinc=calcularSincronismo(e);
+
+  var rev=calcularRevenda(e);
+
+  var compra=e.preco+e.custosEntrada;
+  var uso=combustivel+ipva+seguro+manutPrev+pneus+freios+manutRisco+sinc.custo;
+  return {
+    consMix:consMix, pEstrada:pEstr*100,
+    combustivel:combustivel, ipva:ipva, seguro:seguro,
+    manutPrev:manutPrev, manutRisco:manutRisco, pneus:pneus, freios:freios,
+    sinc:sinc, revenda:rev, compra:compra, uso:uso, fatorIdade:fatorIdade
+  };
+}
+
+// §18 — correia banhada não é troca automática; depende de óleo, km e intervalo.
+function calcularSincronismo(e){
+  var tipo=e.correia, r={custo:0,nota:'',venceNoPeriodo:false,tipo:tipo};
+  if(tipo==='corrente'){ r.nota='corrente — sem troca preventiva programada'; return r; }
+  if(tipo==='?'){ r.nota='não identificado — confirme no manual'; return r; }
+  var intervalo=e.correiaKm, custo=e.correiaCusto;
+  if(!(intervalo>0)){ r.nota='intervalo não informado'; return r; }
+  // Quanto falta até o próximo vencimento, a partir do km atual.
+  var restante=intervalo-(e.km%intervalo);
+  r.restante=restante;
+  r.venceNoPeriodo=restante<=e.kmPeriodo;
+  if(tipo==='seca'){
+    if(r.venceNoPeriodo){ r.custo=custo; r.nota='correia seca vence em ~'+mil(restante)+' km, dentro do período'; }
+    else r.nota='correia seca não vence no período (faltam ~'+mil(restante)+' km)';
+    return r;
+  }
+  // banhada a óleo
+  if(e.oleoOk){
+    if(r.venceNoPeriodo){ r.custo=custo; r.nota='correia banhada vence no período, com óleo na especificação comprovado'; }
+    else r.nota='correia banhada não vence no período e o óleo está comprovado';
+  } else {
+    // Sem comprovação do óleo o intervalo do fabricante não é confiável: provisiona.
+    r.custo=custo; r.venceNoPeriodo=true;
+    r.nota='correia banhada sem comprovação do óleo — provisiona a troca';
+  }
+  return r;
+}
+
+/* ============================== SCORE ============================== */
+// Cada critério devolve uma nota de 0 a 1. O score é a soma ponderada.
+// Só o critério de preço depende do preço — por isso o score é monotônico
+// decrescente nele, que é a premissa da busca binária do teto de risco.
+function notasScore(e,cst){
+  var nt={};
+
+  // Preço vs FIPE: nota 1 em 10% abaixo da tabela, 0 em 20% acima.
+  var desvio=e.fipe>0?(e.preco-e.fipe)/e.fipe:0;
+  nt.preco=clamp((0.20-desvio)/0.30,0,1);
+
+  // Quilometragem: nota 1 em dia, 0 com o dobro do esperado para a idade.
+  var kmEsperado=e.kmRef*e.idadeKm;
+  var excKm=kmEsperado>0?(e.km-kmEsperado)/kmEsperado:0;
+  nt.km=clamp(1-Math.max(0,excKm),0,1);
+
+  nt.historico={sim:1,parcial:0.5,nao:0}[e.historico];
+  if(nt.historico===undefined) nt.historico=0;
+
+  // Risco mecânico: sincronismo + complexidade do motor.
+  var base;
+  if(e.correia==='corrente') base=1.0;
+  else if(e.correia==='seca') base=cst.sinc.venceNoPeriodo?0.75:0.92;
+  else if(e.correia==='banhada') base=e.oleoOk?0.70:0.35;
+  else base=0.45; // não identificado: informação que falta é risco que existe
+  nt.risco=clamp(base-Math.max(0,e.complex-1)*0.30,0,1);
+
+  // Câmbio: o tipo dá a base, mas km e histórico movem a nota. Nenhum câmbio
+  // é condenado por ser CVT ou DCT — o que pesa é o regime de uso.
+  var baseCx={MEC:1.0,AT:0.90,CVT:0.80,DCT:0.72}[e.cambio];
+  if(baseCx===undefined) baseCx=0.85;
+  var desgaste=clamp(e.kmFinal/300000,0,1);          // 300 mil km = desgaste pleno
+  var sensivel=(e.cambio==='CVT'||e.cambio==='DCT')?1:0.5;
+  var bonusHist={sim:0.10,parcial:0.04,nao:0}[e.historico]||0;
+  nt.cambio=clamp(baseCx-desgaste*0.35*sensivel+bonusHist,0,1);
+
+  // Idade: nota 1 até 3 anos, 0 aos 15.
+  nt.idade=clamp(1-Math.max(0,e.idade-3)/12,0,1);
+
+  nt.origem=e.origem==='frota'?0.55:1;
+
+  // Consumo: 8 km/L no mix vale 0, 16 vale 1.
+  nt.consumo=clamp((cst.consMix-8)/8,0,1);
+
+  return nt;
+}
+function montarScore(e,cst){
+  var nt=notasScore(e,cst), total=0, det=[];
+  Object.keys(PESOS).forEach(function(k){
+    var peso=PESOS[k], ganho=peso*(nt[k]===undefined?0:nt[k]);
+    total+=ganho;
+    det.push({chave:k, rotulo:ROTULO_PESO[k], peso:peso, nota:nt[k], pontos:ganho, perda:peso-ganho});
   });
-  if(COMBOS[sel]) COMBOS[sel].sync();
+  return {valor:clamp(total,0,100), detalhe:det, notas:nt};
+}
+function classificar(s){
+  if(s>=FAIXAS.forte)  return {rot:'COMPRA FORTE',cls:'badge-ok',cor:'var(--ok)',tema:'ok'};
+  if(s>=FAIXAS.boa)    return {rot:'BOA COMPRA',cls:'badge-ok',cor:'var(--ok)',tema:'ok'};
+  if(s>=FAIXAS.aceita) return {rot:'ACEITÁVEL',cls:'badge-acc',cor:'var(--acc)',tema:''};
+  if(s>=FAIXAS.atencao)return {rot:'ATENÇÃO',cls:'badge-warn',cor:'var(--warn)',tema:'warn'};
+  return {rot:'DESCARTAR',cls:'badge-red',cor:'var(--red)',tema:'red'};
 }
 
-// ---------- combobox com busca ----------
-// A FIPE devolve centenas de versões por marca. Rolar isso num select nativo, no
-// celular, é o passo que mais dói — então o campo vira busca. O <select> original
-// segue existindo escondido e continua sendo a fonte da verdade: o resto do
-// código lê .value e ouve 'change' como antes.
-var COMBOS={};
-
-// Normaliza mantendo o comprimento em caracteres, para o destaque casar por índice.
-function norm(t){
-  return Array.from(String(t||'')).map(function(c){
-    return c.normalize('NFD').charAt(0).toLowerCase();
-  }).join('');
+/* ============================== ENTRADA DO MOTOR ============================== */
+// Lê a tela uma vez e devolve um objeto imutável. Nada de reler campo no meio da
+// conta, nada de calcular sobre valor já arredondado para exibição.
+function lerEntrada(precoOverride){
+  var anoRef=n('pAnoRef'), ano=n('fAno');
+  var idade=Math.max(0,anoRef-ano);
+  var anos=n('pAnos'), kmAno=n('pKmAno');
+  var kmPeriodo=kmAno*anos, km=n('fKm');
+  var custosEntrada=n('pTransf')+n('pCautelarC')+n('pRevisao');
+  var temTroca=v('mTroca')==='sim', fipeMeu=n('mFipe'), oferta=n('mOferta');
+  var prazo=Math.round(n('pPrazo'));
+  var e={
+    preco:(precoOverride!==undefined&&precoOverride!==null)?precoOverride:n('fPreco'),
+    fipe:n('fFipe'), fipeManual:fipeManual, fipeMes:fipeMesRef,
+    ano:ano, anoRef:anoRef, idade:idade,
+    idadeKm:Math.max(0.5,idade),          // carro do ano também chega rodado
+    km:km, kmAno:kmAno, anos:anos, kmPeriodo:kmPeriodo, kmFinal:km+kmPeriodo,
+    kmRef:Math.max(1,n('pKmRef')),
+    estrada:n('pEstrada'), cons:n('fCons'), precoComb:n('pComb'),
+    ipvaPct:n('pIpva'), seguroPct:n('pSeguro'),
+    manutKm:n('pManutKm'), pneuKm:n('pPneuKm'), pneuCusto:n('pPneuC'),
+    freioKm:n('pFreioKm'), freioCusto:n('pFreioC'),
+    correia:v('fCorreia'), correiaKm:n('fCorreiaKm'), correiaCusto:n('fCorreiaCusto'),
+    oleoOk:v('fOleo')==='sim',
+    cambio:v('fCambio'), complex:n('fComplex'),
+    historico:v('fHist'), origem:v('fOrigem'), cautelar:v('fCautelar'),
+    cautelarItens:ITENS_CAUTELAR.filter(function(it){return chk(it[0])}).length,
+    orcamento:n('pOrc'), scoreMin:n('pLimiar'), custosEntrada:custosEntrada,
+    temTroca:temTroca, fipeMeu:fipeMeu, oferta:oferta,
+    troca:temTroca?oferta:0,
+    // A troca não barateia o negócio: você entrega um bem no valor dele.
+    // O que custa é o deságio que a loja tira do seu carro.
+    perdaTroca:(temTroca&&fipeMeu>0)?Math.max(0,fipeMeu-oferta):0,
+    entradaFin:n('pEntradaFin'), prazo:prazo, taxa:n('pTaxa'),
+    parcelaMax:n('pParcelaMax'), cet:n('pCet'), financiando:prazo>0,
+    nome:v('fNome')||'sem nome'
+  };
+  return e;
 }
 
-function destacar(txt,termos){
-  var chars=Array.from(String(txt)), n=norm(txt), mk=[];
-  termos.forEach(function(t){
-    if(!t) return;
-    var i=n.indexOf(t);
-    while(i!==-1){ for(var k=i;k<i+t.length;k++) mk[k]=1; i=n.indexOf(t,i+1); }
-  });
-  var out='',aberto=false;
-  for(var j=0;j<chars.length;j++){
-    if(mk[j]&&!aberto){ out+='<mark>'; aberto=true; }
-    if(!mk[j]&&aberto){ out+='</mark>'; aberto=false; }
-    out+=esc(chars[j]);
+/* ============================== TETOS ============================== */
+// §40 — teto financeiro = MENOR(teto por caixa, teto por parcela)
+//       teto final      = MENOR(teto financeiro, teto de risco)
+function calcularTetos(e){
+  // 1) Caixa. À vista o preço sai do bolso; financiando, só a entrada sai.
+  var tetoCaixa;
+  if(e.financiando){
+    var sobra=e.orcamento-e.entradaFin-e.custosEntrada;
+    tetoCaixa=sobra>=0?Infinity:0;    // o caixa não limita o preço, a parcela limita
+  } else {
+    tetoCaixa=e.orcamento+e.troca-e.custosEntrada;
   }
-  return out+(aberto?'</mark>':'');
+  // 2) Parcela.
+  var maxFinanciavel=e.financiando?financiavelMax(e.parcelaMax,e.prazo,e.taxa):0;
+  var tetoParcela=e.financiando?(e.troca+e.entradaFin+maxFinanciavel):Infinity;
+  var tetoFinanceiro=Math.min(tetoCaixa,tetoParcela);
+
+  // 3) Risco: maior preço em que o score ainda alcança o mínimo.
+  var tetoRisco=buscarTetoRisco(e);
+
+  var tetoFinal=Math.max(0,Math.min(tetoFinanceiro,tetoRisco));
+  return {
+    tetoCaixa:tetoCaixa, tetoParcela:tetoParcela, tetoFinanceiro:tetoFinanceiro,
+    tetoRisco:tetoRisco, tetoFinal:tetoFinal, maxFinanciavel:maxFinanciavel,
+    limitante: tetoRisco<=tetoFinanceiro ? 'risco'
+             : (tetoParcela<tetoCaixa ? 'parcela' : 'caixa')
+  };
+}
+// O score é não-crescente no preço, então busca binária resolve.
+function buscarTetoRisco(e){
+  var alvo=e.scoreMin;
+  var scoreEm=function(p){
+    var e2=Object.assign({},e,{preco:p});
+    var c2=calcularCustos(e2);
+    return montarScore(e2,c2).valor;
+  };
+  if(scoreEm(0)<alvo) return 0;                    // reprovado em qualquer preço
+  var lo=0, hi=Math.max(e.fipe*2.5, e.orcamento*2.5, 10000);
+  if(scoreEm(hi)>=alvo) return hi;                 // nunca reprova na faixa útil
+  for(var i=0;i<60;i++){ var mid=(lo+hi)/2; if(scoreEm(mid)>=alvo) lo=mid; else hi=mid; }
+  return lo;
 }
 
-function Combo(id){
-  var sel=$(id);
-  var wrap=document.createElement('div'); wrap.className='combo';
-  sel.parentNode.insertBefore(wrap,sel); wrap.appendChild(sel);
-  sel.style.display='none'; sel.setAttribute('tabindex','-1'); sel.setAttribute('aria-hidden','true');
-
-  var inp=document.createElement('input');
-  inp.type='text'; inp.className='combo-inp'; inp.autocomplete='off'; inp.id=id+'_busca';
-  inp.setAttribute('role','combobox'); inp.setAttribute('aria-expanded','false'); inp.setAttribute('aria-autocomplete','list');
-  var seta=document.createElement('span'); seta.className='combo-seta'; seta.textContent='▼';
-  var pop=document.createElement('div'); pop.className='combo-pop'; pop.hidden=true; pop.setAttribute('role','listbox');
-  wrap.appendChild(inp); wrap.appendChild(seta); wrap.appendChild(pop);
-
-  var itens=[], vis=[], ativo=-1, aberto=false;
-
-  function rotulo(){ var o=sel.options[sel.selectedIndex]; return (o&&o.value)?o.textContent:''; }
-
-  function sync(){
-    itens=[];
-    for(var i=0;i<sel.options.length;i++){
-      var o=sel.options[i];
-      if(o.value==='') inp.placeholder=o.textContent; else itens.push({v:o.value,t:o.textContent});
-    }
-    inp.disabled=!itens.length;
-    inp.value=rotulo();
-    fechar();
-  }
-
-  function pintar(q){
-    var termos=norm(q).split(/\s+/).filter(Boolean);
-    vis = termos.length ? itens.filter(function(it){
-      var n=norm(it.t); return termos.every(function(t){ return n.indexOf(t)!==-1; });
-    }) : itens.slice();
-    if(!vis.length){ pop.innerHTML='<div class="combo-vazio">Nada encontrado para “'+esc(q)+'”.</div>'; ativo=-1; return; }
-    var teto=300; // listas gigantes travam o celular se renderizadas inteiras
-    var h='<div class="combo-cnt">'+vis.length+(vis.length===1?' resultado':' resultados')
-      +(vis.length>teto?' · exibindo '+teto+', refine a busca':'')+'</div>';
-    vis.slice(0,teto).forEach(function(it,i){
-      h+='<div class="combo-op'+(i===ativo?' ativo':'')+'" role="option" data-i="'+i+'">'+destacar(it.t,termos)+'</div>';
-    });
-    pop.innerHTML=h;
-  }
-
-  function abrir(q){
-    if(inp.disabled) return;
-    aberto=true; wrap.classList.add('aberto'); pop.hidden=false; inp.setAttribute('aria-expanded','true');
-    pintar(q===undefined?'':q);
-  }
-  function fechar(){
-    aberto=false; wrap.classList.remove('aberto'); pop.hidden=true; inp.setAttribute('aria-expanded','false'); ativo=-1;
-  }
-  function mover(d){
-    if(!aberto){ abrir(''); return; }
-    var max=Math.min(vis.length,300);
-    if(!max) return;
-    ativo=(ativo+d+max)%max;
-    var ops=pop.querySelectorAll('.combo-op');
-    for(var i=0;i<ops.length;i++) ops[i].className='combo-op'+(i===ativo?' ativo':'');
-    if(ops[ativo]) ops[ativo].scrollIntoView({block:'nearest'});
-  }
-  function escolher(i){
-    var it=vis[i]; if(!it) return;
-    sel.value=it.v; inp.value=it.t; fechar();
-    sel.dispatchEvent(new Event('change',{bubbles:true}));
-  }
-
-  inp.addEventListener('focus',function(){ inp.select(); abrir(''); });
-  inp.addEventListener('input',function(){ ativo=-1; abrir(inp.value); });
-  inp.addEventListener('keydown',function(e){
-    if(e.key==='ArrowDown'){ e.preventDefault(); mover(1); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); mover(-1); }
-    else if(e.key==='Enter'){ if(aberto&&ativo>=0){ e.preventDefault(); escolher(ativo); } }
-    else if(e.key==='Escape'){ inp.value=rotulo(); fechar(); }
-  });
-  inp.addEventListener('blur',function(){ setTimeout(function(){ if(!aberto) return; inp.value=rotulo(); fechar(); },120); });
-  // mousedown no painel roubaria o foco antes do clique registrar
-  pop.addEventListener('mousedown',function(e){ e.preventDefault(); });
-  pop.addEventListener('click',function(e){
-    var alvo=e.target.closest?e.target.closest('.combo-op'):null;
-    if(alvo) escolher(parseInt(alvo.getAttribute('data-i'),10));
-  });
-
-  COMBOS[id]={sync:sync};
-  sync();
+/* ============================== PREÇO ALVO ============================== */
+// O alvo desce da FIPE pelos riscos identificados e nunca fica acima do teto.
+function calcularAlvo(e,cst,tt){
+  var desc=C.descBase, motivos=[];
+  function add(p,txt){ if(p>0){ desc+=p; motivos.push(txt+' −'+pct(p*100,0)); } }
+  if(e.correia==='banhada'&&!e.oleoOk) add(0.08,'correia banhada sem óleo comprovado');
+  else if(e.correia==='banhada') add(0.04,'correia banhada a óleo');
+  else if(e.correia==='?') add(0.03,'sincronismo não identificado');
+  else if(cst.sinc.venceNoPeriodo) add(0.02,'sincronismo vence no período');
+  if(e.cambio==='CVT') add(0.03,'câmbio CVT');
+  if(e.cambio==='DCT') add(0.05,'dupla embreagem');
+  var kmEsp=e.kmRef*e.idadeKm;
+  var excKm=kmEsp>0?(e.km-kmEsp)/kmEsp:0;
+  if(excKm>0) add(Math.min(0.10,excKm*0.15),'km acima do esperado');
+  if(e.origem==='frota') add(0.03,'ex-frota');
+  if(e.historico==='nao') add(0.04,'histórico não comprovado');
+  else if(e.historico==='parcial') add(0.02,'histórico parcial');
+  if(e.cautelar==='nao') add(0.02,'cautelar pendente');
+  add(Math.max(0,e.idade-5)*0.01,'idade acima de 5 anos');
+  desc=Math.min(0.35,desc);
+  var alvoBruto=e.fipe*(1-desc);
+  // Nunca apresentar alvo acima do teto: seria mandar mirar onde não se pode ir.
+  var alvo=Math.min(alvoBruto,tt.tetoFinal);
+  return {alvo:Math.max(0,alvo), alvoBruto:alvoBruto, desconto:desc, motivos:motivos,
+          limitadoPeloTeto:alvoBruto>tt.tetoFinal};
 }
 
-// ---------- abas ----------
-var ABAS=['perfil','pagamento','anuncio','resultado'];
-var abaAtual='anuncio';
+/* ============================== ALERTAS ============================== */
+// CRÍTICO impede ou condiciona · ALTO gera desconto · MÉDIO monitorar · INFO conhecimento
+var NIVEL={CRITICO:0,ALTO:1,MEDIO:2,INFO:3};
+function montarAlertas(e,cst,tt,fin){
+  var a=[];
+  function add(nivel,txt){ a.push({nivel:nivel,txt:txt}) }
 
+  if(e.cautelar==='reprovada') add('CRITICO','A cautelar reprovou. Nenhum desconto compensa laudo reprovado — descarte.');
+  else if(e.cautelar==='nao') add('CRITICO','Cautelar não feita. É a única checagem que separa um carro normal de um sinistrado, leiloado ou com restrição. Não feche sem ela.');
+  else if(e.cautelarItens<ITENS_CAUTELAR.length) add('MEDIO','Cautelar aprovada, mas '+(ITENS_CAUTELAR.length-e.cautelarItens)+' de '+ITENS_CAUTELAR.length+' itens do checklist não foram marcados.');
+
+  if(e.correia==='?') add('ALTO','Sincronismo não identificado. Sem saber se é corrente, correia seca ou banhada, não dá para orçar a manutenção nem medir o risco de quebra.');
+  else if(e.correia==='banhada'&&!e.oleoOk) add('ALTO','Correia banhada a óleo sem comprovação do óleo usado. O intervalo do fabricante só vale com o óleo certo — por isso a troca está provisionada em '+brl(cst.sinc.custo)+'.');
+  else if(cst.sinc.venceNoPeriodo&&cst.sinc.custo>0) add('MEDIO','Sincronismo vence dentro do período: '+brl(cst.sinc.custo)+' previstos.');
+
+  if(e.historico==='nao') add('ALTO','Histórico de manutenção não comprovado. Peça as notas antes de negociar preço — sem elas você está comprando a palavra do vendedor.');
+  else if(e.historico==='parcial') add('MEDIO','Histórico parcial. Cubra as lacunas ou desconte o risco.');
+
+  var kmEsp=e.kmRef*e.idadeKm, excKm=kmEsp>0?(e.km-kmEsp)/kmEsp*100:0;
+  if(excKm>35) add('MEDIO','Km '+pct(excKm,0)+' acima do esperado para '+(e.idade<1?'um carro do ano':e.idade+' anos')+'. Chega a '+mil(e.kmFinal)+' km no fim do período, o que castiga a revenda.');
+
+  if(e.financiando&&fin.parcela>0){
+    if(e.parcelaMax>0&&fin.parcela>e.parcelaMax) add('CRITICO','Parcela de '+brl(fin.parcela)+' contra o seu limite de '+brl(e.parcelaMax)+'. Excesso de '+brl(fin.parcela-e.parcelaMax)+' por mês.');
+    if(fin.pctJuros>60) add('ALTO','Juros de '+brl(fin.jurosTotais)+' equivalem a '+pct(fin.pctJuros,0)+' do valor financiado. Encurtar o prazo ou aumentar a entrada reduz isso rápido.');
+    else if(fin.pctJuros>35) add('MEDIO','Juros de '+brl(fin.jurosTotais)+' — '+pct(fin.pctJuros,0)+' do valor financiado.');
+  }
+  if(e.temTroca&&e.fipeMeu>0&&!(e.oferta>0)) add('ALTO','Você marcou carro na troca mas não informou a oferta da loja. Sem esse número o deságio fica de fora da conta.');
+  if(e.perdaTroca>0&&e.fipeMeu>0){
+    var pTroca=e.perdaTroca/e.fipeMeu*100;
+    if(pTroca>8) add('ALTO','A loja paga '+brl(e.oferta)+' no seu carro, '+pct(pTroca,0)+' abaixo da FIPE. São '+brl(e.perdaTroca)+' de desconto que você dá sem ver — negocie a troca separado do preço do carro.');
+    else add('MEDIO','Sua troca sai '+pct(pTroca,0)+' abaixo da FIPE ('+brl(e.perdaTroca)+'). Dentro do normal de loja, mas é margem.');
+  }
+  if(e.origem==='frota') add('MEDIO','Ex-frota: revisão rastreável, mas rodagem intensa e muitos motoristas. Só vale com desconto real.');
+  if(e.fipeManual) add('INFO','O valor da FIPE foi informado manualmente, não consultado. Confira na tabela do mês antes de decidir.');
+  if(cst.sinc.tipo==='corrente') add('INFO','Corrente de comando: sem troca preventiva programada, o que não é o mesmo que ausência de risco.');
+
+  a.sort(function(x,y){return NIVEL[x.nivel]-NIVEL[y.nivel]});
+  return a;
+}
+
+/* ============================== DECISÃO ============================== */
+// §12 — o produto final do app é a decisão, não o score.
+function avaliarDecisao(precoOverride){
+  var e=lerEntrada(precoOverride);
+  var cst=calcularCustos(e);
+  var sc=montarScore(e,cst);
+  var tt=calcularTetos(e);
+  var alv=calcularAlvo(e,cst,tt);
+
+  var aFinanciar=e.financiando?Math.max(0,e.preco-e.troca-e.entradaFin):0;
+  var fin=simularFin(aFinanciar,e.prazo,e.taxa,e.anos*12);
+  var caixaCompra=(e.financiando?e.entradaFin:Math.max(0,e.preco-e.troca))+e.custosEntrada;
+
+  // Trocar não barateia o negócio; o deságio e os juros, sim, custam dinheiro.
+  var tco=cst.compra+e.perdaTroca+fin.juros+cst.uso-cst.revenda.valor;
+  var meses=Math.max(1,e.anos*12);
+  var alertas=montarAlertas(e,cst,tt,fin);
+
+  var descontoNecessario=Math.max(0,e.preco-tt.tetoFinal);   // obrigatório: acima do teto
+  var descontoAoAlvo=Math.max(0,e.preco-alv.alvo);           // desejável: acima do alvo
+  var primeiraOferta=Math.max(0,Math.min(alv.alvo*C.aberturaOferta, tt.tetoFinal));
+
+  // --- regra de decisão ---
+  var decisao, tema, motivos=[];
+  var criticos=alertas.filter(function(x){return x.nivel==='CRITICO'});
+  // Score baixo NO PREÇO PEDIDO não condena o carro: quer dizer que o preço está
+  // alto. Só é descarte quando nenhum preço faz o carro alcançar o score mínimo,
+  // e é exatamente isso que tetoRisco<=0 significa.
+  var carroReprovado=tt.tetoRisco<=0;
+  var financeiroReprovado=tt.tetoFinanceiro<=0;
+
+  if(e.cautelar==='reprovada'){
+    decisao='DESCARTAR'; tema='red';
+    motivos.push('a cautelar reprovou o veículo');
+  } else if(carroReprovado && financeiroReprovado){
+    decisao='DESCARTAR'; tema='red';
+    motivos.push('nenhum preço faz o carro alcançar o score mínimo de '+e.scoreMin+', e a forma de pagamento também não fecha');
+  } else if(carroReprovado){
+    decisao='DESCARTAR'; tema='red';
+    motivos.push('não há preço em que este carro alcance o seu score mínimo de '+e.scoreMin);
+  } else if(financeiroReprovado){
+    // §41 — o problema não é o carro, é a estrutura financeira
+    decisao='CARRO APROVADO · PAGAMENTO REPROVADO'; tema='warn';
+    motivos.push(e.financiando
+      ? 'nem a entrada de '+brl(e.entradaFin)+' mais os custos de entrada cabem no seu caixa de '+brl(e.orcamento)
+      : 'o caixa de '+brl(e.orcamento)+' não cobre nem os custos de entrada');
+  } else if(e.preco>tt.tetoFinal){
+    decisao='NEGOCIAR'; tema='warn';
+    motivos.push('o pedido está '+brl(descontoNecessario)+' acima do seu teto de '+brl(tt.tetoFinal));
+  } else if(descontoAoAlvo>0){
+    // Caber no teto não é motivo para pagar o preço pedido: o alvo é o que o
+    // carro vale depois de descontar os riscos encontrados.
+    decisao='NEGOCIAR'; tema='warn';
+    motivos.push('o pedido cabe no teto, mas está '+brl(descontoAoAlvo)+' acima do alvo de '+brl(alv.alvo));
+  } else if(criticos.length){
+    decisao='COMPRAR COM CONDIÇÃO'; tema='';
+    motivos.push('preço e risco fecham, mas há pendência que precisa ser resolvida antes de assinar');
+  } else {
+    decisao='COMPRAR'; tema='ok';
+    motivos.push('preço dentro do teto, score acima do seu mínimo e nenhuma pendência crítica');
+  }
+
+  return {
+    decisao:decisao, tema:tema, motivos:motivos, criticos:criticos,
+    score:sc.valor, scoreDetalhe:sc.detalhe, classe:classificar(sc.valor),
+    precoPedido:e.preco, precoFipe:e.fipe, precoAlvo:alv.alvo, alvoInfo:alv,
+    primeiraOferta:primeiraOferta,
+    tetoCaixa:tt.tetoCaixa, tetoParcela:tt.tetoParcela, tetoFinanceiro:tt.tetoFinanceiro,
+    tetoRisco:tt.tetoRisco, tetoFinal:tt.tetoFinal, limitante:tt.limitante,
+    maxFinanciavel:tt.maxFinanciavel,
+    descontoNecessario:descontoNecessario, descontoAoAlvo:descontoAoAlvo,
+    desvio:e.fipe>0?(e.preco-e.fipe)/e.fipe*100:0,
+    tco:tco, custoKm:e.kmPeriodo>0?tco/e.kmPeriodo:0, custoMes:tco/meses,
+    custos:cst, fin:fin, aFinanciar:aFinanciar, caixaCompra:caixaCompra,
+    alertas:alertas, e:e,
+    nome:e.nome, ano:e.ano, km:e.km, anos:e.anos, kmPeriodo:e.kmPeriodo, kmFinal:e.kmFinal
+  };
+}
+
+/* ============================== UI ============================== */
+var ABAS=['perfil','pagamento','carro','resultado','comparar'];
 function irAba(nome){
   if(ABAS.indexOf(nome)===-1) return;
   abaAtual=nome;
@@ -1189,213 +1371,760 @@ function irAba(nome){
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
-
-// Barra de contexto: o que está selecionado continua visível em qualquer aba.
-var carroEscolhido='', carroTroca='';
 function contexto(){
   var q=[];
-  q.push(carroEscolhido?'<b>'+esc(carroEscolhido)+'</b>':'nenhum carro escolhido — vá em Anúncio');
-  q.push(Math.round(n('pKmAno')).toLocaleString('pt-BR')+' km/ano');
-  q.push(n('pAnos')+' anos');
-  q.push('orçamento '+brl(n('pOrc')));
-  if(n('pPrazo')>0) q.push(Math.round(n('pPrazo'))+'x a '+n('pTaxa').toFixed(2).replace('.',',')+'%');
-  else q.push('à vista');
-  if($('mTroca').value==='sim'){
-    q.push(n('mOferta')>0 ? 'troca '+brl(n('mOferta'))+(carroTroca?' ('+esc(carroTroca)+')':'')
-                          : 'troca sem oferta informada');
-  }
+  q.push(carroEscolhido?'<b>'+esc(carroEscolhido)+'</b>':'nenhum carro escolhido — vá em Carro');
+  q.push(mil(n('pKmAno'))+' km/ano');
+  q.push(n('pAnos')+(n('pAnos')===1?' ano':' anos'));
+  q.push('caixa '+brl(n('pOrc')));
+  q.push(n('pPrazo')>0?Math.round(n('pPrazo'))+'x a '+pct(n('pTaxa'),2):'à vista');
+  if(v('mTroca')==='sim') q.push(n('mOferta')>0?'troca '+brl(n('mOferta')):'troca sem oferta informada');
   $('ctx').innerHTML=q.join(' · ');
+  pagResumo();
 }
-
+function pagResumo(){
+  var el=$('pagResumo'); if(!el) return;
+  if(!(n('pPrazo')>0)){ el.textContent='Compra à vista — o teto sai do caixa disponível.'; el.style.color='var(--txt2)'; return; }
+  var maxF=financiavelMax(n('pParcelaMax'),Math.round(n('pPrazo')),n('pTaxa'));
+  el.innerHTML='Com parcela de até <b>'+brl(n('pParcelaMax'))+'</b> em '+Math.round(n('pPrazo'))+'x a '+pct(n('pTaxa'),2)
+    +' ao mês, o máximo financiável é <b>'+brl(maxF)+'</b>.';
+  el.style.color='var(--txt2)';
+}
 function resumoTroca(){
-  var el=$('mResumo'), tem=$('mTroca').value==='sim', f=n('mFipe'), o=n('mOferta');
-  if(!tem){ el.textContent='Sem troca.'; el.style.color='var(--txt2)'; return; }
-  if(!(f>0)){ el.textContent='Consulte seu carro na FIPE abaixo, ou digite o valor.'; el.style.color='var(--txt2)'; return; }
-  if(!(o>0)){
-    el.textContent='FIPE '+brl(f)+'. Falta a oferta da loja — sem ela o deságio não é medido.';
-    el.style.color='var(--warn)'; return;
-  }
-  var d=f-o, pct=d/f*100;
-  if(d<=0){ el.textContent='Oferta em linha com a FIPE ou acima. Confira se não há pegadinha no preço do outro carro.'; el.style.color='var(--ok)'; return; }
-  el.textContent='−'+brl(d)+' ('+pct.toFixed(0)+'% abaixo da FIPE)';
-  el.style.color=pct>8?'var(--red)':'var(--warn)';
+  var el=$('mResumo'), tem=v('mTroca')==='sim', f=n('mFipe'), o=n('mOferta');
+  if(!tem){el.textContent='Sem troca.';el.style.color='var(--txt2)';return}
+  if(!(f>0)){el.textContent='Consulte seu carro na FIPE abaixo, ou digite o valor.';el.style.color='var(--txt2)';return}
+  if(!(o>0)){el.textContent='FIPE '+brl(f)+'. Falta a oferta da loja — sem ela o deságio não é medido.';el.style.color='var(--warn)';return}
+  var d=f-o, p=d/f*100;
+  if(d<=0){el.textContent='Oferta em linha com a FIPE ou acima. Confira se a pegadinha não está no preço do outro carro.';el.style.color='var(--ok)';return}
+  el.textContent='−'+brl(d)+' ('+pct(p,0)+' abaixo da FIPE)';
+  el.style.color=p>8?'var(--red)':'var(--warn)';
 }
-
-function resumoPerfil(){ contexto(); }
-
+function sincCautelar(){
+  var s=v('fCautelar');
+  $('cautLista').hidden=(s!=='feita');
+  var el=$('cautResumo');
+  if(s==='nao'){ el.innerHTML='<span style="color:var(--red)">PENDÊNCIA CRÍTICA</span> — não feche sem a cautelar.'; }
+  else if(s==='reprovada'){ el.innerHTML='<span style="color:var(--red)">REPROVADO</span> — nenhum desconto compensa laudo reprovado.'; }
+  else{
+    var m=ITENS_CAUTELAR.filter(function(it){return chk(it[0])}).length;
+    el.innerHTML='<span style="color:var(--ok)">Aprovada</span> — '+m+' de '+ITENS_CAUTELAR.length+' itens conferidos.';
+  }
+}
 function alternarTecnico(){
-  var b=$('tecBloco'), aberto=b.hidden;
-  b.hidden=!aberto;
-  $('btnTec').setAttribute('aria-expanded',String(aberto));
-  $('btnTec').textContent=aberto?'Ocultar ficha técnica':'Ajustar ficha técnica';
+  var b=$('tecBloco'), ab=b.hidden;
+  b.hidden=!ab; $('btnTec').setAttribute('aria-expanded',String(ab));
+  $('btnTec').textContent=ab?'Ocultar ficha técnica':'Ajustar ficha técnica';
+}
+function alternarCfg(){
+  var b=$('cfgBloco'), ab=b.hidden;
+  b.hidden=!ab; $('btnCfg').setAttribute('aria-expanded',String(ab));
+  $('btnCfg').textContent=ab?'Ocultar configurações':'Configurações avançadas';
+}
+function aplicarPerfil(){
+  var p=PERFIS[v('pPerfil')];
+  if(!p) return;
+  Object.keys(p).forEach(function(k){ $(k).value=p[k]; });
+  contexto(); salvarLocal();
+}
+function carregarModelo(){
+  var m=MODELOS.filter(function(x){return x.id===v('fModelo')})[0];
+  if(!m||m.id==='custom') return;
+  $('fCons').value=m.cons; $('fCorreia').value=m.correia;
+  $('fCorreiaKm').value=m.correiaKm; $('fCorreiaCusto').value=m.correiaCusto;
+  $('fCambio').value=m.cambio; $('fComplex').value=m.complex.toFixed(2);
+  if(!v('fNome')||nomeAuto){ $('fNome').value=m.nome; nomeAuto=true; }
+  mostrarFicha({cons:m.cons,cambio:m.cambio,complex:m.complex,sinc:m.correia,
+    sincKm:m.correiaKm,sincCusto:m.correiaCusto,casou:true,
+    ref:'ficha da lista fixa — '+m.nome,motor:'conforme a lista'});
 }
 
-// A FIPE limita requisições por minuto e, quando corta, responde HTML — não JSON.
-// Sem tratar status e timeout, o usuário via só "Unexpected token <".
-function fipeGet(url){
-  var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
-  var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 8000) : null;
-  return fetch(url, ctrl?{signal:ctrl.signal}:undefined).then(function(r){
-    if(timer) clearTimeout(timer);
-    if(r.status===429) throw new Error('limite de consultas atingido, espere um minuto');
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.json().catch(function(){ throw new Error('resposta fora do formato esperado'); });
-  }, function(e){
-    if(timer) clearTimeout(timer);
-    if(e && e.name==='AbortError') throw new Error('tempo esgotado');
-    // "Failed to fetch" não diz nada a quem está na loja olhando um carro.
-    if(e instanceof TypeError) throw new Error('sem conexão');
-    throw e;
-  });
-}
+/* -------- desenho do resultado -------- */
+function avaliar(){
+  var r=avaliarDecisao(); ultimo=r;
+  $('semResultado').hidden=true;
+  $('resultado').style.display='block';
 
-// A mesma cascata serve a dois carros: o do anúncio (prefixo q) e o seu, na
-// troca (prefixo m). Só muda onde a mensagem aparece e o que fazer com o valor.
-function ligarFipe(pre, statusId, aoAchar){
-  var qs=function(suf){ return $(pre+suf); };
-  var st=function(t,cor){ var e=$(statusId); e.textContent=t; e.style.color=cor||'var(--txt2)'; };
+  // veredito
+  $('veredBox').className='vered'+(r.tema?' '+r.tema:'');
+  $('rScore').textContent=Math.round(r.score);
+  $('rScore').style.color=r.classe.cor;
+  $('rDecisao').textContent=r.decisao;
+  $('rDecisao').style.color=r.classe.cor;
+  $('rClasse').innerHTML=esc(r.classe.rot)+' no preço pedido'
+    +(r.score<r.e.scoreMin&&r.tetoRisco>0
+        ? ' — alcança o seu mínimo de '+r.e.scoreMin+' a partir de <b>'+brl(r.tetoRisco)+'</b>'
+        : ' · seu mínimo é '+r.e.scoreMin);
+  $('rVeredito').innerHTML=textoVeredito(r);
 
-  function marcas(){
-    st('Buscando marcas na FIPE…');
-    return fipeGet(FIPE_API).then(function(d){
-      encher(pre+'Marca',d,'codigo','nome','— selecione a marca —');
-      st('Marcas carregadas. Escolha marca, modelo e ano.');
-    }).catch(function(err){
-      encher(pre+'Marca',[],'','','indisponível');
-      st('FIPE indisponível ('+err.message+'). Digite o valor manualmente.','var(--warn)');
-    });
+  // escada de preços
+  $('ePedido').textContent=brl(r.precoPedido);
+  $('eFipe').textContent=brl(r.precoFipe);
+  $('eFipeO').textContent=r.e.fipeManual?'informado manualmente':('consultado · '+(r.e.fipeMes||'—'));
+  $('eAlvo').textContent=brl(r.precoAlvo);
+  $('eAlvoO').textContent=r.alvoInfo.limitadoPeloTeto
+    ? 'limitado pelo teto (alvo bruto seria '+brl(r.alvoInfo.alvoBruto)+')'
+    : pct(r.alvoInfo.desconto*100,0)+' abaixo da FIPE pelos riscos';
+  $('eTeto').textContent=brl(r.tetoFinal);
+  $('eTetoO').textContent='menor entre risco e financeiro';
+
+  // negociação
+  $('nOferta').textContent=brl(r.primeiraOferta);
+  $('nAlvo').textContent=brl(r.precoAlvo);
+  $('nTeto').textContent=brl(r.tetoFinal);
+  $('nTetoO').textContent='limitado por '+({risco:'risco do carro',parcela:'parcela máxima',caixa:'caixa disponível'}[r.limitante]);
+  if(r.descontoNecessario>0){
+    $('nDescL').textContent='Desconto necessário';
+    $('nDesc').textContent=brl(r.descontoNecessario);
+    $('nDesc').style.color='var(--red)';
+    $('nDescO').textContent='obrigatório — o pedido está acima do teto';
+  } else if(r.descontoAoAlvo>0){
+    $('nDescL').textContent='Desconto até o alvo';
+    $('nDesc').textContent=brl(r.descontoAoAlvo);
+    $('nDesc').style.color='var(--warn)';
+    $('nDescO').textContent='cabe no teto, mas o alvo é '+brl(r.precoAlvo);
+  } else {
+    $('nDescL').textContent='Folga até o teto';
+    $('nDesc').textContent=brl(r.tetoFinal-r.precoPedido);
+    $('nDesc').style.color='var(--ok)';
+    $('nDescO').textContent='o pedido já está no alvo ou abaixo';
   }
-  function modelos(){
-    var m=qs('Marca').value;
-    encher(pre+'Ano',[],'','','selecione o modelo');
-    if(!m){ encher(pre+'Modelo',[],'','','selecione a marca'); return; }
-    st('Buscando modelos…');
-    fipeGet(FIPE_API+'/'+m+'/modelos').then(function(d){
-      encher(pre+'Modelo',d.modelos,'codigo','nome','— selecione o modelo —');
-      st(d.modelos.length+' versões. Busque pela versão exata.');
-    }).catch(function(err){ st('Erro ao buscar modelos: '+err.message,'var(--red)'); });
-  }
-  function anos(){
-    var m=qs('Marca').value, mo=qs('Modelo').value;
-    if(!mo){ encher(pre+'Ano',[],'','','selecione o modelo'); return; }
-    st('Buscando anos…');
-    fipeGet(FIPE_API+'/'+m+'/modelos/'+mo+'/anos').then(function(d){
-      encher(pre+'Ano',d,'codigo','nome','— selecione o ano —');
-      st('Escolha o ano.');
-    }).catch(function(err){ st('Erro ao buscar anos: '+err.message,'var(--red)'); });
-  }
-  function valor(){
-    var m=qs('Marca').value, mo=qs('Modelo').value, a=qs('Ano').value;
-    if(!m||!mo||!a) return;
-    st('Consultando valor…');
-    fipeGet(FIPE_API+'/'+m+'/modelos/'+mo+'/anos/'+a).then(function(d){
-      if(d.error){ st('FIPE: '+d.error,'var(--warn)'); return; }
-      aoAchar(d, st);
-    }).catch(function(err){ st('Erro na consulta: '+err.message+'. Digite a FIPE à mão.','var(--red)'); });
-  }
+  $('nTexto').innerHTML=textoNegociacao(r);
 
-  qs('Marca').addEventListener('change',modelos);
-  qs('Modelo').addEventListener('change',anos);
-  qs('Ano').addEventListener('change',valor);
-  return {marcas:marcas};
-}
+  // score explicado
+  $('rCriterios').innerHTML=r.scoreDetalhe.map(function(d){
+    var p100=d.nota*100;
+    var cor=p100>=75?'var(--ok)':(p100>=50?'var(--acc)':'var(--red)');
+    return '<div class="crit"><div class="crit-n">'+esc(d.rotulo)+'</div>'
+      +'<div class="crit-b"><div class="crit-f" style="width:'+p100.toFixed(0)+'%;background:'+cor+'"></div></div>'
+      +'<div class="crit-p" style="color:'+(d.perda>0.5?'var(--red)':'var(--txt2)')+'">'
+      +(d.perda>0.05?('−'+d.perda.toFixed(1)):'0')+' pt</div></div>';
+  }).join('');
+  $('rScoreNota').textContent='Cada critério vale seu peso em pontos; a barra mostra quanto do peso o carro conquistou. '
+    +'Total: '+r.score.toFixed(1)+' de 100.';
 
-function valorFipeNum(txt){
-  return Math.round(parseFloat(String(txt).replace(/[^0-9,]/g,'').replace(',','.'))||0);
-}
+  // alertas — os 3 que decidem
+  var top=r.alertas.slice(0,3);
+  var corN={CRITICO:'var(--red)',ALTO:'var(--warn)',MEDIO:'var(--acc)',INFO:'var(--txt2)'};
+  $('rAlertas').innerHTML=(top.length?top:[{nivel:'INFO',txt:'Nenhum ponto relevante identificado.'}]).map(function(x){
+    return '<div class="al"><span class="al-t" style="color:'+corN[x.nivel]+';border:0.5px solid '+corN[x.nivel]+'">'
+      +x.nivel+'</span><span class="al-x">'+esc(x.txt)+'</span></div>';
+  }).join('')+(r.alertas.length>3?'<div class="muted" style="margin-top:8px">+ '+(r.alertas.length-3)+' pontos menores no relatório.</div>':'');
 
-var fipeAnuncio = null;
-function carregarMarcas(){ if(fipeAnuncio) fipeAnuncio.marcas(); }
+  // custos
+  $('rAnosA').textContent=r.anos+(r.anos===1?' ano':' anos');
+  $('rTco').textContent=brl(r.tco);
+  $('rCustoKm').textContent=brl2(r.custoKm)+'/km';
+  $('rKmTotal').textContent=mil(r.kmPeriodo)+' km no período';
+  $('rCustoMes').textContent=brl(r.custoMes);
+  $('rMesesTx').textContent=(r.anos*12)+' meses';
+  $('rDesvio').textContent=(r.desvio>0?'+':'')+pct(r.desvio);
+  $('rDesvio').style.color=r.desvio>3?'var(--red)':(r.desvio<-3?'var(--ok)':'var(--txt)');
+  $('rDesvioTx').textContent='FIPE '+brl(r.precoFipe);
 
-function aoAcharAnuncio(d, fstatus){
-    var v=valorFipeNum(d.Valor);
-    $('fFipe').value=v;
-    // A FIPE marca zero-km como ano 32000; nesse caso o ano do modelo é o corrente.
-    var ano=parseInt(String(d.AnoModelo),10);
-    if(ano===32000) ano=new Date().getFullYear();
-    if(ano && ano>1990 && ano<2100) $('fAno').value=ano;
-    // Só sobrescreve o apelido enquanto ele for automático — nome digitado é do usuário.
-    if(!$('fNome').value||nomeAuto){ $('fNome').value=marcaLimpa(d.Marca)+' '+d.Modelo; nomeAuto=true; }
-    $('fipeRef').textContent=d.MesReferencia?String(d.MesReferencia).trim():'—';
+  // financiamento
+  if(r.e.financiando&&r.aFinanciar>0){
+    $('boxFin').hidden=false; $('finNota').hidden=true;
+    $('rParcela').textContent=brl(r.fin.parcela);
+    $('rParcela').style.color=(r.e.parcelaMax>0&&r.fin.parcela>r.e.parcelaMax)?'var(--red)':'var(--txt)';
+    $('rParcelaTx').textContent=r.e.prazo+'x · '+pct(r.e.taxa,2)+' a.m.'+(r.e.parcelaMax>0?' · máx '+brl(r.e.parcelaMax):'');
+    $('rFinanciado').textContent=brl(r.aFinanciar);
+    $('rEntradaTx').textContent='entrada '+brl(r.e.entradaFin)+(r.e.troca>0?' + troca '+brl(r.e.troca):'');
+    $('rJuros').textContent=brl(r.fin.jurosTotais);
+    $('rJurosTx').textContent=pct(r.fin.pctJuros,0)+' do valor financiado · total das parcelas '+brl(r.fin.total);
+    $('rCaixa').textContent=brl(r.caixaCompra);
+    $('rCaixaTx').textContent='sai da sua conta no ato';
+  } else if(r.e.financiando){
+    $('boxFin').hidden=true; $('finNota').hidden=false;
+    $('finNota').textContent='Prazo de '+r.e.prazo+'x preenchido, mas entrada de '+brl(r.e.entradaFin)
+      +(r.e.troca>0?' mais '+brl(r.e.troca)+' da troca':'')+' já cobrem os '+brl(r.precoPedido)+' do carro — nada a financiar.';
+  } else { $('boxFin').hidden=true; $('finNota').hidden=true; }
 
-    var ficha=inferirFicha(d.Marca,d.Modelo,d.Combustivel);
-    aplicarFicha(ficha);
-
-    carroEscolhido=marcaLimpa(d.Marca)+' '+d.Modelo+' '+d.AnoModelo;
-    contexto();
-
-    fstatus('FIPE '+d.Valor+' · '+d.Marca+' '+d.Modelo+' '+d.AnoModelo+' · código '+d.CodigoFipe
-      +'. Ficha técnica preenchida abaixo'+(ficha.casou?'':' (motor não reconhecido — confira o sincronismo)')+'.',
-      ficha.casou&&ficha.sinc?'var(--ok)':'var(--warn)');
-}
-
-function aoAcharMeuCarro(d, st){
-  $('mFipe').value=valorFipeNum(d.Valor);
-  // Não pré-preenche a oferta com a FIPE: isso zerava o deságio e dava
-  // "oferta em linha com a FIPE" antes de a loja ter dito qualquer coisa —
-  // um falso negativo justo no número que esta tela existe para pegar.
-  $('mTroca').value='sim';
-  carroTroca=marcaLimpa(d.Marca)+' '+d.Modelo+' '+d.AnoModelo;
-  st('Seu carro: '+d.Valor+' na FIPE de '+String(d.MesReferencia||'').trim()
-    +'. Falta digitar a oferta da loja ao lado.','var(--ok)');
-  resumoTroca();
+  desenharTabelas(r);
+  $('pfAval').textContent='Avaliador de Carro Usado v'+APP_VERSION+' · RitmoProd · gerado em '
+    +new Date().toLocaleString('pt-BR')+' · estimativa a partir dos parâmetros informados; não substitui cautelar nem laudo mecânico.';
   contexto();
-  salvarLocal(); // valor posto por código não dispara change, e sem isto some no reload
+  irAba('resultado');
 }
 
-// ---------- persistência local ----------
-var CAMPOS_P=['pKmAno','pComb','pIpva','pAnos','pOrc','pEstrada','pAnoRef','pKmRef','pEntrada','pLimiar',
-  'pEntradaFin','pPrazo','pTaxa','pParcelaMax','mTroca','mFipe','mOferta'];
+function desenharTabelas(r){
+  var c=r.custos;
+  var linhas=[
+    ['— COMPRA','',true],
+    ['Preço de compra',r.precoPedido],
+    ['Transferência',n('pTransf')],['Cautelar',n('pCautelarC')],['Revisão inicial',n('pRevisao')]
+  ];
+  if(r.e.perdaTroca>0) linhas.push(['Deságio na troca do seu carro',r.e.perdaTroca]);
+  if(r.fin.juros>0) linhas.push(['Juros do financiamento no período',r.fin.juros]);
+  linhas.push(['— USO','',true]);
+  linhas.push(['Combustível ('+c.consMix.toFixed(1).replace('.',',')+' km/L no mix '+Math.round(c.pEstrada)+'% estrada)',c.combustivel]);
+  linhas.push(['IPVA',c.ipva]);
+  linhas.push(['Seguro estimado',c.seguro]);
+  linhas.push(['Manutenção preventiva',c.manutPrev]);
+  linhas.push(['Pneus',c.pneus]);
+  linhas.push(['Freios',c.freios]);
+  linhas.push(['Provisão de risco (câmbio'+(r.e.complex>=1.15?' e turbo':'')+')',c.manutRisco]);
+  linhas.push(['Sincronismo — '+c.sinc.nota,c.sinc.custo]);
+  linhas.push(['— SAÍDA','',true]);
+  linhas.push(['(−) Revenda estimada',-c.revenda.valor]);
+  var h='<thead><tr><th>Item</th><th class="num">Valor</th></tr></thead><tbody>';
+  linhas.forEach(function(x){
+    if(x[2]){ h+='<tr><td colspan="2" class="nm" style="color:var(--txt3);font-family:var(--font-d);font-size:10px;letter-spacing:2px">'+esc(x[0].replace('— ',''))+'</td></tr>'; return; }
+    h+='<tr><td class="nm">'+esc(x[0])+'</td><td class="num" style="color:'+(x[1]<0?'var(--ok)':'var(--txt)')+'">'+brl(Math.abs(x[1]))+'</td></tr>';
+  });
+  h+='<tr><td class="nm" style="font-weight:600">Custo total '+r.anos+(r.anos===1?' ano':' anos')+'</td>'
+    +'<td class="num" style="color:var(--acc);font-weight:600">'+brl(r.tco)+'</td></tr></tbody>';
+  $('tBreak').innerHTML=h;
 
+  $('rPremissas').innerHTML='<b>Revenda estimada:</b> '+brl(c.revenda.valor)+' — '
+    +pct(c.revenda.pctFipeHoje,0)+' da FIPE de hoje. Premissa: '+esc(c.revenda.premissa)
+    +'<br><b>Índice de manutenção '+r.e.complex.toFixed(2).replace('.',',')+':</b> '
+    +(r.e.complex>=1?'+'+pct((r.e.complex-1)*100,0)+' sobre a manutenção base':pct((1-r.e.complex)*100,0)+' abaixo da base')
+    +'; idade acrescenta '+pct((c.fatorIdade-1)*100,0)+'.';
+
+  var kmEsp=r.e.kmRef*r.e.idadeKm, dif=r.km-kmEsp;
+  $('tKm').innerHTML='<tbody>'
+    +'<tr><td class="nm">Km hoje</td><td class="num">'+mil(r.km)+' km</td></tr>'
+    +'<tr><td class="nm">Esperado para '+(r.e.idade<1?'a idade':r.e.idade+' anos')+'</td><td class="num">'+mil(kmEsp)+' km</td></tr>'
+    +'<tr><td class="nm">Diferença</td><td class="num" style="color:'+(dif>0?'var(--warn)':'var(--ok)')+'">'+(dif>0?'+':'')+mil(dif)+' km</td></tr>'
+    +'<tr><td class="nm">Você roda no período</td><td class="num">'+mil(r.kmPeriodo)+' km</td></tr>'
+    +'<tr><td class="nm" style="font-weight:600">Projeção no fim</td><td class="num" style="font-weight:600">'+mil(r.kmFinal)+' km</td></tr>'
+    +'</tbody>';
+
+  var cx=r.scoreDetalhe.filter(function(d){return d.chave==='cambio'})[0];
+  $('rMecanica').innerHTML='<b>Sincronismo:</b> '+esc(c.sinc.nota)
+    +(c.sinc.restante!==undefined?' · faltam ~'+mil(c.sinc.restante)+' km para o próximo vencimento':'')
+    +'<br><b>Câmbio '+esc(CAMBIO_TXT[r.e.cambio]||r.e.cambio)+':</b> nota '+(cx?pct(cx.nota*100,0):'—')
+    +' — considera o tipo, os '+mil(r.kmFinal)+' km projetados e o histórico '
+    +({sim:'comprovado',parcial:'parcial',nao:'não comprovado'}[r.e.historico])+'.';
+}
+
+function textoVeredito(r){
+  var t=[];
+  t.push('<b>'+esc(r.decisao)+'.</b> '+esc(r.motivos.join('; '))+'.');
+  if(r.decisao==='NEGOCIAR'){
+    t.push('Abra em <b>'+brl(r.primeiraOferta)+'</b>, feche em torno de <b>'+brl(r.precoAlvo)
+      +'</b> e não passe de <b>'+brl(r.tetoFinal)+'</b> sem uma evidência nova que reduza o risco.');
+  } else if(r.decisao==='COMPRAR'||r.decisao==='COMPRAR COM CONDIÇÃO'){
+    t.push('O pedido de '+brl(r.precoPedido)+' já está no alvo de <b>'+brl(r.precoAlvo)
+      +'</b> ou abaixo, e dentro do teto de '+brl(r.tetoFinal)+'. Abrir em '+brl(r.primeiraOferta)+' ainda vale a tentativa.');
+    if(r.criticos.length) t.push('Condição: '+esc(r.criticos[0].txt));
+  } else if(r.decisao.indexOf('PAGAMENTO REPROVADO')!==-1){
+    t.push('O problema não é o carro — é a forma de pagamento. '
+      +(r.e.financiando?'Aumente a entrada, alongue o prazo ou eleve a parcela máxima.':'Aumente o caixa disponível ou considere financiar.'));
+  } else {
+    t.push('Não há desconto que compense: '+esc((r.alertas[0]||{txt:'os riscos superam o benefício'}).txt));
+  }
+  return t.join(' ');
+}
+function textoNegociacao(r){
+  var pontos=r.alertas.filter(function(a){return a.nivel==='CRITICO'||a.nivel==='ALTO'}).slice(0,3);
+  var arg=pontos.length
+    ? 'Argumentos para a mesa: '+pontos.map(function(p){return p.txt.split('.')[0]}).join('; ')+'.'
+    : 'Sem pontos fortes de barganha — o desconto terá de vir do preço em si.';
+  return 'A primeira oferta fica '+pct((1-C.aberturaOferta)*100,0)+' abaixo do alvo, para deixar espaço de negociação. '
+    +'A ordem <b>oferta &lt; alvo &lt; teto</b> é sempre respeitada. '+esc(arg);
+}
+
+/* ============================== LISTA E COMPARAÇÃO ============================== */
+function salvar(){
+  avaliar();
+  lista.push(resumoParaLista(ultimo));
+  render(); salvarLocal();
+  irAba('comparar');
+}
+function resumoParaLista(r){
+  return {nome:r.nome, ano:r.ano, km:r.km, score:r.score, classe:r.classe.rot,
+    decisao:r.decisao, precoPedido:r.precoPedido, precoFipe:r.precoFipe,
+    precoAlvo:r.precoAlvo, tetoFinal:r.tetoFinal, descontoNecessario:r.descontoNecessario,
+    custoKm:r.custoKm, tco:r.tco, anos:r.anos, cambio:r.e.cambio, correia:r.e.correia,
+    historico:r.e.historico, idade:r.e.idade, fav:false, sel:false,
+    data:new Date().toISOString()};
+}
+function render(){
+  var t=$('tLista');
+  if(!lista.length){ t.innerHTML='<tbody><tr><td class="muted">Nenhum anúncio salvo ainda.</td></tr></tbody>'; $('boxComparar').hidden=true; return; }
+  var chave=v('ordem')||'score';
+  var ord=lista.slice().sort(function(a,b){
+    if(a.fav!==b.fav) return a.fav?-1:1;
+    if(chave==='score') return b.score-a.score;
+    if(chave==='custoKm') return a.custoKm-b.custoKm;
+    if(chave==='tco') return a.tco-b.tco;
+    if(chave==='preco') return a.precoPedido-b.precoPedido;
+    return b.descontoNecessario-a.descontoNecessario;
+  });
+  var corD={'COMPRAR':'var(--ok)','COMPRAR COM CONDIÇÃO':'var(--acc)','NEGOCIAR':'var(--warn)','DESCARTAR':'var(--red)'};
+  var h='<thead><tr><th class="col-acao"><span class="muted">sel</span></th><th>Carro</th><th class="num">Score</th>'
+    +'<th class="num">Pedido</th><th class="num">FIPE</th><th class="num">Alvo</th><th class="num">Teto</th>'
+    +'<th class="num">Custo/km</th><th>Decisão</th><th class="col-acao"></th></tr></thead><tbody>';
+  ord.forEach(function(r){
+    var i=lista.indexOf(r);
+    h+='<tr>'
+      +'<td class="col-acao"><input type="checkbox" '+(r.sel?'checked':'')+' onchange="marcarSel('+i+',this.checked)" aria-label="Selecionar '+esc(r.nome)+'"></td>'
+      +'<td class="nm">'+(r.fav?'★ ':'')+esc(r.nome)+'<div class="muted">'+esc(r.ano)+' · '+mil(r.km)+' km</div></td>'
+      +'<td class="num"><span class="badge '+classificar(r.score).cls+'">'+Math.round(r.score)+'</span></td>'
+      +'<td class="num">'+brl(r.precoPedido)+'</td><td class="num">'+brl(r.precoFipe)+'</td>'
+      +'<td class="num" style="color:var(--ok)">'+brl(r.precoAlvo)+'</td>'
+      +'<td class="num" style="color:var(--acc)">'+brl(r.tetoFinal)+'</td>'
+      +'<td class="num">'+brl2(r.custoKm)+'</td>'
+      +'<td style="color:'+(corD[r.decisao]||'var(--txt2)')+';font-family:var(--font-b);font-size:12px">'+esc(r.decisao)+'</td>'
+      +'<td class="col-acao" style="white-space:nowrap">'
+        +'<button type="button" class="btn-mini" style="padding:3px 7px" onclick="favoritar('+i+')" aria-label="Favoritar">★</button> '
+        +'<button type="button" class="btn-mini" style="padding:3px 7px" onclick="duplicar('+i+')" aria-label="Duplicar">⧉</button> '
+        +'<button type="button" class="btn-mini" style="padding:3px 7px" onclick="remover('+i+')" aria-label="Excluir">×</button>'
+      +'</td></tr>';
+  });
+  t.innerHTML=h+'</tbody>';
+}
+function marcarSel(i,val){ if(lista[i]){ lista[i].sel=val; salvarLocal(); } }
+function favoritar(i){ if(lista[i]){ lista[i].fav=!lista[i].fav; render(); salvarLocal(); } }
+function duplicar(i){ if(lista[i]){ var c=JSON.parse(JSON.stringify(lista[i])); c.nome=c.nome+' (cópia)'; c.fav=false; c.sel=false; lista.push(c); render(); salvarLocal(); } }
+function remover(i){ lista.splice(i,1); render(); salvarLocal(); }
+function limpar(){ if(confirm('Apagar todos os anúncios salvos?')){ lista=[]; render(); salvarLocal(); } }
+
+function compararSelecionados(){
+  var sel=lista.filter(function(r){return r.sel});
+  if(sel.length<2){ alert('Marque de 2 a 4 anúncios na coluna "sel" para comparar.'); return; }
+  if(sel.length>4){ alert('Compare no máximo 4 por vez. Você marcou '+sel.length+'.'); return; }
+  var campos=[
+    ['Score',function(r){return Math.round(r.score)},'max'],
+    ['Decisão',function(r){return r.decisao},null],
+    ['Preço pedido',function(r){return brl(r.precoPedido)},null],
+    ['FIPE',function(r){return brl(r.precoFipe)},null],
+    ['Desconto necessário',function(r){return brl(r.descontoNecessario)},null],
+    ['Preço alvo',function(r){return brl(r.precoAlvo)},null],
+    ['Teto máximo',function(r){return brl(r.tetoFinal)},null],
+    ['Custo por km',function(r){return brl2(r.custoKm)},'min'],
+    ['Custo total',function(r){return brl(r.tco)},'min'],
+    ['Km',function(r){return mil(r.km)},'min'],
+    ['Idade',function(r){return r.idade+' anos'},'min'],
+    ['Câmbio',function(r){return CAMBIO_TXT[r.cambio]||r.cambio},null],
+    ['Sincronismo',function(r){return {seca:'correia seca',banhada:'correia banhada',corrente:'corrente','?':'não identificado'}[r.correia]},null],
+    ['Histórico',function(r){return {sim:'comprovado',parcial:'parcial',nao:'não comprovado'}[r.historico]},null]
+  ];
+  var h='<thead><tr><th>Critério</th>'+sel.map(function(r){return '<th class="num">'+esc(r.nome)+'</th>'}).join('')+'</tr></thead><tbody>';
+  campos.forEach(function(c){
+    h+='<tr><td class="nm">'+esc(c[0])+'</td>';
+    sel.forEach(function(r){ h+='<td class="num">'+esc(c[1](r))+'</td>'; });
+    h+='</tr>';
+  });
+  $('tComparar').innerHTML=h+'</tbody>';
+
+  // melhor compra: menor custo/km entre os que não são para descartar
+  var viaveis=sel.filter(function(r){return r.decisao!=='DESCARTAR'});
+  var pool=viaveis.length?viaveis:sel;
+  var melhor=pool.slice().sort(function(a,b){return a.custoKm-b.custoKm})[0];
+  var razoes=[];
+  razoes.push('menor custo por km do grupo ('+brl2(melhor.custoKm)+')');
+  if(melhor.score===Math.max.apply(null,pool.map(function(r){return r.score}))) razoes.push('maior score ('+Math.round(melhor.score)+')');
+  if(melhor.descontoNecessario===0) razoes.push('já está dentro do teto, sem depender de desconto');
+  else razoes.push('precisa de '+brl(melhor.descontoNecessario)+' de desconto para caber no teto');
+  if(melhor.historico==='sim') razoes.push('histórico comprovado');
+  $('cMelhor').textContent=melhor.nome;
+  $('cPorque').innerHTML='Escolhido porque:<br>'+razoes.map(function(x,i){return (i+1)+'. '+esc(x)}).join('<br>')
+    +(viaveis.length<sel.length?'<br><span style="color:var(--warn)">'+(sel.length-viaveis.length)+' dos comparados estão marcados para descartar e ficaram fora da escolha.</span>':'');
+  $('boxComparar').hidden=false;
+  $('boxComparar').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ============================== IMPRESSÃO ============================== */
+function cabecalhoImpressao(r){
+  $('phTitulo').textContent=r.nome;
+  var l1=r.ano+' · '+mil(r.km)+' km · pedido '+brl(r.precoPedido)+' · FIPE '+brl(r.precoFipe)
+    +(r.e.fipeManual?' (manual)':(r.e.fipeMes?' ('+r.e.fipeMes+')':''));
+  var l2='Score '+Math.round(r.score)+'/100 · '+r.decisao+' · alvo '+brl(r.precoAlvo)+' · teto '+brl(r.tetoFinal)
+    +(r.descontoNecessario>0?' · desconto necessário '+brl(r.descontoNecessario):'');
+  var l3='Horizonte '+r.anos+(r.anos===1?' ano':' anos')+' · '+mil(r.kmPeriodo)+' km · '
+    +Math.round(r.custos.pEstrada)+'% estrada · gasolina '+brl2(n('pComb'))+'/L';
+  var h=esc(l1)+'<br>'+esc(l2)+'<br>'+esc(l3);
+  if(r.e.financiando&&r.aFinanciar>0){
+    h+='<br>'+esc('Financiado '+brl(r.aFinanciar)+' em '+r.e.prazo+'x de '+brl(r.fin.parcela)+' a '+pct(r.e.taxa,2)
+      +' a.m. · entrada '+brl(r.e.entradaFin)+(r.e.troca>0?' · troca '+brl(r.e.troca):'')
+      +' · juros '+brl(r.fin.jurosTotais)+(r.e.cet>0?' · CET '+pct(r.e.cet,2)+' a.a.':''));
+  }
+  $('phSub').innerHTML=h;
+}
+function imprimir(modo){
+  if(modo==='aval'){
+    if(!ultimo){ alert('Avalie um anúncio antes de gerar o relatório.'); return; }
+    cabecalhoImpressao(ultimo);
+  } else {
+    if(!lista.length){ alert('Nenhum anúncio salvo para imprimir.'); return; }
+    $('phSubLista').textContent=lista.length+(lista.length===1?' anúncio':' anúncios')
+      +' · ordenados por '+(v('ordem')||'score')+' · horizonte '+n('pAnos')+' anos · '+mil(n('pKmAno'))+' km/ano';
+    $('pfLista').textContent='Avaliador de Carro Usado v'+APP_VERSION+' · RitmoProd · '+new Date().toLocaleString('pt-BR');
+  }
+  document.body.classList.add(modo==='aval'?'p-aval':'p-lista');
+  window.print();
+}
+function fimImpressao(){ document.body.classList.remove('p-aval','p-lista'); }
+window.addEventListener('afterprint',fimImpressao);
+if(window.matchMedia){ // iOS nem sempre dispara afterprint
+  var mqP=window.matchMedia('print'), onMq=function(m){ if(!m.matches) fimImpressao(); };
+  if(mqP.addEventListener) mqP.addEventListener('change',onMq); else if(mqP.addListener) mqP.addListener(onMq);
+}
+
+/* ============================== PERSISTÊNCIA ============================== */
+var CAMPOS=['pPerfil','pKmAno','pEstrada','pAnos','pOrc','pLimiar','pAnoRef','pKmRef',
+  'pTransf','pCautelarC','pRevisao','pComb','pIpva','pSeguro','pManutKm','pPneuKm','pPneuC',
+  'pFreioKm','pFreioC','cFForte','cFBoa','cFAceita','cFAtencao',
+  'pEntradaFin','pPrazo','pTaxa','pParcelaMax','pCet','mTroca','mFipe','mOferta'];
+
+function coletarPesos(){
+  var p={}; Object.keys(PESOS_PADRAO).forEach(function(k){ var el=$('w_'+k); p[k]=el?(parseFloat(el.value)||0):PESOS_PADRAO[k]; });
+  return p;
+}
+function aplicarPesosDaTela(){
+  PESOS=coletarPesos();
+  var soma=Object.keys(PESOS).reduce(function(s,k){return s+PESOS[k]},0);
+  var el=$('somaPesos');
+  if(Math.abs(soma-100)<0.01){ el.textContent='Soma: 100 pontos.'; el.style.color='var(--txt2)'; }
+  else { el.textContent='Soma: '+soma.toFixed(0)+' pontos — o score fica fora da escala 0–100 até fechar em 100.'; el.style.color='var(--warn)'; }
+  salvarLocal();
+}
+function resetPesos(){
+  PESOS=Object.assign({},PESOS_PADRAO);
+  Object.keys(PESOS).forEach(function(k){ if($('w_'+k)) $('w_'+k).value=PESOS[k]; });
+  aplicarPesosDaTela();
+}
+function lerFaixas(){
+  FAIXAS={forte:n('cFForte'),boa:n('cFBoa'),aceita:n('cFAceita'),atencao:n('cFAtencao')};
+}
 function salvarLocal(){
   try{
-    var p={}; CAMPOS_P.forEach(function(c){ p[c]=$(c).value; });
-    localStorage.setItem('avaliador_carro',JSON.stringify({v:9,parametros:p,lista:lista}));
-  }catch(e){ /* modo sem storage — export JSON continua funcionando */ }
+    var p={}; CAMPOS.forEach(function(c){ if($(c)) p[c]=$(c).value; });
+    localStorage.setItem('avaliador_carro',JSON.stringify({
+      v:DATA_VERSION, app:APP_VERSION, parametros:p, pesos:PESOS, lista:lista,
+      carro:{nome:v('fNome'),ano:v('fAno'),km:v('fKm'),preco:v('fPreco'),fipe:v('fFipe'),
+        cons:v('fCons'),correia:v('fCorreia'),correiaKm:v('fCorreiaKm'),correiaCusto:v('fCorreiaCusto'),
+        cambio:v('fCambio'),complex:v('fComplex'),hist:v('fHist'),origem:v('fOrigem'),
+        cautelar:v('fCautelar'),oleo:v('fOleo'),
+        escolhido:carroEscolhido, troca:carroTroca, fipeManual:fipeManual, fipeMes:fipeMesRef}
+    }));
+  }catch(e){ /* modo sem storage — exportar JSON continua funcionando */ }
+}
+// §33 — migração entre versões de dados
+function migrar(d){
+  if(!d||typeof d!=='object') return null;
+  var ver=d.v||1;
+  if(ver<4){
+    // v1..v3 guardavam custo de entrada num campo único e histórico em checkbox
+    var p=d.parametros||{};
+    if(p.pEntrada!==undefined&&p.pTransf===undefined){
+      var tot=parseFloat(p.pEntrada)||0;
+      p.pTransf=Math.round(tot*0.55); p.pCautelarC=Math.round(tot*0.16); p.pRevisao=Math.round(tot*0.29);
+    }
+    d.parametros=p; d.v=4;
+  }
+  return d;
 }
 function restaurarLocal(){
   try{
-    var raw=localStorage.getItem('avaliador_carro'); if(!raw) return;
-    var d=JSON.parse(raw);
-    if(d.parametros) CAMPOS_P.forEach(function(c){ if(d.parametros[c]!==undefined) $(c).value=d.parametros[c]; });
-    if(d.lista){ lista=d.lista; render(); }
-  }catch(e){}
+    var raw=localStorage.getItem('avaliador_carro'); if(!raw) return false;
+    var d=migrar(JSON.parse(raw)); if(!d) return false;
+    if(d.parametros) CAMPOS.forEach(function(c){ if($(c)&&d.parametros[c]!==undefined&&d.parametros[c]!=='') $(c).value=d.parametros[c]; });
+    if(d.pesos) Object.keys(PESOS_PADRAO).forEach(function(k){ if(d.pesos[k]!==undefined) PESOS[k]=d.pesos[k]; });
+    if(Array.isArray(d.lista)) lista=d.lista;
+    if(d.carro){
+      var m={nome:'fNome',ano:'fAno',km:'fKm',preco:'fPreco',fipe:'fFipe',cons:'fCons',
+        correia:'fCorreia',correiaKm:'fCorreiaKm',correiaCusto:'fCorreiaCusto',cambio:'fCambio',
+        complex:'fComplex',hist:'fHist',origem:'fOrigem',cautelar:'fCautelar',oleo:'fOleo'};
+      Object.keys(m).forEach(function(k){ if($(m[k])&&d.carro[k]!==undefined&&d.carro[k]!=='') $(m[k]).value=d.carro[k]; });
+      if(d.carro.escolhido) carroEscolhido=d.carro.escolhido;
+      if(d.carro.troca) carroTroca=d.carro.troca;
+      if(d.carro.fipeManual!==undefined) fipeManual=d.carro.fipeManual;
+      if(d.carro.fipeMes) fipeMesRef=d.carro.fipeMes;
+    }
+    return true;
+  }catch(e){ return false; }
 }
-// change só dispara ao sair do campo: digitar e fechar o app perdia o valor
-// até o autosave de 2 minutos. input com espera curta cobre esse buraco.
-var salvarTimer=null;
-function salvarBreve(){ clearTimeout(salvarTimer); salvarTimer=setTimeout(salvarLocal,600); }
-CAMPOS_P.forEach(function(c){
-  $(c).addEventListener('change',salvarLocal);
-  $(c).addEventListener('input',salvarBreve);
-});
-$('fNome').addEventListener('input',function(){ nomeAuto=false; });
-setInterval(salvarLocal,120000);
 
-// ---------- boot ----------
-restaurarLocal();
-Combo('qMarca'); Combo('qModelo'); Combo('mMarca'); Combo('mModelo');
-fipeAnuncio = ligarFipe('q','fipeStatus',aoAcharAnuncio);
-var fipeMeuCarro = ligarFipe('m','mStatus',aoAcharMeuCarro);
-resumoPerfil(); resumoTroca();
-// Primeira visita começa no Perfil; quem já tem dados salvos cai direto no Anúncio.
-var jaUsou=false;
-try{ jaUsou=!!localStorage.getItem('avaliador_carro'); }catch(e){}
-irAba(jaUsou?'anuncio':'perfil');
-CAMPOS_P.forEach(function(c){ $(c).addEventListener('input',resumoPerfil); });
-['mTroca','mFipe','mOferta'].forEach(function(c){ $(c).addEventListener('input',resumoTroca); });
-$('mTroca').addEventListener('change',resumoTroca);
-// O ano de referência é data, não preferência: um valor salvo em 2026 não serve em 2027.
-var ANO_HOJE=new Date().getFullYear();
-if(!(n('pAnoRef')>=ANO_HOJE)) $('pAnoRef').value=ANO_HOJE;
-carregarMarcas();
-fipeMeuCarro.marcas();
+/* ============================== IMPORTAR / EXPORTAR ============================== */
+function exportar(){
+  var p={}; CAMPOS.forEach(function(c){ if($(c)) p[c]=$(c).value; });
+  var dados={app:'avaliador-carro-usado', versao:APP_VERSION, v:DATA_VERSION,
+    data:new Date().toISOString(), parametros:p, pesos:PESOS, faixas:FAIXAS, lista:lista};
+  var b=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download='avaliacao_carros_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  impStatus('Exportado: '+lista.length+' avaliações e '+Object.keys(p).length+' parâmetros.','var(--ok)');
+}
+function impStatus(t,cor){ var e=$('impStatus'); e.textContent=t; e.style.color=cor||'var(--txt2)'; }
+function importar(ev){
+  var f=ev.target.files[0]; if(!f) return;
+  var rd=new FileReader();
+  rd.onerror=function(){ impStatus('Não consegui ler o arquivo.','var(--red)'); };
+  rd.onload=function(x){
+    var d;
+    try{ d=JSON.parse(x.target.result); }
+    catch(err){ impStatus('Arquivo não é um JSON válido.','var(--red)'); ev.target.value=''; return; }
+    if(!d||typeof d!=='object'||(!d.parametros&&!d.lista)){
+      impStatus('JSON válido, mas sem parâmetros nem lista de avaliações. Não importei nada.','var(--red)');
+      ev.target.value=''; return;
+    }
+    d=migrar(d);
+    var nP=0,nL=0;
+    if(d.parametros){
+      var LEG={kmAno:'pKmAno',comb:'pComb',ipva:'pIpva',anos:'pAnos',orc:'pOrc',kmRef:'pKmRef'};
+      Object.keys(d.parametros).forEach(function(k){
+        var id=CAMPOS.indexOf(k)!==-1?k:LEG[k];
+        var val=d.parametros[k];
+        if(id&&$(id)&&val!==undefined&&val!==null&&val!==''){ $(id).value=val; nP++; }
+      });
+    }
+    if(d.pesos){ Object.keys(PESOS_PADRAO).forEach(function(k){ if(d.pesos[k]!==undefined){ PESOS[k]=d.pesos[k]; if($('w_'+k)) $('w_'+k).value=d.pesos[k]; } }); }
+    if(Array.isArray(d.lista)){ lista=d.lista.filter(function(r){return r&&typeof r==='object'&&r.nome!==undefined}); nL=lista.length; render(); }
+    lerFaixas(); aplicarPesosDaTela(); contexto(); resumoTroca(); salvarLocal();
+    impStatus('Arquivo importado: '+nL+' avaliações, '+nP+' parâmetros'
+      +(d.data?' · gerado em '+new Date(d.data).toLocaleDateString('pt-BR'):'')+'.','var(--ok)');
+    ev.target.value='';
+  };
+  rd.readAsText(f);
+}
+function limparAnuncio(){
+  ['fNome'].forEach(function(id){$(id).value=''});
+  $('fPreco').value=0; $('fKm').value=0;
+  nomeAuto=true; ultimo=null;
+  $('resultado').style.display='none'; $('semResultado').hidden=false;
+  $('fichaStatus').hidden=true;
+  carroEscolhido=''; contexto(); salvarLocal();
+}
 
-if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+/* ============================== TESTES ============================== */
+// Roda contra a tela real: preenche campos, avalia e confere invariantes.
+function rodarTestes(){
+  var R=[], estado=null;
+  function guardar(){
+    var s={}; CAMPOS.forEach(function(c){ if($(c)) s[c]=$(c).value; });
+    ['fNome','fAno','fKm','fPreco','fFipe','fCons','fCorreia','fCorreiaKm','fCorreiaCusto',
+     'fCambio','fComplex','fHist','fOrigem','fCautelar','fOleo'].forEach(function(c){ s[c]=v(c); });
+    return s;
+  }
+  function repor(s){ Object.keys(s).forEach(function(k){ if($(k)) $(k).value=s[k]; }); lerFaixas(); }
+  function set(o){ Object.keys(o).forEach(function(k){ if($(k)) $(k).value=o[k]; }); }
+  function ok(nome,cond,detalhe){ R.push({nome:nome,ok:!!cond,detalhe:detalhe||''}); }
+  function base(){
+    set({pAnoRef:2026,pAnos:3,pKmAno:20400,pEstrada:85,pKmRef:12000,pOrc:70000,pLimiar:60,
+      pTransf:1200,pCautelarC:350,pRevisao:650,pComb:6.49,pIpva:4,pSeguro:4,pManutKm:0.11,
+      pPneuKm:50000,pPneuC:2400,pFreioKm:40000,pFreioC:900,
+      pEntradaFin:0,pPrazo:0,pTaxa:1.79,pParcelaMax:1500,pCet:0,
+      mTroca:'nao',mFipe:0,mOferta:0,
+      fAno:2020,fKm:70000,fPreco:80000,fFipe:80000,fCons:12.5,fCorreia:'seca',
+      fCorreiaKm:120000,fCorreiaCusto:1400,fCambio:'AT',fComplex:1.0,
+      fHist:'sim',fOrigem:'particular',fCautelar:'feita',fOleo:'nao'});
+    ITENS_CAUTELAR.forEach(function(it){ if($(it[0])) $(it[0]).checked=true; });
+  }
+
+  estado=guardar();
+  try{
+    // 1 — preço igual à FIPE
+    base(); var r=avaliarDecisao();
+    ok('1. Preço = FIPE', Math.abs(r.desvio)<0.01, 'desvio '+pct(r.desvio,2));
+
+    // 2 — preço abaixo da FIPE melhora o score
+    base(); var alto=avaliarDecisao().score;
+    set({fPreco:68000}); var baixo=avaliarDecisao().score;
+    ok('2. Preço abaixo da FIPE', baixo>alto, 'score '+alto.toFixed(1)+' → '+baixo.toFixed(1));
+
+    // 3 — preço acima da FIPE piora
+    base(); set({fPreco:95000}); var pior=avaliarDecisao().score;
+    ok('3. Preço acima da FIPE', pior<alto, 'score '+alto.toFixed(1)+' → '+pior.toFixed(1));
+
+    // 4 — orçamento menor que o preço limita o teto pelo caixa
+    base(); set({pOrc:40000}); r=avaliarDecisao();
+    ok('4. Orçamento < preço', r.tetoFinanceiro<r.precoPedido&&r.decisao!=='COMPRAR',
+       'teto financeiro '+brl(r.tetoFinanceiro)+' · '+r.decisao);
+
+    // 5 — score abaixo do mínimo reprova
+    base(); set({pLimiar:99}); r=avaliarDecisao();
+    ok('5. Score abaixo do mínimo', r.decisao==='DESCARTAR'&&r.tetoRisco<=r.precoPedido, r.decisao);
+
+    // 6 — financiamento: Price bate com a fórmula fechada e a identidade fecha
+    base(); set({pPrazo:48,pTaxa:1.79,pEntradaFin:20000,pParcelaMax:3000}); r=avaliarDecisao();
+    var i=0.0179, pvT=r.aFinanciar, esperada=pvT*i/(1-Math.pow(1+i,-48));
+    ok('6. Financiamento (PMT)', Math.abs(r.fin.parcela-esperada)<0.01,
+       'parcela '+brl2(r.fin.parcela)+' vs fórmula '+brl2(esperada));
+    ok('6b. Identidade juros', Math.abs(r.fin.total-(pvT+r.fin.jurosTotais))<0.01,
+       'total '+brl2(r.fin.total)+' = PV+juros '+brl2(pvT+r.fin.jurosTotais));
+
+    // 7 — sem financiamento não gera parcela nem juros
+    base(); r=avaliarDecisao();
+    ok('7. Sem financiamento', r.fin.parcela===0&&r.fin.jurosTotais===0&&r.aFinanciar===0, 'tudo zero');
+
+    // 8 — correia que vence entra no custo
+    base(); set({fCorreia:'seca',fCorreiaKm:80000,fCorreiaCusto:1400,fKm:70000}); r=avaliarDecisao();
+    ok('8. Correia vence', r.custos.sinc.venceNoPeriodo&&r.custos.sinc.custo===1400, r.custos.sinc.nota);
+
+    // 9 — correia longe do vencimento não cobra
+    base(); set({fCorreia:'seca',fCorreiaKm:120000,fCorreiaCusto:1400,fKm:10000,pAnos:1,pKmAno:9000});
+    r=avaliarDecisao();
+    ok('9. Correia não vence', !r.custos.sinc.venceNoPeriodo&&r.custos.sinc.custo===0, r.custos.sinc.nota);
+
+    // 10 — cautelar pendente é crítico e condiciona a compra
+    base(); set({fCautelar:'nao',fPreco:60000}); r=avaliarDecisao();
+    ok('10. Cautelar pendente', r.criticos.length>0&&r.decisao==='COMPRAR COM CONDIÇÃO', r.decisao);
+
+    // 11 — cautelar aprovada libera a compra
+    base(); set({fCautelar:'feita',fPreco:60000}); r=avaliarDecisao();
+    ok('11. Cautelar aprovada', r.decisao==='COMPRAR', r.decisao);
+
+    // 12/13 — histórico move o score na direção certa
+    base(); set({fHist:'sim'}); var comHist=avaliarDecisao().score;
+    base(); set({fHist:'nao'}); var semHist=avaliarDecisao().score;
+    ok('12. Histórico comprovado', comHist>semHist, comHist.toFixed(1)+' vs '+semHist.toFixed(1));
+    ok('13. Histórico não comprovado', semHist<comHist-10, 'diferença '+(comHist-semHist).toFixed(1)+' pt');
+
+    // 14 — teto financeiro abaixo do de risco manda no final
+    base(); set({pOrc:50000}); r=avaliarDecisao();
+    ok('14. Financeiro < risco', r.tetoFinal===Math.min(r.tetoFinanceiro,r.tetoRisco)&&r.tetoFinanceiro<r.tetoRisco,
+       'final '+brl(r.tetoFinal));
+
+    // 15 — teto de risco abaixo do financeiro manda no final
+    base(); set({pOrc:500000,pLimiar:75}); r=avaliarDecisao();
+    ok('15. Risco < financeiro', r.tetoFinal===Math.min(r.tetoFinanceiro,r.tetoRisco)&&r.tetoRisco<r.tetoFinanceiro,
+       'final '+brl(r.tetoFinal)+' · limitante '+r.limitante);
+
+    // 16 — acima do teto pede desconto
+    base(); set({pOrc:500000,pLimiar:75,fPreco:200000}); r=avaliarDecisao();
+    ok('16. Carro acima do teto', r.decisao==='NEGOCIAR'&&r.descontoNecessario>0,
+       'desconto '+brl(r.descontoNecessario));
+
+    // 17 — dentro do teto não pede desconto
+    base(); set({fPreco:60000}); r=avaliarDecisao();
+    ok('17. Carro dentro do teto', r.descontoNecessario===0&&r.precoPedido<=r.tetoFinal, r.decisao);
+
+    // 18 — FIPE manual é sinalizada, não fingida
+    base(); var antes=fipeManual; fipeManual=true; r=avaliarDecisao();
+    ok('18. FIPE indisponível/manual', r.e.fipeManual&&r.alertas.some(function(a){return /manualmente/.test(a.txt)}),
+       'alerta de origem presente'); fipeManual=antes;
+
+    // 19/20 — round-trip de exportação/importação
+    base();
+    var pex={}; CAMPOS.forEach(function(c){ if($(c)) pex[c]=$(c).value; });
+    var pacote=JSON.parse(JSON.stringify({v:DATA_VERSION,parametros:pex,pesos:PESOS,lista:[]}));
+    ok('19. Exportação', Object.keys(pacote.parametros).length===CAMPOS.length,
+       Object.keys(pacote.parametros).length+' de '+CAMPOS.length+' campos');
+    CAMPOS.forEach(function(c){ if($(c)) $(c).value=''; });
+    Object.keys(pacote.parametros).forEach(function(k){ if($(k)) $(k).value=pacote.parametros[k]; });
+    var perdidos=CAMPOS.filter(function(c){ return $(c)&&String($(c).value)!==String(pex[c]) });
+    ok('20. Importação', perdidos.length===0, perdidos.length?('perdidos: '+perdidos.join(', ')):'nenhum campo perdido');
+
+    // invariantes estruturais
+    base(); set({pOrc:120000,pPrazo:48,pParcelaMax:1200,pEntradaFin:15000}); r=avaliarDecisao();
+    ok('21. Teto final = menor dos dois', r.tetoFinal===Math.max(0,Math.min(r.tetoFinanceiro,r.tetoRisco)),
+       'fin '+brl(r.tetoFinanceiro)+' · risco '+brl(r.tetoRisco)+' · final '+brl(r.tetoFinal));
+    ok('22. Alvo nunca acima do teto', r.precoAlvo<=r.tetoFinal+0.01,
+       'alvo '+brl(r.precoAlvo)+' · teto '+brl(r.tetoFinal));
+    ok('23. Oferta < alvo <= teto', r.primeiraOferta<=r.precoAlvo+0.01&&r.precoAlvo<=r.tetoFinal+0.01,
+       brl(r.primeiraOferta)+' < '+brl(r.precoAlvo)+' ≤ '+brl(r.tetoFinal));
+    ok('24. Parcela máxima limita o financiável',
+       Math.abs(r.maxFinanciavel-parcelaMaxParaPV(r))<1,
+       'máx financiável '+brl(r.maxFinanciavel));
+
+    // score não-crescente no preço — premissa da busca do teto
+    base(); var mono=true, prev=Infinity, curva=[];
+    for(var p=20000;p<=220000;p+=10000){
+      var s=avaliarDecisao(p).score; curva.push(Math.round(p/1000)+'k:'+s.toFixed(1));
+      if(s>prev+1e-9) mono=false; prev=s;
+    }
+    ok('25. Score não-crescente no preço', mono, curva.slice(0,8).join(' ')+' …');
+
+    // TCO coerente
+    base(); r=avaliarDecisao();
+    var somaUso=r.custos.combustivel+r.custos.ipva+r.custos.seguro+r.custos.manutPrev
+      +r.custos.pneus+r.custos.freios+r.custos.manutRisco+r.custos.sinc.custo;
+    ok('26. TCO = compra + uso − revenda',
+       Math.abs(r.tco-(r.custos.compra+r.e.perdaTroca+r.fin.juros+somaUso-r.custos.revenda.valor))<0.01,
+       brl(r.tco));
+    ok('27. Custo/km e custo/mês', Math.abs(r.custoKm-r.tco/r.kmPeriodo)<1e-9&&Math.abs(r.custoMes-r.tco/(r.anos*12))<1e-9,
+       brl2(r.custoKm)+'/km · '+brl(r.custoMes)+'/mês');
+    ok('28. Nenhum NaN no resultado',
+       [r.score,r.tco,r.custoKm,r.custoMes,r.precoAlvo,r.tetoFinal,r.descontoNecessario].every(isFinite),
+       'todos finitos');
+  } catch(err){
+    R.push({nome:'ERRO durante os testes',ok:false,detalhe:String(err&&err.message||err)});
+  } finally {
+    repor(estado); sincCautelar(); contexto();
+  }
+  return R;
+}
+function parcelaMaxParaPV(r){ return financiavelMax(r.e.parcelaMax,r.e.prazo,r.e.taxa); }
+function mostrarTestes(){
+  var R=rodarTestes(), passou=R.filter(function(x){return x.ok}).length;
+  var h='<table><thead><tr><th>Teste</th><th>Resultado</th><th>Detalhe</th></tr></thead><tbody>';
+  R.forEach(function(x){
+    h+='<tr><td class="nm">'+esc(x.nome)+'</td>'
+      +'<td style="color:'+(x.ok?'var(--ok)':'var(--red)')+'">'+(x.ok?'passou':'FALHOU')+'</td>'
+      +'<td class="muted">'+esc(x.detalhe)+'</td></tr>';
   });
+  h+='</tbody></table><div class="muted" style="margin-top:10px">'+passou+' de '+R.length+' passaram.</div>';
+  $('saidaTestes').innerHTML=h; $('saidaTestes').hidden=false;
 }
+
+/* ============================== BOOT ============================== */
+(function(){
+  // lista fixa de modelos
+  var s=$('fModelo');
+  MODELOS.forEach(function(m){ var o=document.createElement('option'); o.value=m.id; o.textContent=m.nome; s.appendChild(o); });
+  s.value='custom';
+  s.addEventListener('change',carregarModelo);
+
+  // checklist da cautelar
+  $('gradeCautelar').innerHTML=ITENS_CAUTELAR.map(function(it){
+    return '<div class="chk"><input type="checkbox" id="'+it[0]+'" checked><span>'+esc(it[1])+'</span></div>';
+  }).join('');
+  ITENS_CAUTELAR.forEach(function(it){ $(it[0]).addEventListener('change',function(){ sincCautelar(); salvarLocal(); }); });
+
+  // pesos do score
+  $('gradePesos').innerHTML=Object.keys(PESOS_PADRAO).map(function(k){
+    return '<div><label for="w_'+k+'">'+esc(ROTULO_PESO[k])+'</label>'
+      +'<input type="number" id="w_'+k+'" value="'+PESOS_PADRAO[k]+'" min="0" max="100"></div>';
+  }).join('');
+
+  var restaurou=restaurarLocal();
+  Object.keys(PESOS).forEach(function(k){ if($('w_'+k)) $('w_'+k).value=PESOS[k]; });
+  Object.keys(PESOS_PADRAO).forEach(function(k){ $('w_'+k).addEventListener('input',aplicarPesosDaTela); });
+  ['cFForte','cFBoa','cFAceita','cFAtencao'].forEach(function(c){ $(c).addEventListener('input',lerFaixas); });
+  aplicarPesosDaTela(); lerFaixas();
+
+  Combo('qMarca'); Combo('qModelo'); Combo('mMarca'); Combo('mModelo');
+  fipeAnuncio=ligarFipe('q','fipeStatus',aoAcharAnuncio);
+  fipeMeuCarro=ligarFipe('m','mStatus',aoAcharMeuCarro);
+
+  // O ano de referência é data, não preferência: valor salvo em 2026 não serve em 2027.
+  var anoHoje=new Date().getFullYear();
+  if(!(n('pAnoRef')>=anoHoje)) $('pAnoRef').value=anoHoje;
+
+  // change só dispara ao sair do campo: digitar e fechar o app perdia o valor.
+  var tmr=null;
+  function salvarBreve(){ clearTimeout(tmr); tmr=setTimeout(salvarLocal,600); }
+  CAMPOS.forEach(function(c){
+    if(!$(c)) return;
+    $(c).addEventListener('change',function(){ salvarLocal(); contexto(); resumoTroca(); });
+    $(c).addEventListener('input',function(){ salvarBreve(); contexto(); resumoTroca(); });
+  });
+  ['fNome','fAno','fKm','fPreco','fFipe','fCons','fCorreia','fCorreiaKm','fCorreiaCusto',
+   'fCambio','fComplex','fHist','fOrigem','fCautelar','fOleo'].forEach(function(c){
+    $(c).addEventListener('change',salvarLocal); $(c).addEventListener('input',salvarBreve);
+  });
+  $('fNome').addEventListener('input',function(){ nomeAuto=false; });
+  $('fFipe').addEventListener('input',marcarFipeManual);
+
+  $('verApp').textContent='Avaliador v'+APP_VERSION;
+  if(!fipeManual&&fipeMesRef){ $('fipeRef').textContent=fipeMesRef; $('fFipeOrigem').textContent='consultado na FIPE de '+fipeMesRef; }
+  else if(fipeManual&&n('fFipe')>0){ $('fipeRef').textContent='manual'; $('fFipeOrigem').textContent='valor informado manualmente'; }
+  sincCautelar(); resumoTroca(); contexto(); render();
+  irAba(restaurou?'carro':'perfil');
+  carregarMarcas(); fipeMeuCarro.marcas();
+  setInterval(salvarLocal,120000);
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  }
+})();
 </script>
 </body>
 </html>
